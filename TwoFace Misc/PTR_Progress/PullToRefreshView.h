@@ -1,0 +1,134 @@
+//
+//  PullToRefreshView.h
+//  Grant Paul (chpwn)
+//
+//  (based on EGORefreshTableHeaderView)
+//
+//  Created by Devin Doty on 10/14/09October14.
+//  Copyright 2009 enormego. All rights reserved.
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights
+//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//  copies of the Software, and to permit persons to whom the Software is
+//  furnished to do so, subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+//
+
+#import <UIKit/UIKit.h>
+
+#if !defined(__clang__) || __clang_major__ < 3
+#ifndef __bridge
+#define __bridge
+#endif
+
+#ifndef __bridge_retain
+#define __bridge_retain
+#endif
+
+#ifndef __bridge_retained
+#define __bridge_retained
+#endif
+
+#ifndef __autoreleasing
+#define __autoreleasing
+#endif
+
+#ifndef __strong
+#define __strong
+#endif
+
+#ifndef __unsafe_unretained
+#define __unsafe_unretained
+#endif
+
+#ifndef __weak
+#define __weak
+#endif
+#endif
+
+#if __has_feature(objc_arc)
+#define SAFE_ARC_PROP_RETAIN strong
+#define SAFE_ARC_RETAIN(x) (x)
+#define SAFE_ARC_RELEASE(x)
+#define SAFE_ARC_AUTORELEASE(x) (x)
+#define SAFE_ARC_BLOCK_COPY(x) (x)
+#define SAFE_ARC_BLOCK_RELEASE(x)
+#define SAFE_ARC_SUPER_DEALLOC()
+#define SAFE_ARC_AUTORELEASE_POOL_START() @autoreleasepool {
+#define SAFE_ARC_AUTORELEASE_POOL_END() }
+#else
+#define SAFE_ARC_PROP_RETAIN retain
+#define SAFE_ARC_RETAIN(x) ([(x) retain])
+#define SAFE_ARC_RELEASE(x) ([(x) release])
+#define SAFE_ARC_AUTORELEASE(x) ([(x) autorelease])
+#define SAFE_ARC_BLOCK_COPY(x) (Block_copy(x))
+#define SAFE_ARC_BLOCK_RELEASE(x) (Block_release(x))
+#define SAFE_ARC_SUPER_DEALLOC() ([super dealloc])
+#define SAFE_ARC_AUTORELEASE_POOL_START() NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+#define SAFE_ARC_AUTORELEASE_POOL_END() [pool release];
+#endif
+
+typedef enum {
+	kPullToRefreshViewStateUninitialized = 0,
+	kPullToRefreshViewStateNormal,
+	kPullToRefreshViewStateReady,
+	kPullToRefreshViewStateLoading,
+    kPullToRefreshViewStateProgrammaticRefresh,
+	kPullToRefreshViewStateOffline
+} PullToRefreshViewState;
+
+@protocol PullToRefreshViewDelegate;
+
+@class RoundProgressView;
+
+@interface PullToRefreshView : UIView {
+	__unsafe_unretained id<PullToRefreshViewDelegate> delegate;
+	UIScrollView *scrollView;
+	PullToRefreshViewState state;
+
+	UILabel *subtitleLabel;
+	UILabel *statusLabel;
+	CALayer *arrowImage;
+	CALayer *offlineImage;
+//	UIActivityIndicatorView *activityView;
+    RoundProgressView *progressView;
+}
+
+
+- (id)initWithScrollView:(UIScrollView *)scrollView;
+- (void)finishedLoading;
+- (void)beginLoading;
+- (void)containingViewDidUnload;
+- (void)setSubtitleText:(NSString *)newText;
+- (void)setProgress:(float)newProgress;
+- (float)progress;
+
+@property (nonatomic, readonly) UIScrollView *scrollView;
+@property (nonatomic, assign) id<PullToRefreshViewDelegate> delegate;
+@property (nonatomic, assign) PullToRefreshViewState state;
+@property (nonatomic, assign, setter = setProgess:) float progress;
+
+
+
+@end
+
+@protocol PullToRefreshViewDelegate <NSObject>
+
+@optional
+- (void)pullToRefreshViewWasShown:(PullToRefreshView *)view;
+- (void)pullToRefreshViewIsReady:(PullToRefreshView *)view;
+- (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view;
+
+@end

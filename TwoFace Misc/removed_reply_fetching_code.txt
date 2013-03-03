@@ -1,0 +1,261 @@
+/*  NSMutableArray *tweetIdentifiers = [[NSMutableArray alloc]init];
+            
+            for (NSMutableDictionary *dict in [statuses mutableCopy]) {
+
+                NSString *inReplyToID = [dict objectForKey:@"in_reply_to_status_id_str"];
+                
+                BOOL isNotAReply = (inReplyToID == nil || inReplyToID.length == 0);
+                
+                if (!isNotAReply) {
+                    [tweetIdentifiers addObject:[dict objectForKey:@"in_reply_to_status_id_str"]];
+                }
+            }
+            
+            
+             // get the tweets
+             // get the replies
+            
+            NSLog(@"%d entries to enumerate:",tweetIdentifiers.count);
+            NSLog(@"%@",tweetIdentifiers);
+    
+            do {
+                
+                for (NSString *identifier in [tweetIdentifiers mutableCopy]) {
+                    
+                    BOOL alreadyInTimeline = NO;
+                    
+                    for (NSDictionary *dict in statuses) {
+                        if ([[dict objectForKey:@"id_str"]isEqualToString:identifier]) {
+                            NSLog(@"not fetching %@",identifier);
+                            [tweetIdentifiers removeObject:[dict objectForKey:@"id_str"]];
+                            alreadyInTimeline = YES;
+                            break;
+                        }
+                    }
+                    
+                    if (!alreadyInTimeline) {
+                        
+                        if (identifier == nil || identifier.length == 0) {
+                            continue;
+                        }
+                        
+                        NSLog(@"fetching %@",identifier);
+                        
+                        id retrievedTweet = [ad.engine getDetailsForTweet:identifier];
+                        
+                        if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
+                            
+                            if ([retrievedTweet objectForKey:@"error"]) {
+                                NSLog(@"error: %@",[retrievedTweet objectForKey:@"error"]);
+
+                                if ([tweetIdentifiers containsObject:identifier]) {
+                                    [tweetIdentifiers removeObject:identifier];
+                                }
+                                break;
+                            }
+                            
+                            [retrievedTweet removeObjectForKey:@"entities"];
+                            
+                            [statuses addObject:retrievedTweet];
+                            
+                            NSString *in_reply_to_status_id_str = [(NSMutableDictionary *)retrievedTweet objectForKey:@"in_reply_to_status_id_str"];
+                            
+                            if (![tweetIdentifiers containsObject:in_reply_to_status_id_str]) {
+                                [tweetIdentifiers addObject:in_reply_to_status_id_str];
+                            }
+                            
+                            NSString *currentIdentifier = [(NSMutableDictionary *)retrievedTweet objectForKey:@"id_str"];
+                            
+                            if ([tweetIdentifiers containsObject:currentIdentifier]) {
+                                [tweetIdentifiers removeObject:currentIdentifier];
+                            }
+                        }
+                    }
+                }
+                
+                if (tweetIdentifiers.count == 0) {
+                    NSLog(@"breaking");
+                    break;
+                }
+                
+                NSLog(@"%d left",tweetIdentifiers.count);
+                
+                NSLog(@"repeating");
+                
+            } while (YES);
+
+            
+            // first level:
+            // key - most recent identifier
+            // value - conversation dict
+            
+            // Second level (convo dict):
+            // array
+            // Objects:
+            // identifiers array
+            // dictionary: index of convo in identifiers dict mapped to index
+            
+            NSMutableDictionary *conversations = [[NSMutableDictionary alloc]init];
+            
+            for (id tweet in [statuses mutableCopy]) {
+                
+                NSString *in_reply_to_identifier = [tweet objectForKey:@"in_reply_to_status_id_str"];
+                
+                if (in_reply_to_identifier == nil || in_reply_to_identifier.length == 0) {
+                    continue;
+                }
+                
+                NSString *current_identifier = [tweet objectForKey:@"id_str"];
+                
+                if (in_reply_to_identifier == nil || in_reply_to_identifier.length == 0) {
+                    continue;
+                }
+            
+                NSMutableDictionary *convoDict = [conversations objectForKey:in_reply_to_identifier];
+                
+                if (convoDict == nil) {
+                    NSLog(@"");
+                    convoDict = [[NSMutableDictionary alloc]init];
+                }
+                
+               // [conversations removeObjectForKey:in_reply_to_identifier];
+                
+                NSMutableArray *tweets = [convoDict objectForKey:@"tweets"];
+                
+                if (tweets == nil) {
+                    tweets = [[NSMutableArray alloc]init];
+                }
+                
+                [tweets addObject:tweet];
+                
+                
+                //
+                // arrange by date
+                //
+                
+                NSMutableArray *array = [tweets mutableCopy];
+                NSMutableDictionary *the = [NSMutableDictionary dictionary];
+                
+                for (NSDictionary *dict in array) {
+                    NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:dict]];
+                    
+                    BOOL isFacebook = [(NSString *)[dict objectForKey:@"social_network_name"] isEqualToString:@"facebook"];
+                    
+                    NSDate *date = nil;
+                    
+                    if (isFacebook) {
+                        date = [dict objectForKey:@"poster_created_time"];
+                    } else {
+                        date = [self getDateFromTwitterCreatedAt:[dict objectForKey:@"created_at"]];
+                    }
+                    
+                    NSString *time = [NSString stringWithFormat:@"%f",[date timeIntervalSince1970]];
+                    [the setObject:numberInArray forKey:time];
+                }
+                
+                NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:[the allKeys]]; // contains sorted dates, use to fetch number in arrays
+                [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:NO]]];
+                NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
+                
+                for (NSString *number in arrayZ) {
+                    [penultimateArray addObject:[the objectForKey:number]];
+                }
+                
+                
+                NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
+                
+                for (NSString *string in penultimateArray) {
+                    int index = [string intValue];
+                    [final addObject:[array objectAtIndex:index]]; // array obj.. was timeline obj...
+                }
+                
+                [tweets removeAllObjects];
+                [tweets addObjectsFromArray:final]; // bingo!!!
+                
+                NSLog(@"tweets: count %d",tweets.count);
+                
+                //
+                // arrangement done
+                //
+
+                [convoDict setObject:tweets forKey:@"tweets"];
+
+                NSMutableDictionary *indexVsIdentifierDict = [[NSMutableDictionary alloc]init];
+                
+                for (NSMutableDictionary *tweetObj in tweets) {
+                    
+                    NSString *object = [NSString stringWithFormat:@"%d",[statuses indexOfObject:tweetObj]];
+                    NSString *key = [tweetObj objectForKey:@"id_str"];
+
+                    [indexVsIdentifierDict setObject:object forKey:key];
+                }
+
+                [convoDict setObject:indexVsIdentifierDict forKey:@"tweet_map"];
+
+                [conversations setObject:convoDict forKey:current_identifier];
+            }
+            
+            //
+            // Now modify the tweets
+            //
+            
+            NSLog(@"modifying tweets");
+            
+            NSMutableArray *tweetsToRemove = [[NSMutableArray alloc]init];
+            
+            for (NSString *identifier in conversations) {
+                
+                NSMutableDictionary *convoDicty = [conversations objectForKey:identifier];
+                
+                NSMutableArray *tweets = [convoDicty objectForKey:@"tweets"];
+                NSMutableDictionary *tweetMap = [convoDicty objectForKey:@"tweet_map"];
+                
+                if (tweetMap.allKeys.count == 0) {
+                    NSLog(@"no tweet map");
+                    continue;
+                }
+                
+                int indexOfTweetToBeModified = [[tweetMap objectForKey:identifier]intValue];
+                
+                if (indexOfTweetToBeModified == INT_MAX) {
+                    NSLog(@"indexOfTweetToBeModified is equal to INT_MAX");
+                    continue;
+                }
+                
+                NSMutableDictionary *tweet = [statuses objectAtIndex:indexOfTweetToBeModified];
+                
+                if (tweet == nil) {
+                    NSLog(@"No tweet?");
+                    continue;
+                }
+                
+                NSMutableArray *replies = [tweets mutableCopy];
+                [replies removeObject:tweet];
+                
+                for (id obj in replies) {
+                    
+                    int index = [statuses indexOfObject:obj];
+                    
+                    if (index != INT_MAX) {
+                        NSLog(@"Index to remove: %d",index);
+                        [tweetsToRemove addObject:[NSString stringWithFormat:@"%d",index]];
+                    }
+                }
+                
+                [tweet setObject:replies forKey:@"replies"];
+                [statuses replaceObjectAtIndex:indexOfTweetToBeModified withObject:tweet];
+            }
+            
+            for (NSString *obj in tweetsToRemove) {
+                int index = [obj intValue];
+                
+                id obje = [statuses objectAtIndex:index];
+                
+                if ([statuses containsObject:obje]) {
+                    NSLog(@"Removing tweet at index: %d",index);
+                    [statuses removeObjectAtIndex:index];
+                } else {
+                    NSLog(@"failed to remove tweet: Tweet doesn't exist");
+                }
+            }
+*/
