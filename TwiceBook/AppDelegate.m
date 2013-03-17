@@ -566,10 +566,10 @@ NSString * const kFacebookAppID = @"314352998657355";
     // Twitter Selected Users
     //
     
-    NSMutableArray *combinedArrayF = [[NSMutableArray alloc]init];
+    NSMutableArray *combinedArrayF = [NSMutableArray array];
     
-    NSMutableArray *selectedUsersTCloud = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)utc];
-    NSMutableArray *selectedUsersTLocal = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)utl];
+    NSMutableArray *selectedUsersTCloud = [NSMutableArray arrayWithArray:(NSMutableArray *)utc];
+    NSMutableArray *selectedUsersTLocal = [NSMutableArray arrayWithArray:(NSMutableArray *)utl];
     
     for (id obj in deleteArray) {
         if ([selectedUsersTCloud containsObject:obj]) {

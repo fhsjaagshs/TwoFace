@@ -447,6 +447,7 @@
     cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
     cell.detailTextLabel.numberOfLines = 0;
     cell.detailTextLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     cell.textLabel.text = [[[self.post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"poster_name"];
     cell.detailTextLabel.text = [[[self.post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"message"];
@@ -470,7 +471,6 @@
 }
 
 - (id)initWithPost:(NSMutableDictionary *)posty {
-    //self = [super initWithNibName:@"PostDetailViewController" bundle:nil];
     self = [super init];
     if (self) {
         [self setPost:posty];
@@ -561,15 +561,13 @@
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     CGPoint touchPoint = [[touches anyObject] locationInView:self.view];
     CGRect adjustedRect = CGRectMake(self.theImageView.frame.origin.x-5, self.theImageView.frame.origin.y-5, self.theImageView.frame.size.width+10, self.theImageView.frame.size.height+10);
-    BOOL inImageView = CGRectContainsPoint(adjustedRect, touchPoint);
-    if (!inImageView) {
+    if (!CGRectContainsPoint(adjustedRect, touchPoint)) {
         for (UIView *view in self.theImageView.subviews) {
             if ([view isKindOfClass:[UIImageView class]]) {
                 [view removeFromSuperview];
             }
         }
     } else {
-        
         BOOL shouldOverlay = YES;
         
         for (UIView *view in self.theImageView.subviews) {
@@ -579,10 +577,7 @@
         }
         
         if (shouldOverlay) {
-            
-            BOOL isTooSmall = (self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width);
-            
-            if (isTooSmall) {
+            if ((self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width)) {
                 return;
             }
             
@@ -596,16 +591,12 @@
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-    CGPoint touchPoint = [[touches anyObject] locationInView:self.view];
-    BOOL inImageView = CGRectContainsPoint(self.theImageView.frame, touchPoint);
-    if (inImageView) {
-        
-        BOOL isTooSmall = (self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width);
-        
-        if (isTooSmall) {
-            return;
-        }
-        
+    
+    if ((self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width)) {
+        return;
+    }
+    
+    if (CGRectContainsPoint(self.theImageView.frame, [[touches anyObject]locationInView:self.view])) {
         UIImage *shadowNonStretchedImage = [[UIImage alloc]initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"inner-shadow" ofType:@"png"]];
         UIImage *shadow = [shadowNonStretchedImage stretchableImageWithLeftCapWidth:0.0f topCapHeight:0.0f];
         UIImageView *overlayImageView = [[UIImageView alloc]initWithImage:shadow];
