@@ -10,8 +10,6 @@
 
 @implementation IntermediateUserSelectorViewController
 
-@synthesize theTableView;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

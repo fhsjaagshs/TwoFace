@@ -10,8 +10,6 @@
 
 @implementation NewPrefs
 
-@synthesize theTableView;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

@@ -13,8 +13,6 @@
 
 @implementation UserSelectorViewController
 
-@synthesize pull, theTableView, navBar, counter, savedSelectedArrayTwitter, orderedFriendsArray, savedFriendsDict, isFacebook, isImmediateSelection;
-
 - (id)initWithIsFacebook:(BOOL)isfacebook isImmediateSelection:(BOOL)isimdtselection {
     if (self = [super init]) {
         self.isFacebook = isfacebook;

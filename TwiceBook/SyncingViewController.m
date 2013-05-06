@@ -10,8 +10,6 @@
 
 @implementation SyncingViewController
 
-@synthesize theTableView, loggedInUsername;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

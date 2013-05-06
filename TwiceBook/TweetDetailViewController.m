@@ -12,8 +12,6 @@
 
 @implementation TweetDetailViewController
 
-@synthesize tv, username, displayName, theImageView, tweet, navBar;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

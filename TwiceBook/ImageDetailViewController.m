@@ -10,8 +10,6 @@
 
 @implementation ImageDetailViewController
 
-@synthesize navBar, image, shouldShowSaveButton;
-
 - (void)loadView {
     [super loadView];
     self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];

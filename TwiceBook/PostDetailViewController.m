@@ -16,8 +16,6 @@
 
 @implementation PostDetailViewController
 
-@synthesize theImageView, linkButton, displayNameLabel, messageView, navBar, isLoadingImage, commentsTableView, post, isLoadingComments, gradientView, pull;
-
 - (void)loadView {
     [super loadView];
     

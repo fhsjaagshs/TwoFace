@@ -26,8 +26,6 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 @implementation AppDelegate
 
-@synthesize theFetchedUsernames, facebook, keychain, restClient, facebookFriendsDict, engine, window, viewController;
-
 //
 // pic.twitter.com link processing
 //

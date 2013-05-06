@@ -11,8 +11,6 @@
 
 @implementation ViewController
 
-@synthesize timeline, protectedUsers, theTableView, pull;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

@@ -12,8 +12,6 @@
 
 @implementation ReplyViewController
 
-@synthesize replyZone, charactersLeft, bar, navBar, tweet, isFacebook, toID;
-
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
     navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[kAppDelegate facebookFriendsDict]objectForKey:self.toID]componentsSeparatedByString:@" "]firstObjectA]];

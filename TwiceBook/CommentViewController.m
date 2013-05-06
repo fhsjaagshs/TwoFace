@@ -10,8 +10,6 @@
 
 @implementation CommentViewController
 
-@synthesize commentField, postIdentifier, navBar, originalTextViewFrame;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];

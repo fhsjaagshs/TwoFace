@@ -10,8 +10,6 @@
 
 @implementation DraftsViewController
 
-@synthesize theTableView;
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
