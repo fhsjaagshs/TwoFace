@@ -1,5 +1,5 @@
 //
-//  OAuthConsumer.h
+//  OAMutableURLRequest.h
 //  OAuthConsumer
 //
 //  Created by Jon Crosby on 10/19/07.
@@ -24,14 +24,24 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
-
 #import <Foundation/Foundation.h>
-#import "OAToken.h"
 #import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
-#import "OAServiceTicket.h"
+#import "OAToken.h"
+#import "OAHMAC_SHA1SignatureProvider.h"
+
+@interface OAMutableURLRequest : NSMutableURLRequest
+
+@property (nonatomic, assign) NSString *signature;
+@property (nonatomic, assign) NSString *nonce;
+@property (nonatomic, assign) NSString *timestamp;
+
+- (id)initWithURL:(NSURL *)aUrl consumer:(OAConsumer *)aConsumer token:(OAToken *)aToken realm:(NSString *)aRealm signatureProvider:(id<OASignatureProviding, NSObject>)aProvider;
+
+- (id)initWithURL:(NSURL *)aUrl consumer:(OAConsumer *)aConsumer token:(OAToken *)aToken realm:(NSString *)aRealm signatureProvider:(id<OASignatureProviding, NSObject>)aProvider nonce:(NSString *)aNonce timestamp:(NSString *)aTimestamp;
+
+- (void)prepare;
+- (void)setOAuthParameterName:(NSString*)parameterName withValue:(NSString*)parameterValue;
+- (NSArray *)parameters;
+- (void)setParameters:(NSArray *)parameters;
+
+@end

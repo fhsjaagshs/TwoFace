@@ -61,10 +61,9 @@
 		F129B66F157B8237005353EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B66E157B8237005353EB /* AppDelegate.m */; };
 		F129B672157B8237005353EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B671157B8237005353EB /* ViewController.m */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
-		F188BD671694FF2400BF01E4 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD501694FF2400BF01E4 /* FHSTwitterEngine.m */; };
+		F188BD671694FF2400BF01E4 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD501694FF2400BF01E4 /* FHSTwitterEngine.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD681694FF2400BF01E4 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD541694FF2400BF01E4 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD691694FF2400BF01E4 /* Base64TranscoderFHS.c in Sources */ = {isa = PBXBuildFile; fileRef = F188BD561694FF2400BF01E4 /* Base64TranscoderFHS.c */; };
-		F188BD6A1694FF2400BF01E4 /* OAAsynchronousDataFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD591694FF2400BF01E4 /* OAAsynchronousDataFetcher.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD6B1694FF2400BF01E4 /* OAConsumer.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD5B1694FF2400BF01E4 /* OAConsumer.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD6C1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD5D1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD6D1694FF2400BF01E4 /* OAMutableURLRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD5F1694FF2400BF01E4 /* OAMutableURLRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -570,7 +569,6 @@
 				F188BD671694FF2400BF01E4 /* FHSTwitterEngine.m in Sources */,
 				F188BD681694FF2400BF01E4 /* NSString+URLEncoding.m in Sources */,
 				F188BD691694FF2400BF01E4 /* Base64TranscoderFHS.c in Sources */,
-				F188BD6A1694FF2400BF01E4 /* OAAsynchronousDataFetcher.m in Sources */,
 				F188BD6B1694FF2400BF01E4 /* OAConsumer.m in Sources */,
 				F188BD6C1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.m in Sources */,
 				F188BD6D1694FF2400BF01E4 /* OAMutableURLRequest.m in Sources */,

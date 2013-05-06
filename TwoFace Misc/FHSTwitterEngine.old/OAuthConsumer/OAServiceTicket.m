@@ -1,8 +1,8 @@
 //
-//  OAuthConsumer.h
+//  OAServiceTicket.m
 //  OAuthConsumer
 //
-//  Created by Jon Crosby on 10/19/07.
+//  Created by Jon Crosby on 11/5/07.
 //  Copyright 2007 Kaboomerang LLC. All rights reserved.
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,14 +24,25 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
-
-#import <Foundation/Foundation.h>
-#import "OAToken.h"
-#import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
 #import "OAServiceTicket.h"
+
+
+@implementation OAServiceTicket
+@synthesize request, response, didSucceed;
+
+- (id)initWithRequest:(OAMutableURLRequest *)aRequest response:(NSURLResponse *)aResponse didSucceed:(BOOL)success {
+    if (self = [super init]) {
+		self.request = aRequest;
+		self.response = aResponse;
+		self.didSucceed = success;
+	}
+    return self;
+}
+
+- (void)dealloc {
+	[self.request release];
+	[self.response release];
+	[super dealloc];
+}
+
+@end

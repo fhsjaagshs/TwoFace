@@ -25,8 +25,9 @@
 
 
 //
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
+//
+// FHSTwitterEngine OAuthConsumer Version 1.1
+// As modified by Nate Symer (@natesymer)
 //
 
 #import <Foundation/Foundation.h>
@@ -35,3 +36,4 @@
 #import "OAMutableURLRequest.h"
 #import "OARequestParameter.h"
 #import "OAServiceTicket.h"
+#import "OAAsynchronousDataFetcher.h"

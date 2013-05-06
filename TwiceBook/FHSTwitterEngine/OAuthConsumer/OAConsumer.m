@@ -26,7 +26,10 @@
 #import "OAConsumer.h"
 
 @implementation OAConsumer
-@synthesize key, secret;
+
++ (OAConsumer *)consumerWithKey:(NSString *)aKey secret:(NSString *)aSecret {
+    return [[[[self class]alloc]initWithKey:aKey secret:aSecret]autorelease];
+}
 
 - (id)initWithKey:(NSString *)aKey secret:(NSString *)aSecret {
 	if (self = [super init]) {
@@ -37,8 +40,8 @@
 }
 
 - (void)dealloc {
-	[self.key release];
-	[self.secret release];
+    [self setKey:nil];
+    [self setSecret:nil];
 	[super dealloc];
 }
 

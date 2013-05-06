@@ -1,6 +1,5 @@
 //
-//  OAuthConsumer.h
-//  OAuthConsumer
+//  NSString+URLEncoding.h
 //
 //  Created by Jon Crosby on 10/19/07.
 //  Copyright 2007 Kaboomerang LLC. All rights reserved.
@@ -24,14 +23,12 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
-
 #import <Foundation/Foundation.h>
-#import "OAToken.h"
-#import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
-#import "OAServiceTicket.h"
+
+
+@interface NSString (OAURLEncodingAdditions)
+
+- (NSString *)URLEncodedString;
+- (NSString *)URLDecodedString;
+
+@end

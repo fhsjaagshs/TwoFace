@@ -1,5 +1,5 @@
 //
-//  OAuthConsumer.h
+//  OARequestParameter.h
 //  OAuthConsumer
 //
 //  Created by Jon Crosby on 10/19/07.
@@ -24,14 +24,18 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
-
 #import <Foundation/Foundation.h>
-#import "OAToken.h"
-#import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
-#import "OAServiceTicket.h"
+#import "NSString+URLEncoding.h"
+
+@interface OARequestParameter : NSObject
+
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) NSString *value;
+
++ (id)requestParameterWithName:(NSString *)aName value:(NSString *)aValue;
+- (id)initWithName:(NSString *)aName value:(NSString *)aValue;
+- (NSString *)URLEncodedName;
+- (NSString *)URLEncodedValue;
+- (NSString *)URLEncodedNameValuePair;
+
+@end

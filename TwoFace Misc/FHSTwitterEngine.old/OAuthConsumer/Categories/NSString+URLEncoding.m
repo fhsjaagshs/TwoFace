@@ -1,6 +1,5 @@
 //
-//  OAuthConsumer.h
-//  OAuthConsumer
+//  NSString+URLEncoding.m
 //
 //  Created by Jon Crosby on 10/19/07.
 //  Copyright 2007 Kaboomerang LLC. All rights reserved.
@@ -24,14 +23,22 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
+#import "NSString+URLEncoding.h"
 
-#import <Foundation/Foundation.h>
-#import "OAToken.h"
-#import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
-#import "OAServiceTicket.h"
+@implementation NSString (OAURLEncodingAdditions)
+
+- (NSString *)URLEncodedString {
+    CFStringRef url = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)self, NULL, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8); // for some reason, releasing this is disasterous
+    NSString *result = (NSString *)url;
+    [result autorelease];
+	return result;
+}
+
+- (NSString *)URLDecodedString {
+    CFStringRef url = CFURLCreateStringByReplacingPercentEscapesUsingEncoding(kCFAllocatorDefault, (CFStringRef)self, CFSTR(""), kCFStringEncodingUTF8);
+	NSString *result = (NSString *)url;
+	[result autorelease];
+    return result;
+}
+
+@end

@@ -28,7 +28,6 @@
 
 
 @implementation OARequestParameter
-@synthesize name, value;
 
 + (id)requestParameterWithName:(NSString *)aName value:(NSString *)aValue {
 	return [[[[self class]alloc]initWithName:aName value:aValue]autorelease];
@@ -42,25 +41,22 @@
     return self;
 }
 
-- (void)dealloc {
-	[self.name release];
-	[self.value release];
-	[super dealloc];
-}
-
-- (NSString *)URLEncodedName 
-{
+- (NSString *)URLEncodedName {
 	return [self.name URLEncodedString];
 }
 
-- (NSString *)URLEncodedValue 
-{
+- (NSString *)URLEncodedValue {
     return [self.value URLEncodedString];
 }
 
-- (NSString *)URLEncodedNameValuePair 
-{
+- (NSString *)URLEncodedNameValuePair {
     return [NSString stringWithFormat:@"%@=%@", [self URLEncodedName], [self URLEncodedValue]];
+}
+
+- (void)dealloc {
+    [self setName:nil];
+    [self setValue:nil];
+	[super dealloc];
 }
 
 @end

@@ -1,5 +1,5 @@
 //
-//  OAuthConsumer.h
+//  OAConsumer.h
 //  OAuthConsumer
 //
 //  Created by Jon Crosby on 10/19/07.
@@ -24,14 +24,13 @@
 //  THE SOFTWARE.
 
 
-//
-//  FHSTwitterEngine OAuthConsumer Version 1.2.2
-//  As modified by Nate Symer (@natesymer)
-//
-
 #import <Foundation/Foundation.h>
-#import "OAToken.h"
-#import "OAConsumer.h"
-#import "OAMutableURLRequest.h"
-#import "OARequestParameter.h"
-#import "OAServiceTicket.h"
+
+@interface OAConsumer : NSObject
+
+@property (nonatomic, retain) NSString *key;
+@property (nonatomic, retain) NSString *secret;
+
+- (id)initWithKey:(NSString *)aKey secret:(NSString *)aSecret;
+
+@end

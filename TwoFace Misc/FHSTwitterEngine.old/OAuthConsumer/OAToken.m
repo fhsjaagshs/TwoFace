@@ -28,20 +28,10 @@
 
 @implementation OAToken
 
+@synthesize key, secret, verifier;
+
 + (OAToken *)token {
     return [[[[self class]alloc]init]autorelease];
-}
-
-+ (OAToken *)tokenWithKey:(NSString *)aKey secret:(NSString *)aSecret {
-    return [[[[self class]alloc]initWithKey:aKey secret:aSecret]autorelease];
-}
-
-+ (OAToken *)tokenWithHTTPResponseBody:(NSString *)body {
-    return [[[[self class]alloc]initWithHTTPResponseBody:body]autorelease];
-}
-
-+ (OAToken *)tokenWithUserDefaultsUsingServiceProviderName:(NSString *)provider prefix:(NSString *)prefix {
-    return [[[[self class]alloc]initWithUserDefaultsUsingServiceProviderName:provider prefix:prefix]autorelease];
 }
 
 - (NSString *)pin {
@@ -94,15 +84,14 @@
 }
 
 - (id)initWithUserDefaultsUsingServiceProviderName:(NSString *)provider prefix:(NSString *)prefix {
-    self = [super init];
-	if (self) {
+	if (self = [super init]) {
 		NSString *theKey = [[NSUserDefaults standardUserDefaults]stringForKey:[NSString stringWithFormat:@"OAUTH_%@_%@_KEY", prefix, provider]];
 		NSString *theSecret = [[NSUserDefaults standardUserDefaults]stringForKey:[NSString stringWithFormat:@"OAUTH_%@_%@_SECRET", prefix, provider]];
         
-        BOOL nokey = (theKey.length == 0);
-        BOOL nosecret = (theSecret.length == 0);
+        BOOL keyIsEmpty = ((theKey == nil) || (theKey.length == 0));
+        BOOL secretIsEmpty = ((theSecret == nil) || (theSecret.length == 0));
         
-        if ((nokey && nosecret) || (nokey || nosecret)) {
+        if ((keyIsEmpty && secretIsEmpty) || (keyIsEmpty || secretIsEmpty)) {
             return nil;
         }
         
@@ -114,16 +103,17 @@
 }
 
 - (void)dealloc {
-    [self setVerifier:nil];
-    [self setKey:nil];
-    [self setSecret:nil];
+	[self.verifier release];
+	[self.key release];
+	[self.secret release];
 	[super dealloc];
 }
 
-- (void)storeInUserDefaultsWithServiceProviderName:(NSString *)provider prefix:(NSString *)prefix {
+- (int)storeInUserDefaultsWithServiceProviderName:(NSString *)provider prefix:(NSString *)prefix {
 	[[NSUserDefaults standardUserDefaults]setObject:self.key forKey:[NSString stringWithFormat:@"OAUTH_%@_%@_KEY", prefix, provider]];
 	[[NSUserDefaults standardUserDefaults]setObject:self.secret forKey:[NSString stringWithFormat:@"OAUTH_%@_%@_SECRET", prefix, provider]];
 	[[NSUserDefaults standardUserDefaults]synchronize];
+	return 0;
 }
 
 @end
