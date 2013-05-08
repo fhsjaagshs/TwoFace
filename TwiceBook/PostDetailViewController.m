@@ -590,16 +590,16 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     
-    if ((self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width)) {
+    if ((_theImageView.frame.size.height > _theImageView.image.size.height) && (_theImageView.frame.size.width > _theImageView.image.size.width)) {
         return;
     }
     
-    if (CGRectContainsPoint(self.theImageView.frame, [[touches anyObject]locationInView:self.view])) {
+    if (CGRectContainsPoint(_theImageView.frame, [[touches anyObject]locationInView:self.view])) {
         UIImage *shadowNonStretchedImage = [[UIImage alloc]initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"inner-shadow" ofType:@"png"]];
         UIImage *shadow = [shadowNonStretchedImage stretchableImageWithLeftCapWidth:0.0f topCapHeight:0.0f];
         UIImageView *overlayImageView = [[UIImageView alloc]initWithImage:shadow];
-        overlayImageView.frame = self.theImageView.bounds;
-        [self.theImageView addSubview:overlayImageView];
+        overlayImageView.frame = _theImageView.bounds;
+        [_theImageView addSubview:overlayImageView];
     }
 }
 
@@ -612,20 +612,20 @@
 
 - (CGRect)getBGViewRect {
     
-    float mvContentHeight = (self.messageView.frame.origin.y-49)+self.messageView.contentSize.height-8;
-    float mvFrameHeight = (self.messageView.frame.origin.y-49)+self.messageView.frame.size.height;
-    float imgViewInBGViewHeight = (self.theImageView.frame.origin.y-49)+self.theImageView.frame.size.height;
-    float lnkBtnInBGViewHeight = (self.linkButton.frame.origin.y-49)+self.linkButton.frame.size.height;
+    float mvContentHeight = (_messageView.frame.origin.y-49)+_messageView.contentSize.height-8;
+    float mvFrameHeight = (_messageView.frame.origin.y-49)+_messageView.frame.size.height;
+    float imgViewInBGViewHeight = (_theImageView.frame.origin.y-49)+_theImageView.frame.size.height;
+    float lnkBtnInBGViewHeight = (_linkButton.frame.origin.y-49)+_linkButton.frame.size.height;
 
     float height = 0;
 
-    if (self.linkButton.hidden == NO) {
+    if (!_linkButton.hidden) {
         if (lnkBtnInBGViewHeight > height) {
             height = lnkBtnInBGViewHeight;
         }
     }
 
-    if (self.theImageView.hidden == NO) {
+    if (!_theImageView.hidden) {
         if (imgViewInBGViewHeight > height) {
             height = imgViewInBGViewHeight;
         }
@@ -645,7 +645,7 @@
     
     if (height > maxHeight) {
         height = maxHeight;
-        self.messageView.frame = CGRectMake(self.messageView.frame.origin.x, self.messageView.frame.origin.y, self.messageView.frame.size.width, height-33);
+        _messageView.frame = CGRectMake(_messageView.frame.origin.x, _messageView.frame.origin.y, _messageView.frame.size.width, height-33);
     }
     
     height = height+5;
@@ -654,7 +654,7 @@
 }
 
 - (float)getTextHeight {
-    return [self.messageView.text sizeWithFont:self.messageView.font constrainedToSize:CGSizeMake(self.messageView.frame.size.width-50, 999.0f) lineBreakMode:UILineBreakModeTailTruncation].height+10;
+    return [_messageView.text sizeWithFont:_messageView.font constrainedToSize:CGSizeMake(_messageView.frame.size.width-50, 999.0f) lineBreakMode:UILineBreakModeTailTruncation].height+10;
 }
 
 - (void)layoutViews {
@@ -667,31 +667,31 @@
     
     CGRect bgviewFrame = [self getBGViewRect];
     
-    if (self.gradientView == nil) {
+    if (!_gradientView) {
         self.gradientView = [[FHSGradientView alloc]init];
     }
     
-    self.gradientView.frame = bgviewFrame;
+    _gradientView.frame = bgviewFrame;
     
-    if (!self.gradientView.superview) {
-        [self.view addSubview:self.gradientView];
-        [self.view sendSubviewToBack:self.gradientView];
+    if (!_gradientView.superview) {
+        [self.view addSubview:_gradientView];
+        [self.view sendSubviewToBack:_gradientView];
     }
     
-    self.commentsTableView.frame = CGRectMake(0, (bgviewFrame.size.height+49), 320, (self.view.frame.size.height-bgviewFrame.size.height-49));
+    _commentsTableView.frame = CGRectMake(0, (bgviewFrame.size.height+49), 320, (self.view.frame.size.height-bgviewFrame.size.height-49));
     
-    if (self.messageView.frame.size.height < self.messageView.contentSize.height-8) {
-        [self.messageView flashScrollIndicators];
+    if (_messageView.frame.size.height < self.messageView.contentSize.height-8) {
+        [_messageView flashScrollIndicators];
     }
     
-    if (self.commentsTableView.frame.size.height < self.commentsTableView.contentSize.height-8) {
-        [self.commentsTableView flashScrollIndicators];
+    if (_commentsTableView.frame.size.height < _commentsTableView.contentSize.height-8) {
+        [_commentsTableView flashScrollIndicators];
     }    
 }
 - (void)setTitleText {
     NSString *type = [self.post objectForKey:@"type"];
     NSString *timestamp = [[self.post objectForKey:@"poster_created_time"]timeElapsedSinceCurrentDate];
-    self.navBar.topItem.title = [NSString stringWithFormat:@"%@ - %@ ago",[type stringByCapitalizingFirstLetter],timestamp];
+    _navBar.topItem.title = [NSString stringWithFormat:@"%@ - %@ ago",[type stringByCapitalizingFirstLetter],timestamp];
     [self performSelector:@selector(setTitleText) withObject:nil afterDelay:5.0f];
 }
 
