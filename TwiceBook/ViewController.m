@@ -878,7 +878,7 @@
                         [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
                     } else {
                         if (![self.protectedUsers containsObject:username]) {
-                            id lookup = [ad.engine getUserInformationForUsers:[NSArray arrayWithObjects:username, nil] areUsers:YES];
+                            id lookup = [ad.engine lookupUsers:[NSArray arrayWithObjects:username, nil] areIDs:YES];
                             
                             if ([lookup isKindOfClass:[NSArray class]]) {
                                 if ([(NSArray *)lookup count] > 1) {

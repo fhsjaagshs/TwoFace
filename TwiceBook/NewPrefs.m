@@ -91,7 +91,7 @@
                     [[NSUserDefaults standardUserDefaults]setObject:theName forKey:@"fbName"];
                     dispatch_sync(GCDMainThread, ^{
                         @autoreleasepool {
-                            [theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
+                            [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
                         }
                     });
                 }

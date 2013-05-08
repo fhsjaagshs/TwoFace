@@ -169,13 +169,13 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if (self.navBar.alpha == 0) {
-        [self.navBar setAlpha:1];
+    if (_navBar.alpha == 0) {
+        [_navBar setAlpha:1];
         [[UIApplication sharedApplication]setStatusBarHidden:NO];
         [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     }
     [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
-    [self.zoomingImageView setHidden:NO];
+    [_zoomingImageView setHidden:NO];
     [super viewWillAppear:animated];
 }
 
@@ -183,7 +183,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
     [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
-    [self.zoomingImageView setHidden:YES];
+    [_zoomingImageView setHidden:YES];
     [super viewWillDisappear:animated];
 }
 

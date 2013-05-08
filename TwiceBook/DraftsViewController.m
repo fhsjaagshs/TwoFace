@@ -16,14 +16,14 @@
     self.view = [[UIView alloc]initWithFrame:screenBounds];
     [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-64) style:UITableViewStyleGrouped];
-    self.theTableView.delegate = self;
-    self.theTableView.dataSource = self;
-    self.theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:self.theTableView.frame];
+    _theTableView.delegate = self;
+    _theTableView.dataSource = self;
+    _theTableView.backgroundColor = [UIColor clearColor];
+    UIView *bgView = [[UIView alloc]initWithFrame:_theTableView.frame];
     bgView.backgroundColor = [UIColor clearColor];
-    [self.theTableView setBackgroundView:bgView];
-    [self.view addSubview:self.theTableView];
-    [self.view bringSubviewToFront:self.theTableView];
+    [_theTableView setBackgroundView:bgView];
+    [self.view addSubview:_theTableView];
+    [self.view bringSubviewToFront:_theTableView];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select a Draft"];
@@ -32,8 +32,6 @@
     
     [self.view addSubview:bar];
     [self.view bringSubviewToFront:bar];
-    
-    [self startReloadLoop];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -73,15 +71,9 @@
     NSDictionary *draft = [kDraftsArray objectAtIndex:indexPath.row];
     NSString *thumbnailImagePath = (NSString *)[draft objectForKey:@"thumbnailImagePath"];
     
-    UIImage *image = nil;
+    UIImage *image = [UIImage imageWithContentsOfFile:thumbnailImagePath.length?thumbnailImagePath:[draft objectForKey:@"imagePath"]];
     
-    if (thumbnailImagePath) {
-        image = [UIImage imageWithContentsOfFile:thumbnailImagePath];
-    } else {
-        image = [UIImage imageWithContentsOfFile:[draft objectForKey:@"imagePath"]];
-    }
-    
-    if (image != nil) {
+    if (image) {
         cell.accessoryView.hidden = NO;
         [(UIImageView *)cell.accessoryView setImage:image];
     } else {
@@ -120,18 +112,24 @@
 }
 
 - (void)startReloadLoop {
-    if (!self.theTableView.editing) {
-        [self.theTableView reloadData];
+    if (!_theTableView.editing) {
+        [_theTableView reloadData];
     }
     [self performSelector:@selector(startReloadLoop) withObject:nil afterDelay:10.0f];
 }
 
-- (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+- (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    [self startReloadLoop];
 }
 
-- (void)dealloc {
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
+}
+
+- (void)close {
+    [self dismissModalViewControllerAnimated:YES];
 }
 
 @end

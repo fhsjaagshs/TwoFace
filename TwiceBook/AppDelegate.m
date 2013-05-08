@@ -367,6 +367,12 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)fbDidLogin {
+    
+    NSMutableURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://fhsjaagshs.com/nemesis/saveaccesstoken.php?access_token=%@",self.facebook.accessToken]]];
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        NSLog(@"done");
+    }];
+    
     [self saveAccessToken:self.facebook.accessToken andExpirationDate:self.facebook.expirationDate];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }

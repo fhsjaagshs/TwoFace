@@ -14,7 +14,7 @@
 
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
-    navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[kAppDelegate facebookFriendsDict]objectForKey:self.toID]componentsSeparatedByString:@" "]firstObjectA]];
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[kAppDelegate facebookFriendsDict]objectForKey:self.toID]componentsSeparatedByString:@" "]firstObjectA]];
 }
 
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
