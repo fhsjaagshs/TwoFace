@@ -246,14 +246,14 @@
         }
     }
 
-    NSArray *usernameListStrings = [self genIDString:idsToLookUp];
+    NSArray *usernameListStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
     NSMutableArray *errorArray = [NSMutableArray array];
     
     OARequestParameter *includeEntities = [[OARequestParameter alloc]initWithName:@"include_entities" value:@"false"];
     
     NSURL *secondBaseURL = [NSURL URLWithString:@"https://api.twitter.com/1.1/users/lookup.json"];
 
-    for (NSString *idListString in [usernameListStrings mutableCopy]) {
+    for (NSString *idListString in usernameListStrings) {
         OARequestParameter *iden = [[OARequestParameter alloc]initWithName:@"user_id" value:idListString];
         OAMutableURLRequest *requestTwo = [[OAMutableURLRequest alloc] initWithURL:secondBaseURL consumer:consumer token:ad.engine.accessToken realm:nil signatureProvider:nil];
         
@@ -287,12 +287,22 @@
     }
     
     if (uniqueErrors.count == 1) {
-        NSError *theError = [errorArray objectAtIndex:0];
-        qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.localizedDescription);
-    } else {
-        qAlert(@"Multiple Errors", @"There were multiple errors in loading your Twitter friends.");
+        dispatch_sync(GCDMainThread, ^{
+            @autoreleasepool {
+                NSError *theError = (NSError *)[errorArray objectAtIndex:0];
+                if (theError.code != 204) {
+                    qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+                }
+            }
+        });
+    } else if (uniqueErrors.count > 1) {
+        dispatch_sync(GCDMainThread, ^{
+            @autoreleasepool {
+                qAlert(@"Multiple Errors", @"There were multiple errors in loading your Twitter friends.");
+            }
+        });
+        
     }
-    
     [self cacheIDtoUsernameDict:finalCachedUsernamesDict];
     return usernames;
 }
@@ -343,11 +353,7 @@
                 [userInfo removeDuplicates];
                 [ad makeSureUsernameListArraysAreNotNil];
                 [ad.theFetchedUsernames removeAllObjects];
-                
-                for (NSString *string in userInfo) {
-                    [ad.theFetchedUsernames addObject:string];
-                }
-                
+                [ad.theFetchedUsernames addObjectsFromArray:userInfo];
                 [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
                 
                 [self updateListTwitter];

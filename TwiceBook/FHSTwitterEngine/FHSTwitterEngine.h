@@ -355,6 +355,8 @@ extern NSString * const FHSProfileDescriptionKey;
 // Determines your internet status
 + (BOOL)isConnectedToInternet;
 
+- (NSArray *)generateRequestStringsFromArray:(NSArray *)array;
+
 // Determines if entities should be included
 @property (nonatomic, assign) BOOL includeEntities;
 

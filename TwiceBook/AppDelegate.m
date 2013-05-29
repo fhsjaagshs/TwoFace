@@ -130,12 +130,8 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)cacheFetchedUsernames {
-    dispatch_async(GCDBackgroundThread, ^{
-        @autoreleasepool {
-            NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
-            [self.theFetchedUsernames writeToFile:cacheLocation atomically:YES];
-        }
-    });
+    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
+    [self.theFetchedUsernames writeToFile:cacheLocation atomically:YES];
 }
 
 - (NSMutableArray *)getCachedFetchedUsernames {

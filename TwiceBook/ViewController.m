@@ -1049,15 +1049,12 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (self.timeline.count > 0) {
+    if (_timeline.count > 0) {
         
-        NSDictionary *item = [[self.timeline objectAtIndex:indexPath.row]mutableCopy];
-
-        BOOL isFacebook = [(NSString *)[item objectForKey:@"social_network_name"]isEqualToString:@"facebook"];
-    
+        NSDictionary *item = [[_timeline objectAtIndex:indexPath.row]mutableCopy];
         NSString *cellText = nil;
         
-        if (isFacebook) {
+        if ([(NSString *)[item objectForKey:@"social_network_name"]isEqualToString:@"facebook"]) {
             cellText = [item objectForKey:@"message"];
             
             if (cellText.length == 0) {
@@ -1071,21 +1068,19 @@
             cellText = [[cellText substringToIndex:140]stringByAppendingString:@"..."];
         }
 
-        CGSize labelSize = [cellText sizeWithFont:[UIFont systemFontOfSize:17.0] constrainedToSize:CGSizeMake(280, MAXFLOAT) lineBreakMode:UILineBreakModeWordWrap];
+        CGSize labelSize = [cellText sizeWithFont:[UIFont systemFontOfSize:17] constrainedToSize:CGSizeMake(280, 1000) lineBreakMode:UILineBreakModeWordWrap];
         return labelSize.height+35;
-    } else {
-        return 44;
     }
+    return 44;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = self.timeline.count;
+    int count = _timeline.count;
     
     if (count == 0) {
         return 1;
-    } else {
-        return count;
     }
+    return count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1095,17 +1090,15 @@
     if (cell == nil) {
         cell = [[AdditionalLabelCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
-    
-    cell.textLabel.backgroundColor = [UIColor clearColor];    
-    cell.textLabel.highlightedTextColor = [UIColor blackColor];
-    cell.detailTextLabel.backgroundColor = [UIColor clearColor];    
+ 
+    cell.textLabel.highlightedTextColor = [UIColor blackColor];  
     cell.detailTextLabel.highlightedTextColor = [UIColor blackColor];
     
     cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
     cell.detailTextLabel.numberOfLines = 0;
     cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
     
-    if (oneIsCorrect(self.pull.state == kPullToRefreshViewStateLoading, self.timeline.count == 0)) {
+    if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, _timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.additionalLabel.text = nil;
@@ -1125,7 +1118,7 @@
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
             if (oneIsCorrect(kSelectedFriendsDictionary.allKeys.count > 0, usernamesListArray.count > 0)) {
-                if (self.pull.state == kPullToRefreshViewStateNormal) {
+                if (_pull.state == kPullToRefreshViewStateNormal) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";
                 } else {
@@ -1172,9 +1165,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    [self.theTableView deselectRowAtIndexPath:indexPath animated:YES];
+    [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if (self.timeline.count == 0) {
+    if (_timeline.count == 0) {
         return;
     }
 
@@ -1184,7 +1177,7 @@
         return;
     }
     
-    NSMutableDictionary *tappedItem = [[self.timeline objectAtIndex:indexPath.row]mutableCopy];
+    NSMutableDictionary *tappedItem = [[_timeline objectAtIndex:indexPath.row]mutableCopy];
     
     if ([(NSString *)[tappedItem objectForKey:@"social_network_name"]isEqualToString:@"facebook"]) {
         PostDetailViewController *p = [[PostDetailViewController alloc]initWithPost:tappedItem];
