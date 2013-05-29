@@ -18,27 +18,27 @@
     self.view.backgroundColor = [UIColor blackColor];
     
     self.zoomingImageView = [[ZoomingImageView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
-    [self.view addSubview:self.zoomingImageView];
+    [self.view addSubview:_zoomingImageView];
 
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 20, 320, 44)];
-    [self.navBar setBarStyle:UIBarStyleBlackTranslucent];
+    [_navBar setBarStyle:UIBarStyleBlackTranslucent];
     
     UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:@""];
     
-    if (self.shouldShowSaveButton) {
+    if (_shouldShowSaveButton) {
         item.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(saveImage)];
     }
     
     item.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     
-    [self.navBar pushNavigationItem:item animated:YES];
-    [self.view addSubview:self.navBar];
+    [_navBar pushNavigationItem:item animated:YES];
+    [self.view addSubview:_navBar];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showControls) name:kEnteringForegroundNotif object:nil];
     
     self.navBar.topItem.title = [[NSString alloc]initWithFormat:@"%.0f x %.0f", self.image.size.width, self.image.size.height];
-    [self.zoomingImageView setContentSize:self.image.size];
-    [self.zoomingImageView loadImage:self.image];
+    [_zoomingImageView setContentSize:_image.size];
+    [_zoomingImageView loadImage:_image];
     
     [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     
@@ -46,13 +46,13 @@
     [tt setNumberOfTapsRequired:2]; // 2
     [tt setNumberOfTouchesRequired:1]; // 1
     [tt setDelegate:self];
-    [self.zoomingImageView addGestureRecognizer:tt];
+    [_zoomingImageView addGestureRecognizer:tt];
     
     UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imageViewWasTapped)];
     [t setNumberOfTapsRequired:1];
     [t setNumberOfTouchesRequired:1];
     [t setDelegate:self];
-    [self.zoomingImageView addGestureRecognizer:t];
+    [_zoomingImageView addGestureRecognizer:t];
     [t requireGestureRecognizerToFail:tt];
 }
 
@@ -92,13 +92,13 @@
 
 - (id)initWithImage:(UIImage *)imagey {
     if (self = [self init]) {
-        [self setImage:imagey];
+        self.image = imagey;
     }
     return self;
 }
 
 - (void)imageViewWasTapped {
-    if (self.navBar.alpha == 0) {
+    if (_navBar.alpha == 0) {
         [self showControls];
     } else {
         [self hideControls];
@@ -106,10 +106,10 @@
 }
 
 - (void)imageViewWasDoubleTapped:(UIGestureRecognizer *)rec {
-    if (self.zoomingImageView.zoomScale > self.zoomingImageView.minimumZoomScale) {
-        [self.zoomingImageView zoomOut];
+    if (_zoomingImageView.zoomScale > _zoomingImageView.minimumZoomScale) {
+        [_zoomingImageView zoomOut];
     } else {
-        [self.zoomingImageView zoomToPoint:[rec locationInView:self.view] withScale:3 animated:YES];
+        [_zoomingImageView zoomToPoint:[rec locationInView:self.view] withScale:3 animated:YES];
     }
 }
 
@@ -151,7 +151,7 @@
     [UIView setAnimationDuration:0.2];
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    [self.navBar setAlpha:1];
+    [_navBar setAlpha:1];
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
     [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     [UIView commitAnimations];
@@ -162,7 +162,7 @@
     [UIView setAnimationDuration:0.2];
     [UIView setAnimationDelay:0.0];
     [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    [self.navBar setAlpha:0];
+    [_navBar setAlpha:0];
     [[UIApplication sharedApplication]setStatusBarHidden:YES];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
     [UIView commitAnimations];

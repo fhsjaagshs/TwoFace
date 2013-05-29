@@ -762,17 +762,17 @@
         }
     } else {
         
-        if (self.isImmediateSelection) {
-            self.navBar.topItem.title = @"Select User";
+        if (_isImmediateSelection) {
+            _navBar.topItem.title = @"Select User";
         } else {
-            self.navBar.topItem.title = @"Select Users";
+            _navBar.topItem.title = @"Select Users";
         }
         
         if (![ad.engine isAuthorized]) {
             [ad.engine loadAccessToken];
         }
         
-        self.savedSelectedArrayTwitter = usernamesListArray;
+        _savedSelectedArrayTwitter = usernamesListArray;
         
         if (ad.theFetchedUsernames.count == 0) {
             if ([ad.engine isAuthorized]) {

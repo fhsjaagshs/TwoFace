@@ -22,13 +22,13 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadTheCommentsMethinks) name:@"commentsNotif" object:nil];
     
-    NSString *posterName = [self.post objectForKey:@"poster_name"];
-    NSString *postBody = [[self.post objectForKey:@"message"]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSString *imageURL = [self.post objectForKey:@"image_url"];
-    NSString *linkURL = [self.post objectForKey:@"link"];
-    NSString *type = [self.post objectForKey:@"type"];
-    NSArray *comments = [self.post objectForKey:@"comments"];
-    NSString *toName = [self.post objectForKey:@"to_name"];
+    NSString *posterName = [_post objectForKey:@"poster_name"];
+    NSString *postBody = [[_post objectForKey:@"message"]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    NSString *imageURL = [_post objectForKey:@"image_url"];
+    NSString *linkURL = [_post objectForKey:@"link"];
+    NSString *type = [_post objectForKey:@"type"];
+    NSArray *comments = [_post objectForKey:@"comments"];
+    NSString *toName = [_post objectForKey:@"to_name"];
     
     BOOL hasActions = [[self.post objectForKey:@"actions_available"]isEqualToString:@"yes"];
     BOOL hasImage = (imageURL.length > 0);
@@ -106,7 +106,7 @@
     }
 
     if (hasImage) {
-        [self.theImageView setHidden:NO];
+        [_theImageView setHidden:NO];
         
         if (isPhoto) {
             [self loadImageURLMethinks];
@@ -116,33 +116,31 @@
     }
     
     if (hasLink) {
-        self.linkButton.hidden = isPhoto;
+        _linkButton.hidden = isPhoto;
         
         if (oneIsCorrect(postBody.length == 0, [postBody isEqualToString:linkURL])) {
-            NSString *message = [NSString stringWithFormat:@"%@ wants to share a %@ with you. %@.",posterName,type,isPhoto?@"Tap the preview on the right for a full-size image.":@"Please tap \"Visit Link\""];
-            
-            [self.messageView setText:message];
+            _messageView.text = [NSString stringWithFormat:@"%@ wants to share a %@ with you. %@.",posterName,type,isPhoto?@"Tap the preview on the right for a full-size image.":@"Please tap \"Visit Link\""];
         }
         
         if (!hasImage) {
-            CGRect f = self.linkButton.frame;
-            self.linkButton.frame = CGRectMake((f.origin.x/2), MIN(self.messageView.contentSize.height, self.messageView.frame.size.height)+124, f.size.width, f.size.height);
+            CGRect f = _linkButton.frame;
+            _linkButton.frame = CGRectMake((f.origin.x/2), MIN(_messageView.contentSize.height, _messageView.frame.size.height)+124, f.size.width, f.size.height);
         }
     } else {
-        self.linkButton.hidden = YES;
+        _linkButton.hidden = YES;
     }
     
-    aivy = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [aivy setHidesWhenStopped:YES];
-    aivy.center = self.commentsTableView.center;
-    [self.view addSubview:aivy];
+    self.aivy = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [_aivy setHidesWhenStopped:YES];
+    _aivy.center = _commentsTableView.center;
+    [self.view addSubview:_aivy];
     
     if (hasActions) {
         self.pull = [[PullToRefreshView alloc]initWithScrollView:self.commentsTableView];
-        [self.pull setDelegate:self];
-        [self.pull setSubtitleText:@"Comments"];
-        [self.pull setBackgroundColor:[UIColor clearColor]];
-        [self.commentsTableView addSubview:self.pull];
+        [_pull setDelegate:self];
+        [_pull setSubtitleText:@"Comments"];
+        [_pull setBackgroundColor:[UIColor clearColor]];
+        [_commentsTableView addSubview:_pull];
     }
     
     if (comments.count == 0) {
@@ -155,44 +153,44 @@
 
 - (void)adjustImageDimentions {
     
-    if (![[self.post objectForKey:@"type"]isEqualToString:@"photo"]) {
-        if (oneIsCorrect(!self.theImageView.image, self.theImageView.hidden)) {
+    if (![[_post objectForKey:@"type"]isEqualToString:@"photo"]) {
+        if (oneIsCorrect(!_theImageView.image, _theImageView.hidden)) {
             return;
         }
     }
 
-    float imgWidth = self.theImageView.image.size.width;
-    float imgHeight = self.theImageView.image.size.height;
+    float imgWidth = _theImageView.image.size.width;
+    float imgHeight = _theImageView.image.size.height;
     
-    float scaleFactor = MAX(imgHeight/self.theImageView.frame.size.height,imgWidth/self.theImageView.frame.size.width);
+    float scaleFactor = MAX(imgHeight/_theImageView.frame.size.height,imgWidth/_theImageView.frame.size.width);
 
-    float adjustByValueWidth = ((imgWidth/scaleFactor)-self.theImageView.frame.size.width)/2; // subtract from the messageView's width.
-    float adjustByValueHeight = ((imgHeight/scaleFactor)-self.theImageView.frame.size.height)/2; // push the link button down by this much
+    float adjustByValueWidth = ((imgWidth/scaleFactor)-_theImageView.frame.size.width)/2; // subtract from the messageView's width.
+    float adjustByValueHeight = ((imgHeight/scaleFactor)-_theImageView.frame.size.height)/2; // push the link button down by this much
     
-    CGRect m = self.messageView.frame;
-    CGRect l = self.linkButton.frame;
-    CGRect i = self.theImageView.frame;
+    CGRect m = _messageView.frame;
+    CGRect l = _linkButton.frame;
+    CGRect i = _theImageView.frame;
     
-    self.messageView.frame = CGRectMake(m.origin.x, m.origin.y, self.theImageView.frame.origin.x-8, m.size.height);
-    self.linkButton.frame = CGRectMake(l.origin.x, l.origin.y+adjustByValueHeight, l.size.width, l.size.height);
-    self.theImageView.frame = CGRectMake(i.origin.x-adjustByValueWidth, i.origin.y-(adjustByValueHeight/5), (imgWidth/scaleFactor), (imgHeight/scaleFactor));
+    _messageView.frame = CGRectMake(m.origin.x, m.origin.y, _theImageView.frame.origin.x-8, m.size.height);
+    _linkButton.frame = CGRectMake(l.origin.x, l.origin.y+adjustByValueHeight, l.size.width, l.size.height);
+    _theImageView.frame = CGRectMake(i.origin.x-adjustByValueWidth, i.origin.y-(adjustByValueHeight/5), (imgWidth/scaleFactor), (imgHeight/scaleFactor));
 }
 
 - (CGRect)getTextRect {
-    CGSize constrainedRect = CGSizeMake(self.messageView.frame.size.width, MAXFLOAT);
-    CGSize textSize = [self.messageView.text sizeWithFont:self.messageView.font constrainedToSize:constrainedRect lineBreakMode:UILineBreakModeWordWrap];
-    return CGRectMake(self.messageView.frame.origin.x, self.messageView.frame.origin.y, textSize.width, textSize.height);
+    CGSize constrainedRect = CGSizeMake(_messageView.frame.size.width, MAXFLOAT);
+    CGSize textSize = [_messageView.text sizeWithFont:_messageView.font constrainedToSize:constrainedRect lineBreakMode:UILineBreakModeWordWrap];
+    return CGRectMake(_messageView.frame.origin.x, _messageView.frame.origin.y, textSize.width, textSize.height);
 }
 
 - (NSString *)imageInCachesDir {
-    NSString *imageName = [[self.post objectForKey:@"id"]stringByAppendingString:@".png"];
+    NSString *imageName = [[_post objectForKey:@"id"]stringByAppendingString:@".png"];
     return [kCachesDirectory stringByAppendingPathComponent:imageName];
 }
 
 - (void)removeImageViewSpinner {
     for (UIView *view in self.view.subviews) {
         if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
-            if (![view isEqual:aivy]) {
+            if (![view isEqual:_aivy]) {
                 [view removeFromSuperview];
             }
         }
@@ -200,8 +198,9 @@
 }
 
 - (void)loadImageURLMethinks {
-    if ([[NSFileManager defaultManager]fileExistsAtPath:[self imageInCachesDir]]) {
-        [self.theImageView setImage:[UIImage imageWithContentsOfFile:[self imageInCachesDir]]];
+    NSString *imageInCachesDir = [self imageInCachesDir];
+    if ([[NSFileManager defaultManager]fileExistsAtPath:imageInCachesDir]) {
+        [_theImageView setImage:[UIImage imageWithContentsOfFile:imageInCachesDir]];
         [self layoutViews];
         return;
     }
@@ -209,9 +208,9 @@
     if (![FHSTwitterEngine isConnectedToInternet]) {
         [self removeImageViewSpinner];
         UIImage *caution = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Caution" ofType:@"png"]];
-        [self.theImageView setImage:caution];
-        self.theImageView.backgroundColor = [UIColor clearColor];
-        self.theImageView.layer.borderWidth = 0;
+        [_theImageView setImage:caution];
+        _theImageView.backgroundColor = [UIColor clearColor];
+        _theImageView.layer.borderWidth = 0;
         [self layoutViews];
         return;
     }
@@ -221,7 +220,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
     UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    aiv.center = self.theImageView.center;
+    aiv.center = _theImageView.center;
     [self.view addSubview:aiv];
     [self.view bringSubviewToFront:aiv];
     [aiv startAnimating];
@@ -231,7 +230,6 @@
     NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL([self.post objectForKey:@"object_id"]),ad.facebook.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
-    
     [req setHTTPMethod:@"GET"];
     
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -239,7 +237,7 @@
         self.isLoadingComments = NO;
         
         if (![ad.facebook isPendingRequests]) {
-            if (!self.isLoadingImage) {
+            if (!_isLoadingImage) {
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             }
         }
@@ -247,21 +245,15 @@
         if (error) {
             [self removeImageViewSpinner];
             UIImage *caution = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Caution" ofType:@"png"]];
-            [self.theImageView setImage:caution];
-            self.theImageView.backgroundColor = [UIColor clearColor];
-            self.theImageView.layer.borderWidth = 0;
+            [_theImageView setImage:caution];
+            _theImageView.backgroundColor = [UIColor clearColor];
+            _theImageView.layer.borderWidth = 0;
             [self layoutViews];
         } else {
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             NSDictionary *resultDict = [NSDictionary dictionaryWithDictionary:(NSDictionary *)result];
             NSArray *images = [resultDict objectForKey:@"images"];
-            NSDictionary *imageContents = nil;
-            if (images.count > 1) {
-                imageContents = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[images objectAtIndex:1]];
-            } else {
-                imageContents = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[images objectAtIndex:0]];
-            }
-            
+            NSDictionary *imageContents = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[images objectAtIndex:(images.count > 1)?1:0]];
             [self getImageAtURL:[imageContents objectForKey:@"source"]];
         }
     }];
@@ -269,19 +261,17 @@
 
 - (void)loadTheCommentsMethinks {
     
-    BOOL hasActions = [[self.post objectForKey:@"actions_available"]isEqualToString:@"yes"];
-    
-    if (!hasActions) {
+    if ([[_post objectForKey:@"actions_available"]isEqualToString:@"no"]) {
         return;
     }
     
     if (![FHSTwitterEngine isConnectedToInternet]) {
-        [self.pull finishedLoading];
+        [_pull finishedLoading];
         return;
     }
 
     if ([(NSArray *)[self.post objectForKey:@"comments"]count] == 0) {
-        [aivy startAnimating];
+        [_aivy startAnimating];
     }
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
@@ -289,10 +279,9 @@
     
     AppDelegate *ad = kAppDelegate;
     
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL([self.post objectForKey:@"id"]),ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL([_post objectForKey:@"id"]),ad.facebook.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
-    
     [req setHTTPMethod:@"GET"];
     
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -304,8 +293,6 @@
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             }
         }
-        
-        [self.pull finishedLoading];
         
         if (!error) {
             NSMutableArray *timeline = [ad.viewController timeline];
@@ -316,6 +303,15 @@
             
             NSMutableArray *parsedComments = [[NSMutableArray alloc]init];
             
+            NSDateFormatter *df = [[NSDateFormatter alloc]init];
+            // [df setTimeZone:[NSTimeZone timeZoneWithName:@"America/Los_Angeles"]];
+            [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
+            
+            NSLocale *usLocale = [[NSLocale alloc]initWithLocaleIdentifier:@"en_US"];
+            [df setLocale:usLocale];
+            [df setDateStyle:NSDateFormatterLongStyle];
+            [df setFormatterBehavior:NSDateFormatterBehavior10_4];
+            
             for (NSDictionary *rawComment in comments) {
                 NSMutableDictionary *comment = [[NSMutableDictionary alloc]init];
                 
@@ -323,7 +319,7 @@
                 NSString *posterName = [[rawComment objectForKey:@"from"]objectForKey:@"name"];
                 NSString *posterID = [[rawComment objectForKey:@"from"]objectForKey:@"id"];
                 NSString *message = [rawComment objectForKey:@"message"];
-                NSDate *created_time = [self getDateFromFacebookCreatedAt:[rawComment objectForKey:@"created_time"]];
+                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"created_time"]];
                 
                 [comment setObject:created_time forKey:@"created_time"];
                 [comment setObject:postID forKey:@"post_id"];
@@ -340,26 +336,21 @@
                 [parsedComments addObject:dictionary];
             }
             
-            int index = [timeline indexOfObject:self.post];
+            int index = [timeline indexOfObject:_post];
             
-            if (index < INT16_MAX) {
-                [self.post setObject:parsedComments forKey:@"comments"];
+            if (index < INT_MAX) {
+                [_post setObject:parsedComments forKey:@"comments"];
                 [ad.viewController.timeline replaceObjectAtIndex:index withObject:self.post];
                 [ad cacheTimeline];
             }
             
-            [self.commentsTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+            [_commentsTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
             [self layoutViews];
-            [aivy stopAnimating];
+            [_aivy stopAnimating];
         }
+        
+        [_pull finishedLoading];
     }];
-}
-
-- (NSDate *)getDateFromFacebookCreatedAt:(NSString *)facebookDate {
-    NSDateFormatter *df = [[NSDateFormatter alloc]init];
-    [df setTimeZone:[NSTimeZone timeZoneWithName:@"America/Los_Angeles"]];
-    [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
-    return [df dateFromString:facebookDate];
 }
 
 - (void)getImageAtURL:(NSString *)imageURLz {
@@ -368,20 +359,20 @@
     
     if ([[NSFileManager defaultManager]fileExistsAtPath:cachepath]) {
         NSData *data = [NSData dataWithContentsOfFile:cachepath];
-        [self.theImageView setImage:[UIImage imageWithData:data]];
+        [_theImageView setImage:[UIImage imageWithData:data]];
 
         if (![[kAppDelegate facebook]isPendingRequests]) {
-            if (!self.isLoadingComments) {
+            if (!_isLoadingComments) {
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             }
         }
         [self layoutViews];
     } else {
-        self.isLoadingImage = YES;
+        _isLoadingImage = YES;
         [self removeImageViewSpinner];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        aiv.center = self.theImageView.center;
+        aiv.center = _theImageView.center;
         [self.view addSubview:aiv];
         [self.view bringSubviewToFront:aiv];
         [aiv startAnimating];
@@ -394,20 +385,20 @@
             
             if (error) {
                 UIImage *caution = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Caution" ofType:@"png"]];
-                [self.theImageView setImage:caution];
-                self.theImageView.backgroundColor = [UIColor clearColor];
-                self.theImageView.layer.borderWidth = 0;
+                [_theImageView setImage:caution];
+                _theImageView.backgroundColor = [UIColor clearColor];
+                _theImageView.layer.borderWidth = 0;
             } else {
                 NSString *savepath = [self imageInCachesDir];
                 [data writeToFile:savepath atomically:NO];
                 UIImage *image = [[UIImage alloc]initWithData:data];
-                [self.theImageView setImage:image];
+                [_theImageView setImage:image];
             }
 
-            self.isLoadingImage = NO;
+            _isLoadingImage = NO;
             
             if (![[kAppDelegate facebook]isPendingRequests]) {
-                if (!self.isLoadingComments) {
+                if (!_isLoadingComments) {
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 }
             }
@@ -421,7 +412,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *cellText = [[[self.post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"message"];
+    NSString *cellText = [[[_post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"message"];
     UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
     CGSize constraintSize = CGSizeMake(300.0f, MAXFLOAT);
     CGSize labelSize = [cellText sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:UILineBreakModeWordWrap];
@@ -429,7 +420,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[self.post objectForKey:@"comments"]count];
+    return [[_post objectForKey:@"comments"]count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -457,7 +448,7 @@
 }
 
 - (void)showReply {
-    CommentViewController *cvc = [[CommentViewController alloc]initWithPostID:[self.post objectForKey:@"id"]];
+    CommentViewController *cvc = [[CommentViewController alloc]initWithPostID:[_post objectForKey:@"id"]];
     [self presentModalViewController:cvc animated:YES];
 }
 
@@ -518,12 +509,12 @@
 }
 
 - (void)linkAction {
-    NSString *linkURL = [self.post objectForKey:@"link"];
+    NSString *linkURL = [_post objectForKey:@"link"];
     [[UIApplication sharedApplication]openURL:[NSURL URLWithString:linkURL]];
 }
 
 - (void)showImageDetailViewer {
-    if (!self.isLoadingImage) {
+    if (!_isLoadingImage) {
         
         if (![[NSFileManager defaultManager]fileExistsAtPath:[self imageInCachesDir]]) {
             return;
@@ -537,7 +528,7 @@
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
     CGPoint touchPoint = [[touches anyObject] locationInView:self.view];
-    CGRect adjustedRect = CGRectMake(self.theImageView.frame.origin.x-5, self.theImageView.frame.origin.y-5, self.theImageView.frame.size.width+10, self.theImageView.frame.size.height+10);
+    CGRect adjustedRect = CGRectMake(_theImageView.frame.origin.x-5, _theImageView.frame.origin.y-5, _theImageView.frame.size.width+10, _theImageView.frame.size.height+10);
     BOOL inImageView = CGRectContainsPoint(adjustedRect, touchPoint);
     if (inImageView) {
         for (UIView *view in self.theImageView.subviews) {
@@ -546,7 +537,7 @@
             }
         }
         
-        BOOL isTooSmall = (self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width);
+        BOOL isTooSmall = (_theImageView.frame.size.height > _theImageView.image.size.height) && (_theImageView.frame.size.width > _theImageView.image.size.width);
         
         if (isTooSmall) {
             return;
@@ -558,9 +549,9 @@
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
     CGPoint touchPoint = [[touches anyObject] locationInView:self.view];
-    CGRect adjustedRect = CGRectMake(self.theImageView.frame.origin.x-5, self.theImageView.frame.origin.y-5, self.theImageView.frame.size.width+10, self.theImageView.frame.size.height+10);
+    CGRect adjustedRect = CGRectMake(_theImageView.frame.origin.x-5, _theImageView.frame.origin.y-5, _theImageView.frame.size.width+10, _theImageView.frame.size.height+10);
     if (!CGRectContainsPoint(adjustedRect, touchPoint)) {
-        for (UIView *view in self.theImageView.subviews) {
+        for (UIView *view in _theImageView.subviews) {
             if ([view isKindOfClass:[UIImageView class]]) {
                 [view removeFromSuperview];
             }
@@ -568,22 +559,22 @@
     } else {
         BOOL shouldOverlay = YES;
         
-        for (UIView *view in self.theImageView.subviews) {
+        for (UIView *view in _theImageView.subviews) {
             if ([view isKindOfClass:[UIImageView class]]) {
                 shouldOverlay = NO;
             }
         }
         
         if (shouldOverlay) {
-            if ((self.theImageView.frame.size.height > self.theImageView.image.size.height) && (self.theImageView.frame.size.width > self.theImageView.image.size.width)) {
+            if ((_theImageView.frame.size.height > _theImageView.image.size.height) && (_theImageView.frame.size.width > _theImageView.image.size.width)) {
                 return;
             }
             
             UIImage *shadowNonStretchedImage = [[UIImage alloc]initWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"inner-shadow" ofType:@"png"]];
             UIImage *shadow = [shadowNonStretchedImage stretchableImageWithLeftCapWidth:0.0f topCapHeight:0.0f];
             UIImageView *overlayImageView = [[UIImageView alloc]initWithImage:shadow];
-            overlayImageView.frame = self.theImageView.bounds;
-            [self.theImageView addSubview:overlayImageView];
+            overlayImageView.frame = _theImageView.bounds;
+            [_theImageView addSubview:overlayImageView];
         }
     }
 }

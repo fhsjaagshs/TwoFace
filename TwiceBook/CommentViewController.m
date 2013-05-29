@@ -20,17 +20,23 @@
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Reply"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Post" style:UIBarButtonItemStyleDone target:self action:@selector(post)];
-    [self.navBar pushNavigationItem:topItem animated:NO];
-    [self.view addSubview:self.navBar];
+    [_navBar pushNavigationItem:topItem animated:NO];
+    [self.view addSubview:_navBar];
     
     self.commentField = [[UITextView alloc]initWithFrame:CGRectMake(0, self.navBar.frame.size.height, screenBounds.size.width, screenBounds.size.height-44)];
-    self.commentField.backgroundColor = [UIColor whiteColor];
-    self.commentField.editable = YES;
-    self.commentField.clipsToBounds = YES;
-    self.commentField.font = [UIFont systemFontOfSize:14];
-    self.commentField.delegate = self;
-    [self.view addSubview:self.commentField];
-    [self.view bringSubviewToFront:self.commentField];
+    _commentField.backgroundColor = [UIColor whiteColor];
+    _commentField.editable = YES;
+    _commentField.clipsToBounds = YES;
+    _commentField.font = [UIFont systemFontOfSize:14];
+    _commentField.delegate = self;
+    [self.view addSubview:_commentField];
+    [self.view bringSubviewToFront:_commentField];
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [_commentField becomeFirstResponder];
+    [_commentField setDelegate:self];
+    _navBar.topItem.rightBarButtonItem.enabled = (_commentField.text.length > 0);
 }
 
 - (void)keyboardWillShow:(NSNotification*)notification {
@@ -53,12 +59,12 @@
     [UIView setAnimationCurve:animationCurve];
     
     if (up) {
-        CGRect newTextViewFrame = self.commentField.frame;
-        self.originalTextViewFrame = self.commentField.frame;
-        newTextViewFrame.size.height = keyboardRect.origin.y-self.commentField.frame.origin.y;
-        self.commentField.frame = newTextViewFrame;
+        CGRect newTextViewFrame = _commentField.frame;
+        _originalTextViewFrame = _commentField.frame;
+        newTextViewFrame.size.height = keyboardRect.origin.y-_commentField.frame.origin.y;
+        _commentField.frame = newTextViewFrame;
     } else {
-        self.commentField.frame = self.originalTextViewFrame;
+        _commentField.frame = _originalTextViewFrame;
     }
     
     [UIView commitAnimations];
@@ -67,10 +73,10 @@
 - (void)post {
     AppDelegate *ad = kAppDelegate;
     
-    [self.commentField resignFirstResponder];
+    [_commentField resignFirstResponder];
     [ad showHUDWithTitle:@"Posting..."];
     
-    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/%@/comments",self.postIdentifier]]];
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/%@/comments",_postIdentifier]]];
     [req setHTTPMethod:@"POST"];
     
     NSString *boundary = @"---------------------------14737809831466499882746641449";
@@ -87,7 +93,7 @@
 
     [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"message\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[self.commentField.text dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[_commentField.text dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
     
@@ -98,7 +104,7 @@
         [ad hideHUD];
         
         if (error) {
-            [self.commentField becomeFirstResponder];
+            [_commentField becomeFirstResponder];
             qAlert(@"Facebook Error", @"Failed to post comment, please try again at a later time.");
         } else {
             [self dismissModalViewControllerAnimated:YES];
@@ -119,22 +125,13 @@
 
 - (id)initWithPostID:(NSString *)postID {
     if (self = [super init]) {
-        [self setPostIdentifier:postID];
+        self.postIdentifier = postID;
     }
     return self;
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
-    self.navBar.topItem.rightBarButtonItem.enabled = (self.commentField.text.length > 0);
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    [self.commentField becomeFirstResponder];
-    [self.commentField setDelegate:self];
-    self.navBar.topItem.rightBarButtonItem.enabled = (self.commentField.text.length > 0);
+    _navBar.topItem.rightBarButtonItem.enabled = (_commentField.text.length > 0);
 }
 
 @end

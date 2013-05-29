@@ -15,15 +15,15 @@
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
     [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
-    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
-    self.theTableView.delegate = self;
-    self.theTableView.dataSource = self;
-    self.theTableView.backgroundColor = [UIColor clearColor];
+    _theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
+    _theTableView.delegate = self;
+    _theTableView.dataSource = self;
+    _theTableView.backgroundColor = [UIColor clearColor];
     UIView *bgView = [[UIView alloc]initWithFrame:self.theTableView.frame];
     bgView.backgroundColor = [UIColor clearColor];
-    [self.theTableView setBackgroundView:bgView];
-    [self.view addSubview:self.theTableView];
-    [self.view bringSubviewToFront:self.theTableView];
+    [_theTableView setBackgroundView:bgView];
+    [self.view addSubview:_theTableView];
+    [self.view bringSubviewToFront:_theTableView];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Social Network"];
@@ -54,26 +54,32 @@
     
     if (indexPath.row == 0) {
         cell.textLabel.text = @"Twitter";
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%d/5",usernamesListArray.count];
+        BOOL authorized = [[kAppDelegate engine]isAuthorized];
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",usernamesListArray.count]:@"Login Required";
+        
+        if (!authorized) {
+            cell.detailTextLabel.textColor = [UIColor redColor];
+        } 
     } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Facebook";
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"%d/5",kSelectedFriendsDictionary.allKeys.count];
+        BOOL authorized = [[kAppDelegate facebook]isSessionValid];
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",kSelectedFriendsDictionary.allKeys.count]:@"Login Required";
+        
+        if (!authorized) {
+            cell.detailTextLabel.textColor = [UIColor redColor];
+        }
     }
     return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0) {
-        if (![[kAppDelegate engine]isAuthorized]) {
-            qAlert(@"Login Required", @"You must be logged in order to obtain a list of your friends on Twitter.");
-        } else {
+        if ([[kAppDelegate engine]isAuthorized]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:NO];
             [self presentModalViewController:userSelector animated:YES];
         }
     } else if (indexPath.row == 1) {
-        if (![[kAppDelegate facebook]isSessionValid]) {
-            qAlert(@"Login Required", @"You must be logged in order to obtain a list of your friends on Facebook.");
-        } else {
+        if ([[kAppDelegate facebook]isSessionValid]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:YES];
             [self presentModalViewController:userSelector animated:YES];
         }

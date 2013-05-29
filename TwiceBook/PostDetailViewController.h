@@ -10,9 +10,7 @@
 
 @class FHSGradientView;
 
-@interface PostDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, PullToRefreshViewDelegate> {
-    UIActivityIndicatorView *aivy;
-}
+@interface PostDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, PullToRefreshViewDelegate>
 
 - (id)initWithPost:(NSMutableDictionary *)posty;
 
@@ -25,6 +23,7 @@
 @property (strong, nonatomic) UITextView *messageView;
 @property (strong, nonatomic) FHSGradientView *gradientView;
 @property (strong, nonatomic) PullToRefreshView *pull;
+@property (strong, nonatomic) UIActivityIndicatorView *aivy;
 
 @property (strong, nonatomic) NSMutableDictionary *post;
 
