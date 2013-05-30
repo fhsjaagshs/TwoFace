@@ -203,26 +203,16 @@
 }
 
 - (NSArray *)getFriends {
-    
-    NSURL *baseURL = [NSURL URLWithString:@"https://api.twitter.com/1.1/friends/ids.json"];
-    
+
     AppDelegate *ad = kAppDelegate;
     
-    OARequestParameter *cursor = [[OARequestParameter alloc]initWithName:@"cursor" value:@"-1"];
-    OARequestParameter *param = [[OARequestParameter alloc]initWithName:@"user_id" value:ad.engine.loggedInID];
-    OARequestParameter *sIDs = [[OARequestParameter alloc]initWithName:@"stringify_ids" value:@"true"];
-    
-    OAConsumer *consumer = [[OAConsumer alloc]initWithKey:kOAuthConsumerKey secret:kOAuthConsumerSecret];
-    
-    OAMutableURLRequest *request = [[OAMutableURLRequest alloc]initWithURL:baseURL consumer:consumer token:ad.engine.accessToken realm:nil signatureProvider:nil];
-    
-    id returnedValue = [ad.engine sendGETRequest:request withParameters:[NSArray arrayWithObjects:param, sIDs, cursor, nil]];
-    
-    NSMutableArray *identifiersFromRequest = nil;
+    id returnedValue = [ad.engine getFriendsIDs];
     
     if ([returnedValue isKindOfClass:[NSError class]]) {
         return nil;
     }
+    
+    NSMutableArray *identifiersFromRequest = nil;
     
     if ([returnedValue isKindOfClass:[NSDictionary class]]) {
         id idsRAW = [(NSDictionary *)returnedValue objectForKey:@"ids"];
@@ -230,6 +220,8 @@
             identifiersFromRequest = [(NSArray *)idsRAW mutableCopy];
         }
     }
+    
+    NSLog(@"Identifiers %@",identifiersFromRequest);
     
     NSMutableArray *usernames = [NSMutableArray array];
     NSMutableArray *idsToLookUp = [NSMutableArray array];
@@ -245,64 +237,30 @@
             [idsToLookUp addObject:identifier];
         }
     }
-
-    NSArray *usernameListStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
-    NSMutableArray *errorArray = [NSMutableArray array];
     
-    OARequestParameter *includeEntities = [[OARequestParameter alloc]initWithName:@"include_entities" value:@"false"];
+    id parsed = [ad.engine lookupUsers:idsToLookUp areIDs:YES];
     
-    NSURL *secondBaseURL = [NSURL URLWithString:@"https://api.twitter.com/1.1/users/lookup.json"];
-
-    for (NSString *idListString in usernameListStrings) {
-        OARequestParameter *iden = [[OARequestParameter alloc]initWithName:@"user_id" value:idListString];
-        OAMutableURLRequest *requestTwo = [[OAMutableURLRequest alloc] initWithURL:secondBaseURL consumer:consumer token:ad.engine.accessToken realm:nil signatureProvider:nil];
-        
-        id parsed = [ad.engine sendGETRequest:requestTwo withParameters:[NSArray arrayWithObjects:iden, includeEntities, nil]];
-        
-        if ([parsed isKindOfClass:[NSError class]]) {
-            [errorArray addObject:(NSError *)parsed];
-            continue;
-        } else if ([parsed isKindOfClass:[NSDictionary class]]) {
-            [usernames addObject:[parsed objectForKey:@"screen_name"]];
-            [finalCachedUsernamesDict setObject:[parsed objectForKey:@"screen_name"] forKey:[parsed objectForKey:@"id_str"]];
-        } else if ([parsed isKindOfClass:[NSMutableArray class]]) {
-            NSMutableArray *array = [(NSArray *)parsed mutableCopy];
-            for (NSDictionary *dict in array) {
-                NSString *name = [dict objectForKey:@"screen_name"];
-                [usernames addObject:name];
-                [finalCachedUsernamesDict setObject:name forKey:[dict objectForKey:@"id_str"]];
-            }
+    NSLog(@"%@",parsed);
+    
+    if ([parsed isKindOfClass:[NSError class]]) {
+        NSError *theError = (NSError *)parsed;
+        NSLog(@"Error: %@",theError);
+        if (theError.code != 204) {
+            qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+        }
+    } else if ([parsed isKindOfClass:[NSDictionary class]]) {
+        // Hey fix me!!!
+        [usernames addObject:[parsed objectForKey:@"screen_name"]];
+        [finalCachedUsernamesDict setObject:[parsed objectForKey:@"screen_name"] forKey:[parsed objectForKey:@"id_str"]];
+    } else if ([parsed isKindOfClass:[NSMutableArray class]]) {
+        NSMutableArray *array = [(NSArray *)parsed mutableCopy];
+        for (NSDictionary *dict in array) {
+            NSString *name = [dict objectForKey:@"screen_name"];
+            [usernames addObject:name];
+            [finalCachedUsernamesDict setObject:name forKey:[dict objectForKey:@"id_str"]];
         }
     }
-    
-    NSMutableArray *uniqueErrors = [NSMutableArray array];
-    NSMutableArray *errorCodesUsed = [NSMutableArray array];
-    
-    for (NSError *error in errorArray) {
-        NSString *code = [NSString stringWithFormat:@"%d",error.code];
-        if (![errorCodesUsed containsObject:code]) {
-            [uniqueErrors addObject:error];
-            [errorCodesUsed addObject:code];
-        }
-    }
-    
-    if (uniqueErrors.count == 1) {
-        dispatch_sync(GCDMainThread, ^{
-            @autoreleasepool {
-                NSError *theError = (NSError *)[errorArray objectAtIndex:0];
-                if (theError.code != 204) {
-                    qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
-                }
-            }
-        });
-    } else if (uniqueErrors.count > 1) {
-        dispatch_sync(GCDMainThread, ^{
-            @autoreleasepool {
-                qAlert(@"Multiple Errors", @"There were multiple errors in loading your Twitter friends.");
-            }
-        });
-        
-    }
+
     [self cacheIDtoUsernameDict:finalCachedUsernamesDict];
     return usernames;
 }
