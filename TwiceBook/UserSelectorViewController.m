@@ -227,26 +227,28 @@
                     }
                 }
                 
-                NSArray *idConcatStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
-                
-                for (NSString *idconcatstr in idConcatStrings) {
-                    NSArray *lolarray = [idconcatstr componentsSeparatedByString:@","];
+                if (idsToLookUp.count > 0) {
+                    NSArray *idConcatStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
                     
-                    id usersRet = [ad.engine lookupUsers:lolarray areIDs:YES];
-                    
-                    if ([usersRet isKindOfClass:[NSError class]]) {
-                        NSError *theError = (NSError *)usersRet;
-                        dispatch_sync(GCDMainThread, ^{
-                            @autoreleasepool {
-                                qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+                    for (NSString *idconcatstr in idConcatStrings) {
+                        NSArray *lolarray = [idconcatstr componentsSeparatedByString:@","];
+                        
+                        id usersRet = [ad.engine lookupUsers:lolarray areIDs:YES];
+                        
+                        if ([usersRet isKindOfClass:[NSError class]]) {
+                            NSError *theError = (NSError *)usersRet;
+                            dispatch_sync(GCDMainThread, ^{
+                                @autoreleasepool {
+                                    qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+                                }
+                            });
+                            succeeeded = NO;
+                            break;
+                        } else if ([usersRet isKindOfClass:[NSArray class]]) {
+                            NSArray *userDicts = (NSArray *)usersRet;
+                            for (NSDictionary *dict in userDicts) {
+                                [usernames addObject:[dict objectForKey:@"screen_name"]];
                             }
-                        });
-                        succeeeded = NO;
-                        break;
-                    } else if ([usersRet isKindOfClass:[NSArray class]]) {
-                        NSArray *userDicts = (NSArray *)usersRet;
-                        for (NSDictionary *dict in userDicts) {
-                            [usernames addObject:[dict objectForKey:@"screen_name"]];
                         }
                     }
                 }
