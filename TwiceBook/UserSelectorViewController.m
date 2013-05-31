@@ -257,6 +257,7 @@
                     [ad.theFetchedUsernames addObjectsFromArray:usernames];
                     [ad.theFetchedUsernames sortUsingSelector:@selector(caseInsensitiveCompare:)];
                     [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
+                    [self cacheIDtoUsernameDict:finalCachedUsernamesDict];
                 }
             }
             
