@@ -199,7 +199,6 @@
             
             AppDelegate *ad = kAppDelegate;
             id retIDs = [ad.engine getFriendsIDs];
-            
             if ([retIDs isKindOfClass:[NSError class]]) {
                 NSError *theError = (NSError *)retIDs;
                 dispatch_sync(GCDMainThread, ^{
@@ -210,7 +209,7 @@
             } else if ([retIDs isKindOfClass:[NSDictionary class]]) {
                 NSArray *ids = [(NSDictionary *)retIDs objectForKey:@"ids"];
                 
-                __block BOOL succeeeded = YES;
+                BOOL succeeeded = YES;
                 
                 NSMutableArray *usernames = [NSMutableArray array];
                 NSMutableArray *idsToLookUp = [NSMutableArray array];
@@ -231,9 +230,7 @@
                     NSArray *idConcatStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
                     
                     for (NSString *idconcatstr in idConcatStrings) {
-                        NSArray *lolarray = [idconcatstr componentsSeparatedByString:@","];
-                        
-                        id usersRet = [ad.engine lookupUsers:lolarray areIDs:YES];
+                        id usersRet = [ad.engine lookupUsers:[idconcatstr componentsSeparatedByString:@","] areIDs:YES];
                         
                         if ([usersRet isKindOfClass:[NSError class]]) {
                             NSError *theError = (NSError *)usersRet;
@@ -247,7 +244,10 @@
                         } else if ([usersRet isKindOfClass:[NSArray class]]) {
                             NSArray *userDicts = (NSArray *)usersRet;
                             for (NSDictionary *dict in userDicts) {
-                                [usernames addObject:[dict objectForKey:@"screen_name"]];
+                                NSString *screen_name = [dict objectForKey:@"screen_name"];
+                                NSString *user_id = [dict objectForKey:@"id_str"];
+                                [finalCachedUsernamesDict setObject:screen_name forKey:user_id];
+                                [usernames addObject:screen_name];
                             }
                         }
                     }
