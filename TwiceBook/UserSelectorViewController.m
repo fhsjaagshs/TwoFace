@@ -156,49 +156,7 @@
 }
 
 - (NSMutableDictionary *)loadCachedUsernameLookupDict {
-    NSString *cachePath = [kCachesDirectory stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"];
-    return [NSMutableDictionary dictionaryWithContentsOfFile:cachePath];
-}
-
-- (NSArray *)genIDString:(NSArray *)idsArray {
-    
-    int count = idsArray.count;
-    NSMutableArray *reqStrs = [[NSMutableArray alloc]init];
-    int remainder = fmod(count, 99);
-    int numberOfStrings = (count-remainder)/99;
-    
-    for (int i = 0; i < numberOfStrings; i++) {
-        NSString *reqString = @"";
-        
-        for (int ii = 0; ii < 99; ii++) {
-            int lol = (i*99)+ii;
-            NSString *currentID = [[idsArray objectAtIndex:lol]stringByAppendingString:@","];
-            reqString = [reqString stringByAppendingString:currentID];
-        }
-
-        if ([[reqString substringFromIndex:reqString.length-1]isEqualToString:@","]) {
-            reqString = [reqString substringToIndex:reqString.length-1];
-        }
-        
-        [reqStrs addObject:reqString];
-    }
-    
-    if (numberOfStrings*99 < count) {
-        NSString *reqString = @"";
-        
-        for (int iii = 0; iii < remainder; iii++) {
-            NSString *currentID = [[idsArray objectAtIndex:(iii+numberOfStrings*99)]stringByAppendingString:@","];
-            reqString = [reqString stringByAppendingString:currentID];
-        }
-        
-        if (([[reqString substringFromIndex:reqString.length-1]isEqualToString:@","])) {
-            reqString = [reqString substringToIndex:reqString.length-1];
-        }
-        
-        [reqStrs addObject:reqString];
-    }
-    
-    return reqStrs;
+    return [NSMutableDictionary dictionaryWithContentsOfFile:[kCachesDirectory stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]];
 }
 
 - (void)updateListTwitter {
@@ -236,32 +194,70 @@
 
 - (void)fetchFriends {
     
-    AppDelegate *ad = kAppDelegate;
-    
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             
-            id returnValue = [ad.engine getFriends];
+            AppDelegate *ad = kAppDelegate;
+            id retIDs = [ad.engine getFriendsIDs];
             
-            if ([returnValue isKindOfClass:[NSError class]]) {
-                NSError *theError = (NSError *)returnValue;
+            if ([retIDs isKindOfClass:[NSError class]]) {
+                NSError *theError = (NSError *)retIDs;
                 dispatch_sync(GCDMainThread, ^{
                     @autoreleasepool {
                         qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
-                        return;
                     }
                 });
-            } else if ([returnValue isKindOfClass:[NSDictionary class]]) {
-                NSArray *userDicts = [(NSDictionary *)returnValue objectForKey:@"users"];
+            } else if ([retIDs isKindOfClass:[NSDictionary class]]) {
+                NSArray *ids = [(NSDictionary *)retIDs objectForKey:@"ids"];
                 
-                [ad makeSureUsernameListArraysAreNotNil];
-                [ad.theFetchedUsernames removeAllObjects];
+                __block BOOL succeeeded = YES;
                 
-                for (NSDictionary *dict in userDicts) {
-                    [ad.theFetchedUsernames addObject:[dict objectForKey:@"screen_name"]];
+                NSMutableArray *usernames = [NSMutableArray array];
+                NSMutableArray *idsToLookUp = [NSMutableArray array];
+                NSMutableDictionary *finalCachedUsernamesDict = [NSMutableDictionary dictionary];
+                NSMutableDictionary *cachedUsernamesLookupDict = [self loadCachedUsernameLookupDict];
+                
+                for (NSString *identifier in ids) {
+                    if ([cachedUsernamesLookupDict.allKeys containsObject:identifier]) {
+                        NSString *theUsernameFromCache = [cachedUsernamesLookupDict objectForKey:identifier];
+                        [finalCachedUsernamesDict setObject:theUsernameFromCache forKey:identifier];
+                        [usernames addObject:theUsernameFromCache];
+                    } else {
+                        [idsToLookUp addObject:identifier];
+                    }
                 }
                 
-                [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
+                NSArray *idConcatStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
+                
+                for (NSString *idconcatstr in idConcatStrings) {
+                    NSArray *lolarray = [idconcatstr componentsSeparatedByString:@","];
+                    
+                    id usersRet = [ad.engine lookupUsers:lolarray areIDs:YES];
+                    
+                    if ([usersRet isKindOfClass:[NSError class]]) {
+                        NSError *theError = (NSError *)usersRet;
+                        dispatch_sync(GCDMainThread, ^{
+                            @autoreleasepool {
+                                qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+                            }
+                        });
+                        succeeeded = NO;
+                        break;
+                    } else if ([usersRet isKindOfClass:[NSArray class]]) {
+                        NSArray *userDicts = (NSArray *)usersRet;
+                        for (NSDictionary *dict in userDicts) {
+                            [usernames addObject:[dict objectForKey:@"screen_name"]];
+                        }
+                    }
+                }
+                
+                if (succeeeded) {
+                    [ad makeSureUsernameListArraysAreNotNil];
+                    [ad.theFetchedUsernames removeAllObjects];
+                    [ad.theFetchedUsernames addObjectsFromArray:usernames];
+                    [ad.theFetchedUsernames sortUsingSelector:@selector(caseInsensitiveCompare:)];
+                    [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
+                }
             }
             
             dispatch_sync(GCDMainThread, ^{

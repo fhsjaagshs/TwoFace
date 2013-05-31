@@ -221,15 +221,7 @@ static NSString * const url_followers_list = @"https://api.twitter.com/1.1/follo
 static NSString * const url_friends_ids = @"https://api.twitter.com/1.1/friends/ids.json";
 static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends/list.json";
 
-- (id)getFriends {
-    return [self listFriendsForUser:self.loggedInUsername isID:NO];
-}
-
-- (id)getFollowers {
-    return [self listFollowersForUser:self.loggedInUsername isID:NO];
-}
-
-- (id)listFollowersForUser:(NSString *)user isID:(BOOL)isID {
+- (id)listFollowersForUser:(NSString *)user isID:(BOOL)isID withCursor:(NSString *)cursor {
     
     if (user.length == 0) {
         return getBadRequestError();
@@ -240,10 +232,11 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
     OARequestParameter *skipstatusP = [OARequestParameter requestParameterWithName:@"skip_status" value:@"true"];
     OARequestParameter *include_entitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:self.includeEntities?@"true":@"false"];
     OARequestParameter *screen_nameP = [OARequestParameter requestParameterWithName:isID?@"user_id":@"screen_name" value:user];
-    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, nil]];
+    OARequestParameter *cursorP = [OARequestParameter requestParameterWithName:@"cursor" value:cursor];
+    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, cursorP, nil]];
 }
 
-- (id)listFriendsForUser:(NSString *)user isID:(BOOL)isID {
+- (id)listFriendsForUser:(NSString *)user isID:(BOOL)isID withCursor:(NSString *)cursor {
     
     if (user.length == 0) {
         return getBadRequestError();
@@ -254,7 +247,8 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
     OARequestParameter *skipstatusP = [OARequestParameter requestParameterWithName:@"skip_status" value:@"true"];
     OARequestParameter *include_entitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:self.includeEntities?@"true":@"false"];
     OARequestParameter *screen_nameP = [OARequestParameter requestParameterWithName:isID?@"user_id":@"screen_name" value:user];
-    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, nil]];
+    OARequestParameter *cursorP = [OARequestParameter requestParameterWithName:@"cursor" value:cursor];
+    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, cursorP, nil]];
 }
 
 - (id)searchUsersWithQuery:(NSString *)q andCount:(int)count {
@@ -425,7 +419,7 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
         return getBadRequestError();
     }
     
-    if (users.count >= 99) {
+    if (users.count > 100) {
         return getBadRequestError();
     }
     
@@ -445,7 +439,7 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
         return getBadRequestError();
     }
     
-    if (users.count >= 99) {
+    if (users.count > 100) {
         return getBadRequestError();
     }
     
@@ -1289,7 +1283,7 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
         return nil;
     }
     
-    if (users.count > 99) {
+    if (users.count > 100) {
         return getBadRequestError();
     }
     
@@ -1430,18 +1424,18 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
 
     NSString *initialString = [array componentsJoinedByString:@","];
     
-    if (array.count <= 99) {
+    if (array.count <= 100) {
         return [NSArray arrayWithObjects:initialString, nil];
     }
     
     int offset = 0;
-    int remainder = fmod(array.count, 99);
-    int numberOfStrings = (array.count-remainder)/99;
+    int remainder = fmod(array.count, 100);
+    int numberOfStrings = (array.count-remainder)/100;
     
     NSMutableArray *reqStrs = [NSMutableArray array];
     
     for (int i = 1; i <= numberOfStrings; ++i) {
-        NSString *ninetyNinththItem = (NSString *)[array objectAtIndex:i*99];
+        NSString *ninetyNinththItem = (NSString *)[array objectAtIndex:(i*100)-1];
         NSRange range = [initialString rangeOfString:ninetyNinththItem];
         int endOffset = range.location+range.length;
         NSRange rangeOfAString = NSMakeRange(offset, endOffset-offset);
@@ -1454,6 +1448,15 @@ static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends
         
         [reqStrs addObject:endResult];
     }
+    
+    NSString *remainderString = [initialString stringByReplacingOccurrencesOfString:[reqStrs componentsJoinedByString:@","] withString:@""];
+    
+    if ([[remainderString substringToIndex:1]isEqualToString:@","]) {
+        remainderString = [remainderString substringFromIndex:1];
+    }
+    
+    [reqStrs addObject:remainderString];
+    
     return reqStrs;
 }
 
