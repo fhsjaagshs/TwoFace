@@ -24,12 +24,7 @@
  * Handles frictionless interaction and recipient-caching by the SDK,
  * see https://developers.facebook.com/docs/reference/dialogs/requests/ 
  */
-@interface FBFrictionlessRequestSettings : NSObject<FBRequestDelegate> {
-@private
-    NSArray*            _allowedRecipients;
-    FBRequest*          _activeRequest;
-    BOOL                _enabled;
-}
+@interface FBFrictionlessRequestSettings : NSObject<FBRequestDelegate>
 
 /**
  * BOOL indicating whether frictionless request sending has been enabled

@@ -43,18 +43,14 @@
     NSString *q = [url absoluteString];
     NSString *token = [self getStringFromUrl:q needle:@"access_token="];
     NSString *expTime = [self getStringFromUrl:q needle:@"expires_in="];
-    NSDate *expirationDate =nil;
+    NSDate *expirationDate = nil;
     
     if (expTime != nil) {
         int expVal = [expTime intValue];
-        if (expVal == 0) {
-            expirationDate = [NSDate distantFuture];
-        } else {
-            expirationDate = [NSDate dateWithTimeIntervalSinceNow:expVal];
-        } 
+        expirationDate = (expVal == 0)?[NSDate distantFuture]:[NSDate dateWithTimeIntervalSinceNow:expVal];
     } 
     
-    if ((token == (NSString *) [NSNull null]) || (token.length == 0)) {
+    if ((token == (NSString *)[NSNull null]) || (token.length == 0)) {
         [self dialogDidCancel:url];
         [self dismissWithSuccess:NO animated:YES];
     } else {
@@ -65,9 +61,7 @@
     }
 }
 
-/**
- * Override FBDialog : to call with the login dialog get canceled 
- */
+// Override FBDialog: to call with the login dialog get canceled 
 - (void)dialogDidCancel:(NSURL *)url {
     [self dismissWithSuccess:NO animated:YES];
     if ([_loginDelegate respondsToSelector:@selector(fbDialogNotLogin:)]) {
@@ -76,8 +70,7 @@
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    if (!(([error.domain isEqualToString:@"NSURLErrorDomain"] && error.code == -999) ||
-          ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102))) {
+    if (!(([error.domain isEqualToString:@"NSURLErrorDomain"] && error.code == -999) || ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102))) {
         [super webView:webView didFailLoadWithError:error];
         if ([_loginDelegate respondsToSelector:@selector(fbDialogNotLogin:)]) {
             [_loginDelegate fbDialogNotLogin:NO];

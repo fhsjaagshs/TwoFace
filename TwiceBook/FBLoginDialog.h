@@ -26,13 +26,12 @@
  * It start pop-ups prompting for credentials and permissions.
  */
 
-@interface FBLoginDialog : FBDialog {
-    
-}
+@interface FBLoginDialog : FBDialog
 
 @property (nonatomic, assign) id<FBLoginDialogDelegate> loginDelegate;
 
 - (id)initWithURL:(NSString *)loginURL loginParams:(NSMutableDictionary *)params delegate:(id<FBLoginDialogDelegate>)delegate;
+
 @end
 
 @protocol FBLoginDialogDelegate <NSObject>

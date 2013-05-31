@@ -22,8 +22,8 @@
 //
 @interface FBFrictionlessRequestSettings ()
 
-@property (readwrite, retain) NSArray *     allowedRecipients;
-@property (readwrite, retain) FBRequest*    activeRequest;
+@property (readwrite, retain) NSArray *allowedRecipients;
+@property (readwrite, retain) FBRequest *activeRequest;
 
 @end
 
@@ -39,7 +39,7 @@
 - (id)init {
     if (self = [super init]) {
         // start life with an empty frictionless cache
-        self.allowedRecipients = [[[NSArray alloc] init] autorelease];
+        self.allowedRecipients = [[[NSArray alloc]init]autorelease];
     }
     return self;
 }
@@ -53,31 +53,24 @@
 
 - (void)reloadRecipientCacheWithFacebook:(Facebook *)facebook {
     // request the list of frictionless recipients from the server
-    id request = [facebook requestWithGraphPath:@"me/apprequestformerrecipients"
-                                    andDelegate:self];
+    id request = [facebook requestWithGraphPath:@"me/apprequestformerrecipients" andDelegate:self];
     if (request) {
         self.activeRequest = request;
     }    
 }
 
-- (void)updateRecipientCacheWithRecipients:(NSArray*)ids {
+- (void)updateRecipientCacheWithRecipients:(NSArray *)ids {
     // if setting recipients directly, no need to complete pending request
     self.activeRequest = nil;
-    
-    if (ids == nil) {
-        self.allowedRecipients = [[[NSArray alloc] init] autorelease];
-    } else {
-        self.allowedRecipients = [[[NSArray alloc] initWithArray:ids] autorelease];
-    }
+    self.allowedRecipients = (ids == nil)?[NSArray array]:[NSArray arrayWithArray:ids];
 }
 
 - (BOOL)isFrictionlessEnabledForRecipient:(NSString *)fbid {
     // trim whitespace from edges
-    fbid = [fbid stringByTrimmingCharactersInSet:
-                             [NSCharacterSet whitespaceCharacterSet]];
+    fbid = [fbid stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
     // linear search through cache for a match
-    for (NSString *entry in self.allowedRecipients) {
+    for (NSString *entry in _allowedRecipients) {
         if ([entry isEqualToString:fbid]) {
             return YES;
         }
@@ -88,20 +81,16 @@
 - (BOOL)isFrictionlessEnabledForRecipients:(NSArray*)fbids {
     // we handle arrays of NSString and NSNumber, and throw on anything else
     for (id fbid in fbids) {
-        NSString* fbidstr;
+        NSString *fbidstr;
         // give us a number, and we convert it to a string
         if ([fbid isKindOfClass:[NSNumber class]]) {
-            fbidstr = [(NSNumber*)fbid stringValue];
+            fbidstr = [(NSNumber *)fbid stringValue];
         } else if ([fbid isKindOfClass:[NSString class]]) {
             // or give us a string, and we just use it as is
-            fbidstr = (NSString*)fbid;
+            fbidstr = (NSString *)fbid;
         } else {
             // unexpected type found in the array of fbids
-            @throw [NSException exceptionWithName:NSInvalidArgumentException
-                                           reason:@"items in fbids must be NSString or NSNumber"
-                                         userInfo:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                   [fbid class], @"invalid class", 
-                                                   nil]];
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"items in fbids must be NSString or NSNumber" userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[fbid class], @"invalid class", nil]];
         }
         
         // if we miss our cache once, we fail the set
@@ -115,19 +104,15 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // FBRequestDelegate
 
-- (void)request:(FBRequest *)request
-        didLoad:(id)result {
+- (void)request:(FBRequest *)request didLoad:(id)result {
 
-    // a little request bookkeeping
     self.activeRequest = nil;
 
-    int items = [[result objectForKey: @"data"] count];
-    NSMutableArray* recipients = [[[NSMutableArray alloc] initWithCapacity: items] autorelease];
-        
-    for (int i = 0; i < items; i++) {
-        [recipients addObject: [[[result objectForKey: @"data"] 
-                                 objectAtIndex: i] 
-                                objectForKey: @"recipient_id"]] ;
+    NSMutableArray *recipients = [NSMutableArray array];
+    NSArray *data = [result objectForKey:@"data"];
+    
+    for (NSDictionary *dict in data) {
+        [recipients addObject:[dict objectForKey:@"recipient_id"]];
     }
         
     self.allowedRecipients = recipients;        
@@ -143,20 +128,10 @@
     self.activeRequest = nil;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// NSObject
-
 - (void)dealloc {    
     self.activeRequest = nil;
     self.allowedRecipients = nil;
     [super dealloc];
 }
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// private helpers
-// 
-
-@synthesize allowedRecipients = _allowedRecipients;
-@synthesize activeRequest = _activeRequest;
 
 @end
