@@ -7,7 +7,6 @@
 //
 
 #import "UserSelectorViewController.h"
-#import "OAuthConsumer.h"
 
 #define fqlFriendsOrdered @"SELECT name,uid,last_name FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) order by last_name"
 
@@ -202,69 +201,6 @@
     return reqStrs;
 }
 
-- (NSArray *)getFriends {
-
-    AppDelegate *ad = kAppDelegate;
-    
-    id returnedValue = [ad.engine getFriendsIDs];
-    
-    if ([returnedValue isKindOfClass:[NSError class]]) {
-        return nil;
-    }
-    
-    NSMutableArray *identifiersFromRequest = nil;
-    
-    if ([returnedValue isKindOfClass:[NSDictionary class]]) {
-        id idsRAW = [(NSDictionary *)returnedValue objectForKey:@"ids"];
-        if ([idsRAW isKindOfClass:[NSArray class]]) {
-            identifiersFromRequest = [(NSArray *)idsRAW mutableCopy];
-        }
-    }
-    
-    NSLog(@"Identifiers %@",identifiersFromRequest);
-    
-    NSMutableArray *usernames = [NSMutableArray array];
-    NSMutableArray *idsToLookUp = [NSMutableArray array];
-    NSMutableDictionary *finalCachedUsernamesDict = [NSMutableDictionary dictionary];
-    NSMutableDictionary *cachedUsernamesLookupDict = [self loadCachedUsernameLookupDict];
-    
-    for (NSString *identifier in identifiersFromRequest) {
-        if ([cachedUsernamesLookupDict.allKeys containsObject:identifier]) {
-            NSString *theUsernameFromCache = [cachedUsernamesLookupDict objectForKey:identifier];
-            [finalCachedUsernamesDict setObject:theUsernameFromCache forKey:identifier];
-            [usernames addObject:theUsernameFromCache];
-        } else {
-            [idsToLookUp addObject:identifier];
-        }
-    }
-    
-    id parsed = [ad.engine lookupUsers:idsToLookUp areIDs:YES];
-    
-    NSLog(@"%@",parsed);
-    
-    if ([parsed isKindOfClass:[NSError class]]) {
-        NSError *theError = (NSError *)parsed;
-        NSLog(@"Error: %@",theError);
-        if (theError.code != 204) {
-            qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
-        }
-    } else if ([parsed isKindOfClass:[NSDictionary class]]) {
-        // Hey fix me!!!
-        [usernames addObject:[parsed objectForKey:@"screen_name"]];
-        [finalCachedUsernamesDict setObject:[parsed objectForKey:@"screen_name"] forKey:[parsed objectForKey:@"id_str"]];
-    } else if ([parsed isKindOfClass:[NSMutableArray class]]) {
-        NSMutableArray *array = [(NSArray *)parsed mutableCopy];
-        for (NSDictionary *dict in array) {
-            NSString *name = [dict objectForKey:@"screen_name"];
-            [usernames addObject:name];
-            [finalCachedUsernamesDict setObject:name forKey:[dict objectForKey:@"id_str"]];
-        }
-    }
-
-    [self cacheIDtoUsernameDict:finalCachedUsernamesDict];
-    return usernames;
-}
-
 - (void)updateListTwitter {
     
     AppDelegate *ad = kAppDelegate;
@@ -304,17 +240,28 @@
     
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
-
-            NSMutableArray *userInfo = [[self getFriends]mutableCopy];
             
-            if (userInfo.count > 0) {
-                [userInfo removeDuplicates];
+            id returnValue = [ad.engine getFriends];
+            
+            if ([returnValue isKindOfClass:[NSError class]]) {
+                NSError *theError = (NSError *)returnValue;
+                dispatch_sync(GCDMainThread, ^{
+                    @autoreleasepool {
+                        qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
+                        return;
+                    }
+                });
+            } else if ([returnValue isKindOfClass:[NSDictionary class]]) {
+                NSArray *userDicts = [(NSDictionary *)returnValue objectForKey:@"users"];
+                
                 [ad makeSureUsernameListArraysAreNotNil];
                 [ad.theFetchedUsernames removeAllObjects];
-                [ad.theFetchedUsernames addObjectsFromArray:userInfo];
-                [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
                 
-                [self updateListTwitter];
+                for (NSDictionary *dict in userDicts) {
+                    [ad.theFetchedUsernames addObject:[dict objectForKey:@"screen_name"]];
+                }
+                
+                [ad.theFetchedUsernames writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"] atomically:YES];
             }
             
             dispatch_sync(GCDMainThread, ^{

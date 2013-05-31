@@ -109,9 +109,6 @@ NSError * getNilReturnLengthError() {
 
 @interface FHSTwitterEngine()
 
-// id list generator - returns an array of id/username list strings
-- (NSArray *)generateRequestStringsFromArray:(NSArray *)array;
-
 // Login stuff
 - (NSString *)getRequestTokenString;
 
@@ -219,9 +216,46 @@ static NSString * const url_favorites_destroy = @"https://api.twitter.com/1.1/fa
 static NSString * const url_application_rate_limit_status = @"https://api.twitter.com/1.1/application/rate_limit_status.json";
 
 static NSString * const url_followers_ids = @"https://api.twitter.com/1.1/followers/ids.json";
+static NSString * const url_followers_list = @"https://api.twitter.com/1.1/followers/list.json";
 
 static NSString * const url_friends_ids = @"https://api.twitter.com/1.1/friends/ids.json";
+static NSString * const url_friends_list = @"https://api.twitter.com/1.1/friends/list.json";
 
+- (id)getFriends {
+    return [self listFriendsForUser:self.loggedInUsername isID:NO];
+}
+
+- (id)getFollowers {
+    return [self listFollowersForUser:self.loggedInUsername isID:NO];
+}
+
+- (id)listFollowersForUser:(NSString *)user isID:(BOOL)isID {
+    
+    if (user.length == 0) {
+        return getBadRequestError();
+    }
+    
+    NSURL *baseURL = [NSURL URLWithString:url_friends_list];
+    OAMutableURLRequest *request = [OAMutableURLRequest requestWithURL:baseURL consumer:self.consumer token:self.accessToken];
+    OARequestParameter *skipstatusP = [OARequestParameter requestParameterWithName:@"skip_status" value:@"true"];
+    OARequestParameter *include_entitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:self.includeEntities?@"true":@"false"];
+    OARequestParameter *screen_nameP = [OARequestParameter requestParameterWithName:isID?@"user_id":@"screen_name" value:user];
+    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, nil]];
+}
+
+- (id)listFriendsForUser:(NSString *)user isID:(BOOL)isID {
+    
+    if (user.length == 0) {
+        return getBadRequestError();
+    }
+    
+    NSURL *baseURL = [NSURL URLWithString:url_friends_list];
+    OAMutableURLRequest *request = [OAMutableURLRequest requestWithURL:baseURL consumer:self.consumer token:self.accessToken];
+    OARequestParameter *skipstatusP = [OARequestParameter requestParameterWithName:@"skip_status" value:@"true"];
+    OARequestParameter *include_entitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:self.includeEntities?@"true":@"false"];
+    OARequestParameter *screen_nameP = [OARequestParameter requestParameterWithName:isID?@"user_id":@"screen_name" value:user];
+    return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:include_entitiesP, skipstatusP, screen_nameP, nil]];
+}
 
 - (id)searchUsersWithQuery:(NSString *)q andCount:(int)count {
     
@@ -1364,91 +1398,6 @@ static NSString * const url_friends_ids = @"https://api.twitter.com/1.1/friends/
     OARequestParameter *param = [OARequestParameter requestParameterWithName:@"screen_name" value:self.loggedInUsername];
     OARequestParameter *stringify_ids = [OARequestParameter requestParameterWithName:@"stringify_ids" value:@"true"];
     return [self sendGETRequest:request withParameters:[NSArray arrayWithObjects:param, stringify_ids, nil]];
-}
-
-- (id)getFollowers {
-    id returnedValue = [self getFollowersIDs];
-    
-    NSMutableArray *identifiersFromRequest = [NSMutableArray array];
-    
-    if ([returnedValue isKindOfClass:[NSDictionary class]]) {
-        id idsRAW = [(NSDictionary *)returnedValue objectForKey:@"ids"];
-        if ([idsRAW isKindOfClass:[NSArray class]]) {
-            [identifiersFromRequest addObjectsFromArray:(NSArray *)idsRAW];
-        }
-    } else if ([returnedValue isKindOfClass:[NSError class]]) {
-        return returnedValue;
-    }
-    
-    if (identifiersFromRequest.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *usernames = [NSMutableArray array];
-    NSArray *idLists = [self generateRequestStringsFromArray:identifiersFromRequest];
-    
-    for (NSString *idList in idLists) {
-        NSURL *baseURL = [NSURL URLWithString:url_users_lookup];
-        OAMutableURLRequest *requestTwo = [OAMutableURLRequest requestWithURL:baseURL consumer:self.consumer token:self.accessToken];
-        OARequestParameter *iden = [OARequestParameter requestParameterWithName:@"user_id" value:idList];
-        OARequestParameter *includeEntitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:@"false"];
-        
-        id parsed = [self sendGETRequest:requestTwo withParameters:[NSArray arrayWithObjects:iden, includeEntitiesP, nil]];
-        
-        if ([parsed isKindOfClass:[NSDictionary class]]) {
-            [usernames addObject:[parsed objectForKey:@"screen_name"]];
-        } else if ([parsed isKindOfClass:[NSArray class]]) {
-            for (NSDictionary *dict in (NSArray *)parsed) {
-                [usernames addObject:[dict objectForKey:@"screen_name"]];
-            }
-        }
-    }
-    
-    return [usernames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
-}
-
-- (id)getFriends {
-    id returnedValue = [self getFriendsIDs];
-    
-    NSMutableArray *identifiersFromRequest = [NSMutableArray array];
-    
-    if ([returnedValue isKindOfClass:[NSDictionary class]]) {
-        id idsRAW = [(NSDictionary *)returnedValue objectForKey:@"ids"];
-        if ([idsRAW isKindOfClass:[NSArray class]]) {
-            [identifiersFromRequest addObjectsFromArray:(NSArray *)idsRAW];
-        }
-    } else if ([returnedValue isKindOfClass:[NSError class]]) {
-        return returnedValue;
-    }
-    
-    if (identifiersFromRequest.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *usernames = [NSMutableArray array];
-    
-    NSArray *usernameListStrings = [self generateRequestStringsFromArray:identifiersFromRequest];
-    
-    for (NSString *idListString in usernameListStrings) {
-        NSURL *baseURL = [NSURL URLWithString:url_users_lookup];
-        OAMutableURLRequest *requestTwo = [OAMutableURLRequest requestWithURL:baseURL consumer:self.consumer token:self.accessToken];
-        OARequestParameter *iden = [OARequestParameter requestParameterWithName:@"user_id" value:idListString];
-        OARequestParameter *includeEntitiesP = [OARequestParameter requestParameterWithName:@"include_entities" value:@"false"];
-        
-        id parsed = [self sendGETRequest:requestTwo withParameters:[NSArray arrayWithObjects:iden, includeEntitiesP, nil]];
-        
-        if ([parsed isKindOfClass:[NSDictionary class]]) {
-            [usernames addObject:[parsed objectForKey:@"screen_name"]];
-        } else if ([parsed isKindOfClass:[NSArray class]]) {
-            for (NSDictionary *dict in (NSArray *)parsed) {
-                [usernames addObject:[dict objectForKey:@"screen_name"]];
-            }
-        } else if ([parsed isKindOfClass:[NSError class]]) {
-            return parsed;
-        }
-    }
-    
-    return [usernames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)];
 }
 
 - (id)init {

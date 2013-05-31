@@ -111,18 +111,6 @@ extern NSString * const FHSProfileDescriptionKey;
 // REST API
 //
 
-//
-// Custom REST API methods
-// Can be expensive CACHE CACHE CACHE
-//
-
-- (id)getFollowers; // followers/ids & users/lookup
-- (id)getFriends; // friends/ids & users/lookup
-
-//
-// Standard REST API methods
-//
-
 // statuses/update
 - (NSError *)postTweet:(NSString *)tweetString;
 - (NSError *)postTweet:(NSString *)tweetString inReplyTo:(NSString *)inReplyToString;
@@ -310,8 +298,16 @@ extern NSString * const FHSProfileDescriptionKey;
 // followers/ids
 - (id)getFollowersIDs;
 
+// followers/list
+- (id)getFollowers;
+- (id)listFollowersForUser:(NSString *)user isID:(BOOL)isID;
+
 // friends/ids
 - (id)getFriendsIDs;
+
+// friends/list
+- (id)getFriends;
+- (id)listFriendsForUser:(NSString *)user isID:(BOOL)isID;
 
 //
 // Login and Auth
@@ -343,6 +339,9 @@ extern NSString * const FHSProfileDescriptionKey;
 // Date parser
 - (NSDate *)getDateFromTwitterCreatedAt:(NSString *)twitterDate;
 
+// id list generator - returns an array of id/username list strings
+- (NSArray *)generateRequestStringsFromArray:(NSArray *)array;
+
 // Temporaryily set keys
 // if you don't want your keys in memory, simply use
 // this method. You will have to use it before logging in.
@@ -354,8 +353,6 @@ extern NSString * const FHSProfileDescriptionKey;
 
 // Determines your internet status
 + (BOOL)isConnectedToInternet;
-
-- (NSArray *)generateRequestStringsFromArray:(NSArray *)array;
 
 // Determines if entities should be included
 @property (nonatomic, assign) BOOL includeEntities;

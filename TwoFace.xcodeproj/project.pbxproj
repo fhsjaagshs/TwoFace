@@ -165,7 +165,7 @@
 		F129B662157B8237005353EB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		F129B666157B8237005353EB /* TwoFace-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "TwoFace-Info.plist"; sourceTree = "<group>"; };
 		F129B66A157B8237005353EB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		F129B66C157B8237005353EB /* twoface-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "twoface-Prefix.pch"; sourceTree = "<group>"; };
+		F129B66C157B8237005353EB /* TwoFace-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "TwoFace-Prefix.pch"; sourceTree = "<group>"; };
 		F129B66D157B8237005353EB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F129B66E157B8237005353EB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		F129B670157B8237005353EB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -178,8 +178,6 @@
 		F188BD541694FF2400BF01E4 /* NSString+URLEncoding.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+URLEncoding.m"; sourceTree = "<group>"; };
 		F188BD561694FF2400BF01E4 /* Base64TranscoderFHS.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Base64TranscoderFHS.c; sourceTree = "<group>"; };
 		F188BD571694FF2400BF01E4 /* Base64TranscoderFHS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64TranscoderFHS.h; sourceTree = "<group>"; };
-		F188BD581694FF2400BF01E4 /* OAAsynchronousDataFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAAsynchronousDataFetcher.h; sourceTree = "<group>"; };
-		F188BD591694FF2400BF01E4 /* OAAsynchronousDataFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAAsynchronousDataFetcher.m; sourceTree = "<group>"; };
 		F188BD5A1694FF2400BF01E4 /* OAConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAConsumer.h; sourceTree = "<group>"; };
 		F188BD5B1694FF2400BF01E4 /* OAConsumer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAConsumer.m; sourceTree = "<group>"; };
 		F188BD5C1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAHMAC_SHA1SignatureProvider.h; sourceTree = "<group>"; };
@@ -393,7 +391,7 @@
 				9BE3E7E11601738D00F64709 /* inner-shadow.png */,
 				F129B666157B8237005353EB /* TwoFace-Info.plist */,
 				F129B66A157B8237005353EB /* main.m */,
-				F129B66C157B8237005353EB /* twoface-Prefix.pch */,
+				F129B66C157B8237005353EB /* TwoFace-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -413,8 +411,6 @@
 			children = (
 				F188BD521694FF2400BF01E4 /* Categories */,
 				F188BD551694FF2400BF01E4 /* Crytpo */,
-				F188BD581694FF2400BF01E4 /* OAAsynchronousDataFetcher.h */,
-				F188BD591694FF2400BF01E4 /* OAAsynchronousDataFetcher.m */,
 				F188BD5A1694FF2400BF01E4 /* OAConsumer.h */,
 				F188BD5B1694FF2400BF01E4 /* OAConsumer.m */,
 				F188BD5C1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.h */,
