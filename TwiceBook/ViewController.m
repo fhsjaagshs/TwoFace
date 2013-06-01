@@ -849,20 +849,20 @@
                 cachedRepliedToTweets = [NSMutableArray array];
             }
             
+            NSMutableArray *potentialBadUsers = [NSMutableArray array];
+            
             for (NSString *username in usernames) {
                 NSLog(@"%@",username);
                 
-                id badUsername = nil;
-                
                 if (username.length > 0) {
-                    badUsername = [cachedInvalidUsers objectForKey:username];
-                }
-
-                if (badUsername) {
-                    if ([(NSString *)[badUsername objectForKey:@"invalid"]isEqualToString:@"yes"] || ([(NSString *)[badUsername objectForKey:@"protected"]isEqualToString:@"yes"] && ![ad.theFetchedUsernames containsObject:username])) {
-                        [self.protectedUsers addObject:username];
+                    id badUsername = [cachedInvalidUsers objectForKey:username];
+                    
+                    if (badUsername) {
+                        if ([(NSString *)[badUsername objectForKey:@"invalid"]isEqualToString:@"yes"] || ([(NSString *)[badUsername objectForKey:@"protected"]isEqualToString:@"yes"] && ![ad.theFetchedUsernames containsObject:username])) {
+                            [self.protectedUsers addObject:username];
+                        }
+                        continue;
                     }
-                    continue;
                 }
                 
                 NSString *identifier = [self getLatestTweetIDInTimelineCacheForUsername:username];
@@ -878,20 +878,7 @@
                         [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
                     } else {
                         if (![self.protectedUsers containsObject:username]) {
-                            id lookup = [ad.engine lookupUsers:[NSArray arrayWithObjects:username, nil] areIDs:YES];
-                            
-                            if ([lookup isKindOfClass:[NSArray class]]) {
-                                if ([(NSArray *)lookup count] > 1) {
-                                    if ([(NSDictionary *)[lookup firstObjectA]objectForKey:@"protected"] && [addedUsernamesListArray containsObject:username]) {
-                                        [self.protectedUsers addObject:username];
-                                        [cachedInvalidUsers setObject:[NSDictionary dictionaryWithObjectsAndKeys:@"yes", @"protected", @"no", @"invalid", nil] forKey:username];
-                                        [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
-                                    }
-                                }
-                            } else if ([lookup isKindOfClass:[NSError class]]) {
-                                NSLog(@"TWITTER: Lookup error: %@",lookup);
-                                errorEncounteredWhileLoading = YES;
-                            }
+                            [potentialBadUsers addObject:username];
                         }
                     }
                 }
@@ -908,6 +895,27 @@
                     [self addTweetsToTimelineTweetCache:fetched];
                 }
                 NSLog(@" ");
+            }
+            
+            //
+            // Bad User checking
+            //
+            
+            id lookup = [ad.engine lookupUsers:potentialBadUsers areIDs:YES];
+            
+            if ([lookup isKindOfClass:[NSArray class]]) {
+                for (NSDictionary *entry in lookup) {
+                    NSString *username = [entry objectForKey:@"screen_name"];
+                    if ([entry objectForKey:@"protected"] && ![usernamesListArray containsObject:username]) {
+                        [self.protectedUsers addObject:username];
+                        [cachedInvalidUsers setObject:[NSDictionary dictionaryWithObjectsAndKeys:@"yes", @"protected", @"no", @"invalid", nil] forKey:username];
+                        [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
+                    }
+                }
+                
+            } else if ([lookup isKindOfClass:[NSError class]]) {
+                NSLog(@"TWITTER: Lookup error: %@",lookup);
+                errorEncounteredWhileLoading = YES;
             }
             
             
@@ -1144,13 +1152,12 @@
             cell.detailTextLabel.text = [tweetOrStatus objectForKey:@"message"];
             
             if (cell.detailTextLabel.text.length == 0) {
-                NSString *type = [tweetOrStatus objectForKey:@"type"];
-                cell.detailTextLabel.text = [type stringByCapitalizingFirstLetter];
+                cell.detailTextLabel.text = [[tweetOrStatus objectForKey:@"type"]stringByCapitalizingFirstLetter];
             }
             
         } else {
             cell.additionalLabel.text = @"Twitter    ";
-            cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:255.0/255.0 alpha:1.0];
+            cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
             cell.textLabel.text = [[tweetOrStatus objectForKey:@"user"]objectForKey:@"name"];
             cell.detailTextLabel.text = [[tweetOrStatus objectForKey:@"text"]stringByRemovingHTMLEntities];
         }
