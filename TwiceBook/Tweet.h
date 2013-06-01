@@ -27,4 +27,6 @@
 - (id)initWithDictionary:(NSDictionary *)dictionary;
 + (Tweet *)tweetWithDictionary:(NSDictionary *)dictionary;
 
+- (NSDictionary *)dictionaryValue;
+
 @end

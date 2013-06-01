@@ -25,4 +25,6 @@
 - (id)initWithDictionary:(NSDictionary *)dict;
 + (TwitterUser *)twitterUserWithDictionary:(NSDictionary *)dict;
 
+- (NSDictionary *)dictionaryValue;
+
 @end

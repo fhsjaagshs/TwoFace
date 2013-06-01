@@ -834,7 +834,7 @@
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             
-            NSMutableArray *tweets = [NSMutableArray array];
+            /*NSMutableArray *tweets = [NSMutableArray array];
             NSMutableArray *mentions = [NSMutableArray array];
             
             for (NSString *username in usernames) {
@@ -867,7 +867,7 @@
                     [self addTweetsToTimelineTweetCache:fetched];
                 }
             }
-            
+            */
 
             NSMutableArray *statuses = [[NSMutableArray alloc]init];
             
