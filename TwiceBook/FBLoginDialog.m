@@ -17,26 +17,22 @@
 #import "FBDialog.h"
 #import "FBLoginDialog.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 @implementation FBLoginDialog
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// public 
 
 // initialize the FBLoginDialog with url and parameters
 - (id)initWithURL:(NSString *)loginURL loginParams:(NSMutableDictionary *)params delegate:(id <FBLoginDialogDelegate>)delegate {
     self = [super init];
     if (self) {
-        _serverURL = [loginURL retain];
+        self.serverURL = [loginURL retain];
         self.params = [params retain];
         self.loginDelegate = delegate;
     }
     return self;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // FBDialog
+//
 
 // Override FBDialog : to call when the webView Dialog did succeed
 - (void) dialogDidSucceed:(NSURL*)url {

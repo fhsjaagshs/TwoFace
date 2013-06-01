@@ -19,9 +19,6 @@
 #import "Facebook.h"
 #import "FBFrictionlessRequestSettings.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// global
-
 static CGFloat kBorderGray[4] = {0.3, 0.3, 0.3, 0.8};
 static CGFloat kBorderBlack[4] = {0.3, 0.3, 0.3, 1};
 
@@ -29,8 +26,6 @@ static CGFloat kTransitionDuration = 0.3;
 
 static CGFloat kPadding = 0;
 static CGFloat kBorderWidth = 10;
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
 
 static BOOL FBIsDeviceIPad() {
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 30200
@@ -41,12 +36,22 @@ static BOOL FBIsDeviceIPad() {
     return NO;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+@interface FBDialog ()
+
+@property (nonatomic, retain) NSURL *loadingURL;
+@property (nonatomic, retain) UIWebView *webView;
+@property (nonatomic, retain) UIActivityIndicatorView *spinner;
+@property (nonatomic, retain) UIButton *closeButton;
+@property (nonatomic, retain) UIView *modalBackgroundView;
+@property (nonatomic, retain) FBFrictionlessRequestSettings *frictionlessSettings;
+@property (nonatomic, assign) UIInterfaceOrientation orientation;
+@property (nonatomic, assign) BOOL showingKeyboard;
+@property (nonatomic, assign) BOOL isViewInvisible;
+
+
+@end
 
 @implementation FBDialog
-
-@synthesize delegate = _delegate,
-params   = _params;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // private
@@ -134,10 +139,7 @@ params   = _params;
     if (orientation == _orientation) {
         return NO;
     } else {
-        return orientation == UIInterfaceOrientationPortrait
-        || orientation == UIInterfaceOrientationPortraitUpsideDown
-        || orientation == UIInterfaceOrientationLandscapeLeft
-        || orientation == UIInterfaceOrientationLandscapeRight;
+        return orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown || orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight;
     }
 }
 
@@ -160,9 +162,7 @@ params   = _params;
     }
     
     CGRect frame = [UIScreen mainScreen].applicationFrame;
-    CGPoint center = CGPointMake(
-                                 frame.origin.x + ceil(frame.size.width/2),
-                                 frame.origin.y + ceil(frame.size.height/2));
+    CGPoint center = CGPointMake(frame.origin.x+ceil(frame.size.width/2),frame.origin.y+ceil(frame.size.height/2));
     
     CGFloat scale_factor = 1.0f;
     if (FBIsDeviceIPad()) {
@@ -170,10 +170,10 @@ params   = _params;
         scale_factor = 0.6f;
     }
     
-    CGFloat width = floor(scale_factor * frame.size.width) - kPadding * 2;
-    CGFloat height = floor(scale_factor * frame.size.height) - kPadding * 2;
+    CGFloat width = floor(scale_factor*frame.size.width)-kPadding*2;
+    CGFloat height = floor(scale_factor*frame.size.height)-kPadding*2;
     
-    _orientation = [UIApplication sharedApplication].statusBarOrientation;
+    self.orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (UIInterfaceOrientationIsLandscape(_orientation)) {
         self.frame = CGRectMake(kPadding, kPadding, height, width);
     } else {
@@ -189,11 +189,9 @@ params   = _params;
 - (void)updateWebOrientation {
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (UIInterfaceOrientationIsLandscape(orientation)) {
-        [_webView stringByEvaluatingJavaScriptFromString:
-         @"document.body.setAttribute('orientation', 90);"];
+        [_webView stringByEvaluatingJavaScriptFromString:@"document.body.setAttribute('orientation', 90);"];
     } else {
-        [_webView stringByEvaluatingJavaScriptFromString:
-         @"document.body.removeAttribute('orientation');"];
+        [_webView stringByEvaluatingJavaScriptFromString:@"document.body.removeAttribute('orientation');"];
     }
 }
 
@@ -216,21 +214,15 @@ params   = _params;
 - (NSURL*)generateURL:(NSString*)baseURL params:(NSDictionary*)params {
     if (params) {
         NSMutableArray* pairs = [NSMutableArray array];
-        for (NSString* key in params.keyEnumerator) {
-            NSString* value = [params objectForKey:key];
-            NSString* escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(
-                                                                                          NULL, /* allocator */
-                                                                                          (CFStringRef)value,
-                                                                                          NULL, /* charactersToLeaveUnescaped */
-                                                                                          (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-                                                                                          kCFStringEncodingUTF8);
-            
+        for (NSString *key in params.keyEnumerator) {
+            NSString *value = [params objectForKey:key];
+            NSString *escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(nil, (CFStringRef)value, nil, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
             [pairs addObject:[NSString stringWithFormat:@"%@=%@", key, escaped_value]];
             [escaped_value release];
         }
         
-        NSString* query = [pairs componentsJoinedByString:@"&"];
-        NSString* url = [NSString stringWithFormat:@"%@?%@", baseURL, query];
+        NSString *query = [pairs componentsJoinedByString:@"&"];
+        NSString *url = [NSString stringWithFormat:@"%@?%@", baseURL, query];
         return [NSURL URLWithString:url];
     } else {
         return [NSURL URLWithString:baseURL];
@@ -238,22 +230,15 @@ params   = _params;
 }
 
 - (void)addObservers {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(deviceOrientationDidChange:)
-                                                 name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:) name:@"UIKeyboardWillShowNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:) name:@"UIKeyboardWillHideNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(deviceOrientationDidChange:) name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:@"UIKeyboardWillShowNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:@"UIKeyboardWillHideNotification" object:nil];
 }
 
 - (void)removeObservers {
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"UIDeviceOrientationDidChangeNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"UIKeyboardWillShowNotification" object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:@"UIKeyboardWillHideNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"UIDeviceOrientationDidChangeNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"UIKeyboardWillShowNotification" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"UIKeyboardWillHideNotification" object:nil];
 }
 
 - (void)postDismissCleanup {
@@ -267,12 +252,9 @@ params   = _params;
 
     // If the dialog has been closed, then we need to cancel the order to open it.	
     // This happens in the case of a frictionless request, see webViewDidFinishLoad for details	
-    [NSObject cancelPreviousPerformRequestsWithTarget:self 
-                                             selector:@selector(showWebView)
-                                               object:nil];
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(showWebView) object:nil];
 
-    [_loadingURL release];
-    _loadingURL = nil;
+    self.loadingURL = nil;
     
     if (animated) {
         [UIView beginAnimations:nil context:nil];
@@ -291,36 +273,15 @@ params   = _params;
 }
 
 - (BOOL)testBoolUrlParam:(NSURL *)url param:(NSString *)param {
-    NSString *paramVal = [self getStringFromUrl: [url absoluteString] 
-                                         needle: param];
-    return [paramVal boolValue];
+    return [[self getStringFromUrl:[url absoluteString] needle:param]boolValue];
 }
 
 - (void)dialogSuccessHandleFrictionlessResponses:(NSURL *)url {
-    // did we receive a recipient list?
-    NSString *recipientJson = [self getStringFromUrl:[url absoluteString]
-                                              needle:@"frictionless_recipients="];
-    if (recipientJson) {
-        // if value parses as an array, treat as set of fbids
-        /*SBJsonParser *parser = [[[SBJsonParser alloc]
-                                 init]
-                                autorelease];
-        id recipients = [parser objectWithString:recipientJson];*/
-        
+    NSString *recipientJson = [self getStringFromUrl:[url absoluteString] needle:@"frictionless_recipients="];
+    if (recipientJson.length > 0) {
         id recipients = [NSJSONSerialization JSONObjectWithData:[recipientJson dataUsingEncoding:NSUTF8StringEncoding allowLossyConversion:NO] options:NSJSONReadingMutableContainers error:nil];
-
-        // if we got something usable, copy the ids out and update the cache
         if ([recipients isKindOfClass:[NSArray class]]) { 
-            NSMutableArray *ids = [[[NSMutableArray alloc]
-                                    initWithCapacity:[recipients count]]
-                                   autorelease];
-            for (id recipient in recipients) {
-                NSString *fbid = [NSString stringWithFormat:@"%@", recipient];
-                [ids addObject:fbid];
-            }
-            // we may be tempted to terminate outstanding requests before this
-            // point, but that would cause problems if the user cancelled a dialog
-            [_frictionlessSettings updateRecipientCacheWithRecipients:ids];
+            [_frictionlessSettings updateRecipientCacheWithRecipients:recipients];
         }
     }
 }
@@ -329,17 +290,17 @@ params   = _params;
 // NSObject
 
 - (id)init {
-    if ((self = [super initWithFrame:CGRectZero])) {
-        _delegate = nil;
-        _loadingURL = nil;
-        _showingKeyboard = NO;
+    if (self = [super initWithFrame:CGRectZero]) {
+        self.delegate = nil;
+        self.loadingURL = nil;
+        self.showingKeyboard = NO;
         
         self.backgroundColor = [UIColor clearColor];
         self.autoresizesSubviews = YES;
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         self.contentMode = UIViewContentModeRedraw;
         
-        _webView = [[UIWebView alloc] initWithFrame:CGRectMake(kPadding, kPadding, 480, 480)];
+        self.webView = [[UIWebView alloc] initWithFrame:CGRectMake(kPadding, kPadding, 480, 480)];
         _webView.delegate = self;
         _webView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self addSubview:_webView];
@@ -349,51 +310,41 @@ params   = _params;
        // UIImage *closeImage = [UIImage imageNamed:@"FBDialog.bundle/images/close.png"];
         
         UIColor *color = [UIColor colorWithRed:167.0/255 green:184.0/255 blue:216.0/255 alpha:1];
-        _closeButton = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
+        self.closeButton = [[UIButton buttonWithType:UIButtonTypeCustom] retain];
         [_closeButton setImage:closeImage forState:UIControlStateNormal];
         [_closeButton setTitleColor:color forState:UIControlStateNormal];
         [_closeButton setTitleColor:[UIColor whiteColor] forState:UIControlStateHighlighted];
         [_closeButton addTarget:self action:@selector(cancel)
                forControlEvents:UIControlEventTouchUpInside];
-        
-        // To be compatible with OS 2.x
-#if __IPHONE_OS_VERSION_MAX_ALLOWED <= __IPHONE_2_2
-        _closeButton.font = [UIFont boldSystemFontOfSize:12];
-#else
         _closeButton.titleLabel.font = [UIFont boldSystemFontOfSize:12];
-#endif
-        
         _closeButton.showsTouchWhenHighlighted = YES;
-        _closeButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin
-        | UIViewAutoresizingFlexibleBottomMargin;
+        _closeButton.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
         [self addSubview:_closeButton];
         
-        _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:
-                    UIActivityIndicatorViewStyleWhiteLarge];
+        self.spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
         if ([_spinner respondsToSelector:@selector(setColor:)]) {
             [_spinner setColor:[UIColor grayColor]];
         } else {
             [_spinner setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleGray];
         }
-        _spinner.autoresizingMask =
-        UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin
-        | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+        _spinner.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
         [self addSubview:_spinner];
-        _modalBackgroundView = [[UIView alloc] init];
+        
+        self.modalBackgroundView = [[UIView alloc]init];
     }
     return self;
 }
 
 - (void)dealloc {
     _webView.delegate = nil;
-    [_webView release];
-    [_params release];
-    [_serverURL release];
-    [_spinner release];
-    [_closeButton release];
-    [_loadingURL release];
-    [_modalBackgroundView release];
-    [_frictionlessSettings release];
+    self.webView = nil;
+    self.serverURL = nil;
+    self.params = nil;
+    self.spinner = nil;
+    self.closeButton = nil;
+    self.loadingURL = nil;
+    self.modalBackgroundView = nil;
+    self.frictionlessSettings = nil;
     [super dealloc];
 }
 
@@ -402,11 +353,7 @@ params   = _params;
 
 - (void)drawRect:(CGRect)rect {
     [self drawRect:rect fill:kBorderGray radius:0];
-    
-    CGRect webRect = CGRectMake(
-                                ceil(rect.origin.x + kBorderWidth), ceil(rect.origin.y + kBorderWidth)+1,
-                                rect.size.width - kBorderWidth*2, _webView.frame.size.height+1);
-    
+    CGRect webRect = CGRectMake(ceil(rect.origin.x+kBorderWidth), ceil(rect.origin.y+kBorderWidth)+1, rect.size.width - kBorderWidth*2, _webView.frame.size.height+1);
     [self strokeLines:webRect stroke:kBorderBlack];
 }
 
@@ -448,19 +395,16 @@ params   = _params;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // UIWebViewDelegate
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request
- navigationType:(UIWebViewNavigationType)navigationType {
-    NSURL* url = request.URL;
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    NSURL *url = request.URL;
     
     if ([url.scheme isEqualToString:@"fbconnect"]) {
         if ([[url.resourceSpecifier substringToIndex:8] isEqualToString:@"//cancel"]) {
             NSString * errorCode = [self getStringFromUrl:[url absoluteString] needle:@"error_code="];
             NSString * errorStr = [self getStringFromUrl:[url absoluteString] needle:@"error_msg="];
             if (errorCode) {
-                NSDictionary * errorData = [NSDictionary dictionaryWithObject:errorStr forKey:@"error_msg"];
-                NSError * error = [NSError errorWithDomain:@"facebookErrDomain"
-                                                      code:[errorCode intValue]
-                                                  userInfo:errorData];
+                NSDictionary *errorData = [NSDictionary dictionaryWithObject:errorStr forKey:@"error_msg"];
+                NSError *error = [NSError errorWithDomain:@"facebookErrDomain" code:[errorCode intValue] userInfo:errorData];
                 [self dismissWithError:error animated:YES];
             } else {
                 [self dialogDidCancel:url];
@@ -507,8 +451,7 @@ params   = _params;
     // the page has completely loaded, if we find cases where we want this to result in dialog failure
     // (usually this just means quick-user), then we should add something more robust here to account
     // for differences in application needs
-    if (!(([error.domain isEqualToString:@"NSURLErrorDomain"] && error.code == -999) ||
-          ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102))) {
+    if (!(([error.domain isEqualToString:@"NSURLErrorDomain"] && error.code == -999) || ([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102))) {
         [self dismissWithError:error animated:YES];
     }
 }
@@ -516,7 +459,7 @@ params   = _params;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // UIDeviceOrientationDidChangeNotification
 
-- (void)deviceOrientationDidChange:(void*)object {
+- (void)deviceOrientationDidChange:(void *)object {
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
     if (!_showingKeyboard && [self shouldRotateToOrientation:orientation]) {
         [self updateWebOrientation];
@@ -532,21 +475,16 @@ params   = _params;
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // UIKeyboardNotifications
 
-- (void)keyboardWillShow:(NSNotification*)notification {
+- (void)keyboardWillShow:(NSNotification *)notification {
     
-    _showingKeyboard = YES;
+    self.showingKeyboard = YES;
     
     if (FBIsDeviceIPad()) {
-        // On the iPad the screen is large enough that we don't need to
-        // resize the dialog to accomodate the keyboard popping up
         return;
     }
     
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (UIInterfaceOrientationIsLandscape(orientation)) {
-        _webView.frame = CGRectInset(_webView.frame,
-                                     -(kPadding + kBorderWidth),
-                                     -(kPadding + kBorderWidth));
+    if (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        _webView.frame = CGRectInset(_webView.frame, -(kPadding + kBorderWidth), -(kPadding + kBorderWidth));
     }
 }
 
@@ -556,11 +494,9 @@ params   = _params;
     if (FBIsDeviceIPad()) {
         return;
     }
-    UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
-    if (UIInterfaceOrientationIsLandscape(orientation)) {
-        _webView.frame = CGRectInset(_webView.frame,
-                                     kPadding + kBorderWidth,
-                                     kPadding + kBorderWidth);
+
+    if (UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)) {
+        _webView.frame = CGRectInset(_webView.frame, kPadding + kBorderWidth, kPadding + kBorderWidth);
     }
 }
 
@@ -570,8 +506,8 @@ params   = _params;
 /**
  * Find a specific parameter from the url
  */
-- (NSString *) getStringFromUrl: (NSString*) url needle:(NSString *) needle {
-    NSString * str = nil;
+- (NSString *)getStringFromUrl:(NSString *)url needle:(NSString *)needle {
+    NSString *str = nil;
     NSRange start = [url rangeOfString:needle];
     if (start.location != NSNotFound) {
         // confirm that the parameter is not a partial name match
@@ -579,31 +515,26 @@ params   = _params;
         if (start.location != 0) {
             c = [url characterAtIndex:start.location - 1];
         }
+        
         if (c == '?' || c == '&' || c == '#') {        
-            NSRange end = [[url substringFromIndex:start.location+start.length] rangeOfString:@"&"];
+            NSRange end = [[url substringFromIndex:start.location+start.length]rangeOfString:@"&"];
             NSUInteger offset = start.location+start.length;
-            str = end.location == NSNotFound ?
-                [url substringFromIndex:offset] : 
-                [url substringWithRange:NSMakeRange(offset, end.location)];
+            str = end.location == NSNotFound?[url substringFromIndex:offset]:[url substringWithRange:NSMakeRange(offset, end.location)];
             str = [str stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         }
-    }    
+    }
     return str;
 }
 
-- (id)initWithURL: (NSString *) serverURL
-           params: (NSMutableDictionary *) params
-  isViewInvisible: (BOOL)isViewInvisible
-     frictionlessSettings: (FBFrictionlessRequestSettings*) frictionlessSettings
-         delegate: (id <FBDialogDelegate>) delegate {
-    
+- (id)initWithURL:(NSString *)serverURL params:(NSMutableDictionary *)params isViewInvisible:(BOOL)isViewInvisible frictionlessSettings:(FBFrictionlessRequestSettings *)frictionlessSettings delegate:(id<FBDialogDelegate>)delegate {
     self = [self init];
-    _serverURL = [serverURL retain];
-    _params = [params retain];    
-    _delegate = delegate;
-    _isViewInvisible = isViewInvisible;
-    _frictionlessSettings = [frictionlessSettings retain];
-    
+    if (self) {
+        self.serverURL = [serverURL retain];
+        self.params = [params retain];
+        self.delegate = delegate;
+        self.isViewInvisible = isViewInvisible;
+        self.frictionlessSettings = [frictionlessSettings retain];
+    }
     return self;
 }
 
@@ -611,13 +542,9 @@ params   = _params;
     [self loadURL:_serverURL get:_params];
 }
 
-- (void)loadURL:(NSString*)url get:(NSDictionary*)getParams {
-
-    [_loadingURL release];
-    _loadingURL = [[self generateURL:url params:getParams] retain];
-    NSMutableURLRequest* request = [NSMutableURLRequest requestWithURL:_loadingURL];
-    
-    [_webView loadRequest:request];
+- (void)loadURL:(NSString *)url get:(NSDictionary *)getParams {
+    self.loadingURL = [[self generateURL:url params:getParams] retain];
+    [_webView loadRequest:[NSMutableURLRequest requestWithURL:_loadingURL]];
 }
 
 - (void)show {
@@ -626,18 +553,8 @@ params   = _params;
     
     CGFloat innerWidth = self.frame.size.width - (kBorderWidth+1)*2;
     [_closeButton sizeToFit];
-    
-    _closeButton.frame = CGRectMake(
-                                    2,
-                                    2,
-                                    29,
-                                    29);
-    
-    _webView.frame = CGRectMake(
-                                kBorderWidth+1,
-                                kBorderWidth+1,
-                                innerWidth,
-                                self.frame.size.height - (1 + kBorderWidth*2));
+    _closeButton.frame = CGRectMake(2, 2, 29, 29);
+    _webView.frame = CGRectMake(kBorderWidth+1, kBorderWidth+1, innerWidth, self.frame.size.height-(1+kBorderWidth*2));
     
     if (!_isViewInvisible) {	
         [self showSpinner];	
@@ -674,7 +591,6 @@ params   = _params;
 }
 
 - (void)dialogDidSucceed:(NSURL *)url {
-    
     if ([_delegate respondsToSelector:@selector(dialogCompleteWithUrl:)]) {
         [_delegate dialogCompleteWithUrl:url];
     }

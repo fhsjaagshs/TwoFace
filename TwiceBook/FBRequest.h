@@ -63,15 +63,11 @@ typedef NSUInteger FBRequestState;
 
 @end
 
-////////////////////////////////////////////////////////////////////////////////
-
 @protocol FBRequestDelegate <NSObject>
 
 @optional
 
-/*
- * Called just before the request is sent to the server.
- */
+// Called just before the request is sent to the server.
 - (void)requestLoading:(FBRequest *)request;
 
 /*
@@ -83,9 +79,7 @@ typedef NSUInteger FBRequestState;
  */
 - (void)request:(FBRequest *)request didReceiveResponse:(NSURLResponse *)response;
 
-/*
- * Called when an error prevents the request from completing successfully.
- */
+// Called when an error prevents the request from completing successfully.
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error;
 
 /*
@@ -97,11 +91,8 @@ typedef NSUInteger FBRequestState;
  */
 - (void)request:(FBRequest *)request didLoad:(id)result;
 
-/*
- * Called when a request returns a response.
- *
- * The result object is the raw response from the server of type NSData
- */
+// Called when a request returns a response.
+// The result object is the raw response from the server of type NSData
 - (void)request:(FBRequest *)request didLoadRawResponse:(NSData *)data;
 
 @end

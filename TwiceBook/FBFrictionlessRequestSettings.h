@@ -24,12 +24,12 @@
  * Handles frictionless interaction and recipient-caching by the SDK,
  * see https://developers.facebook.com/docs/reference/dialogs/requests/ 
  */
-@interface FBFrictionlessRequestSettings : NSObject<FBRequestDelegate>
+@interface FBFrictionlessRequestSettings : NSObject <FBRequestDelegate>
 
 /**
  * BOOL indicating whether frictionless request sending has been enabled
  */
-@property(nonatomic, readonly) BOOL enabled;
+@property (nonatomic, readonly) BOOL enabled;
 
 /**
  * Enable frictionless request sending by the sdk; this means:

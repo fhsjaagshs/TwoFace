@@ -17,9 +17,6 @@
 #import "Facebook.h"
 #import "FBFrictionlessRequestSettings.h"
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// private interface
-//
 @interface FBFrictionlessRequestSettings ()
 
 @property (readwrite, retain) NSArray *allowedRecipients;
@@ -27,14 +24,7 @@
 
 @end
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
-
 @implementation FBFrictionlessRequestSettings 
-
-///////////////////////////////////////////////////////////////////////////////////////////////////
-// public
-
-@synthesize enabled = _enabled;
 
 - (id)init {
     if (self = [super init]) {
@@ -46,7 +36,7 @@
 
 - (void)enableWithFacebook:(Facebook*)facebook {
     if (!_enabled) {
-        _enabled = true;
+        _enabled = YES;
         [self reloadRecipientCacheWithFacebook:facebook];
     }
 }
@@ -66,7 +56,6 @@
 }
 
 - (BOOL)isFrictionlessEnabledForRecipient:(NSString *)fbid {
-    // trim whitespace from edges
     fbid = [fbid stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
 
     // linear search through cache for a match
@@ -101,8 +90,9 @@
     return YES;
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////
+//
 // FBRequestDelegate
+//
 
 - (void)request:(FBRequest *)request didLoad:(id)result {
 
