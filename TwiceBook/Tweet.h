@@ -24,9 +24,12 @@
 @property (nonatomic, assign) BOOL isFavorited; // favorited
 @property (nonatomic, assign) BOOL isRetweeted; // retweeted
 
+@property (nonatomic, retain) NSMutableDictionary *replies;
+
 - (id)initWithDictionary:(NSDictionary *)dictionary;
 + (Tweet *)tweetWithDictionary:(NSDictionary *)dictionary;
 
 - (NSDictionary *)dictionaryValue;
+- (void)addReply:(Tweet *)reply;
 
 @end

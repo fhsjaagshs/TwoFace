@@ -834,15 +834,14 @@
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             
-            /*NSMutableArray *tweets = [NSMutableArray array];
+            NSMutableArray *tweets = [NSMutableArray array];
             NSMutableArray *mentions = [NSMutableArray array];
             
             for (NSString *username in usernames) {
-                NSString *identifier = [self getLatestTweetIDInTimelineCacheForUsername:username];
                 
-                NSLog(@"TWITTER: latest tweet identifier: %@",identifier);
+                NSLog(@"TWITTER: Starting User: %@",username);
                 
-                id fetched = [ad.engine getTimelineForUser:username isID:NO count:3 sinceID:identifier maxID:nil];
+                id fetched = [ad.engine getTimelineForUser:username isID:NO count:3];
                 
                 if ([fetched isKindOfClass:[NSError class]]) {
                     if ([(NSError *)fetched code] == 404) {
@@ -851,25 +850,18 @@
                 }
                 
                 if ([fetched isKindOfClass:[NSArray class]]) {
-                    int numberOfTweetsToLoad = 3-[(NSArray *)fetched count];
+                    for (NSDictionary *dict in fetched) {
+                        [tweets addObject:[Tweet tweetWithDictionary:dict]];
+                    }
                     
-                    NSMutableArray *loadedFromCacheTweets = [self loadTimelineTweetCacheWithCount:numberOfTweetsToLoad forUsername:username];
-                    
-                    NSLog(@"TWITTER: fetched: %u loaded: %d",[(NSArray *)fetched count],loadedFromCacheTweets.count);
-                    
-                    id mentions = [ad.engine getMentionsTimelineWithCount:4];
-                    
-                    
-                    
-                    [tweets addObjectsFromArray:loadedFromCacheTweets];
-                    [tweets addObjectsFromArray:fetched];
-                    
-                    [self addTweetsToTimelineTweetCache:fetched];
+                    NSLog(@"TWITTER: fetched: %u",[(NSArray *)fetched count]);
                 }
             }
-            */
+            
+            
+            
 
-            NSMutableArray *statuses = [[NSMutableArray alloc]init];
+          /*  NSMutableArray *statuses = [[NSMutableArray alloc]init];
             
             NSMutableDictionary *cachedInvalidUsers = [[NSMutableDictionary alloc]initWithContentsOfFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]];
             
@@ -930,13 +922,13 @@
                     [self addTweetsToTimelineTweetCache:fetched];
                 }
                 NSLog(@" ");
-            }
+            }*/
             
             //
             // Bad User checking
             //
             
-            id lookup = [ad.engine lookupUsers:potentialBadUsers areIDs:YES];
+            /*id lookup = [ad.engine lookupUsers:potentialBadUsers areIDs:YES];
             
             if ([lookup isKindOfClass:[NSArray class]]) {
                 for (NSDictionary *entry in lookup) {
@@ -951,16 +943,23 @@
             } else if ([lookup isKindOfClass:[NSError class]]) {
                 NSLog(@"TWITTER: Lookup error: %@",lookup);
                 errorEncounteredWhileLoading = YES;
-            }
+            }*/
             
             
             //
             // Replied to tweet fetching
             //
+
+            NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
+            NSMutableArray *cachedRepliedToTweets = [[NSMutableArray alloc]initWithContentsOfFile:irtTweetCachePath];
             
-            NSMutableArray *unusedStatusesFromCache = [statuses mutableCopy];
+            if (cachedRepliedToTweets == nil) {
+                cachedRepliedToTweets = [NSMutableArray array];
+            }
             
-            for (NSMutableDictionary *dict in [statuses mutableCopy]) {
+            NSMutableArray *unusedStatusesFromCache = [tweets mutableCopy];
+            
+            for (NSMutableDictionary *dict in [tweets mutableCopy]) {
                 
                 NSString *inReplyToID = [dict objectForKey:@"in_reply_to_status_id_str"];
                 if (!(inReplyToID == nil || inReplyToID.length == 0)) {
@@ -982,7 +981,7 @@
                     if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
                         if (![retrievedTweet objectForKey:@"error"]) {
                             [cachedRepliedToTweets addObject:retrievedTweet];
-                            [statuses addObject:retrievedTweet];
+                            [tweets addObject:retrievedTweet];
                             [unusedStatusesFromCache removeObject:retrievedTweet];
                             NSLog(@"Fetched Contextual Tweet: %@",inReplyToID);
                         } else {
@@ -997,9 +996,9 @@
             NSLog(@" ");
             
             [cachedRepliedToTweets removeObjectsInArray:unusedStatusesFromCache];
-            [cachedRepliedToTweets writeToFile:cachedPath atomically:YES];
+            [cachedRepliedToTweets writeToFile:irtTweetCachePath atomically:YES];
             
-            for (NSMutableDictionary *dict in [statuses mutableCopy]) {
+           /* for (NSMutableDictionary *dict in [statuses mutableCopy]) {
                 [dict setValue:@"twitter" forKey:@"social_network_name"];
                 
                 NSString *text = [dict objectForKey:@"text"];
@@ -1062,13 +1061,11 @@
                 [user removeObjectsForKeys:[NSArray arrayWithObjects:@"entities", @"geo_enabled", @"utc_offset", nil]];
                 [dict setObject:user forKey:@"user"];
                 [dict removeObjectForKey:@"place"];
-            }
+            }*/
+
+            NSLog(@"TWITTER: Duplicate tweets: %d",(tweets.count-[tweets arrayByRemovingDuplicates].count));
             
-            int duplicateTweetCount = statuses.count-[[statuses mutableCopy]arrayByRemovingDuplicates].count;
-            
-            NSLog(@"TWITTER: Duplicate tweets: %d",duplicateTweetCount);
-            
-            [self.timeline addObjectsFromArray:statuses];
+            [self.timeline addObjectsFromArray:tweets];
 
             finishedLoadingTwitter = YES;
             
