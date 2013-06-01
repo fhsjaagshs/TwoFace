@@ -835,7 +835,13 @@
         @autoreleasepool {
             
             NSMutableArray *tweets = [NSMutableArray array];
-            NSMutableArray *mentions = [NSMutableArray array];
+            
+            NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
+            NSMutableArray *cachedRepliedToTweets = [NSMutableArray arrayWithContentsOfFile:irtTweetCachePath];
+            
+            if (cachedRepliedToTweets == nil) {
+                cachedRepliedToTweets = [NSMutableArray array];
+            }
             
             for (NSString *username in usernames) {
                 
@@ -850,13 +856,61 @@
                 }
                 
                 if ([fetched isKindOfClass:[NSArray class]]) {
+                    
                     for (NSDictionary *dict in fetched) {
-                        [tweets addObject:[Tweet tweetWithDictionary:dict]];
+                        
+                        Tweet *tweet = [Tweet tweetWithDictionary:dict];
+                        
+                        if (!tweet.inReplyToTweetIdentifier.length == 0) {
+                            
+                            id retrievedTweet = nil;
+                            
+                            if (cachedRepliedToTweets.count > 0) {
+                                for (NSDictionary *dict_cached in cachedRepliedToTweets) {
+                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:tweet.inReplyToTweetIdentifier]) {
+                                        retrievedTweet = dict_cached;
+                                        break;
+                                    }
+                                }
+                            }
+                            
+                            if (retrievedTweet == nil) {
+                                retrievedTweet = [ad.engine getDetailsForTweet:tweet.inReplyToTweetIdentifier];
+                            }
+                            
+                            if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
+                                
+                                Tweet *irt = [Tweet tweetWithDictionary:retrievedTweet];
+                                
+                                
+                                
+                                [cachedRepliedToTweets addObject:retrievedTweet];
+                                [tweets addObject:retrievedTweet];
+                                
+                                //[unusedStatusesFromCache removeObject:retrievedTweet];
+                                NSLog(@"TWITTER: Fetched Contextual Tweet: %@",tweet.inReplyToTweetIdentifier);
+                            } else if ([retrievedTweet isKindOfClass:[NSError class]]) {
+                                errorEncounteredWhileLoading = YES;
+                            }
+                        }
+                        
+                        
+                        
+                        [tweets addObject:tweet];
                     }
                     
                     NSLog(@"TWITTER: fetched: %u",[(NSArray *)fetched count]);
                 }
             }
+            
+          //  [cachedRepliedToTweets removeObjectsInArray:unusedStatusesFromCache];
+            [cachedRepliedToTweets writeToFile:irtTweetCachePath atomically:YES];
+            
+            NSLog(@" ");
+            NSLog(@"-----------------------");
+            NSLog(@" ");
+            
+            
             
             
             
@@ -950,26 +1004,29 @@
             // Replied to tweet fetching
             //
 
-            NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
+            /*NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
             NSMutableArray *cachedRepliedToTweets = [[NSMutableArray alloc]initWithContentsOfFile:irtTweetCachePath];
             
             if (cachedRepliedToTweets == nil) {
                 cachedRepliedToTweets = [NSMutableArray array];
             }
             
+            NSMutableArray *irts = [NSMutableArray array];
+            
             NSMutableArray *unusedStatusesFromCache = [tweets mutableCopy];
             
-            for (NSMutableDictionary *dict in [tweets mutableCopy]) {
+            for (NSMutableDictionary *dict in tweets) {
                 
                 NSString *inReplyToID = [dict objectForKey:@"in_reply_to_status_id_str"];
-                if (!(inReplyToID == nil || inReplyToID.length == 0)) {
-
+                if (!inReplyToID.length == 0) {
+                    
                     id retrievedTweet = nil;
                     
                     if (cachedRepliedToTweets.count > 0) {
                         for (NSDictionary *dict_cached in cachedRepliedToTweets) {
                             if ([[dict_cached objectForKey:@"in_reply_to_status_id_str"]isEqualToString:inReplyToID]) {
-                                retrievedTweet = [dict_cached mutableCopy];
+                                retrievedTweet = dict_cached;
+                                break;
                             }
                         }
                     }
@@ -979,14 +1036,12 @@
                     }
                     
                     if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
-                        if (![retrievedTweet objectForKey:@"error"]) {
-                            [cachedRepliedToTweets addObject:retrievedTweet];
-                            [tweets addObject:retrievedTweet];
-                            [unusedStatusesFromCache removeObject:retrievedTweet];
-                            NSLog(@"Fetched Contextual Tweet: %@",inReplyToID);
-                        } else {
-                            errorEncounteredWhileLoading = YES;
-                        }
+                        [cachedRepliedToTweets addObject:retrievedTweet];
+                        [tweets addObject:retrievedTweet];
+                        [unusedStatusesFromCache removeObject:retrievedTweet];
+                        NSLog(@"TWITTER: Fetched Contextual Tweet: %@",inReplyToID);
+                    } else if ([retrievedTweet isKindOfClass:[NSError class]]) {
+                        errorEncounteredWhileLoading = YES;
                     }
                 }
             }
@@ -996,7 +1051,7 @@
             NSLog(@" ");
             
             [cachedRepliedToTweets removeObjectsInArray:unusedStatusesFromCache];
-            [cachedRepliedToTweets writeToFile:irtTweetCachePath atomically:YES];
+            [cachedRepliedToTweets writeToFile:irtTweetCachePath atomically:YES];*/
             
            /* for (NSMutableDictionary *dict in [statuses mutableCopy]) {
                 [dict setValue:@"twitter" forKey:@"social_network_name"];
