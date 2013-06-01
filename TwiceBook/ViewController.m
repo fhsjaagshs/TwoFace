@@ -833,6 +833,41 @@
     
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
+            
+            NSMutableArray *tweets = [NSMutableArray array];
+            NSMutableArray *mentions = [NSMutableArray array];
+            
+            for (NSString *username in usernames) {
+                NSString *identifier = [self getLatestTweetIDInTimelineCacheForUsername:username];
+                
+                NSLog(@"TWITTER: latest tweet identifier: %@",identifier);
+                
+                id fetched = [ad.engine getTimelineForUser:username isID:NO count:3 sinceID:identifier maxID:nil];
+                
+                if ([fetched isKindOfClass:[NSError class]]) {
+                    if ([(NSError *)fetched code] == 404) {
+                        [self.protectedUsers addObject:username];
+                    }
+                }
+                
+                if ([fetched isKindOfClass:[NSArray class]]) {
+                    int numberOfTweetsToLoad = 3-[(NSArray *)fetched count];
+                    
+                    NSMutableArray *loadedFromCacheTweets = [self loadTimelineTweetCacheWithCount:numberOfTweetsToLoad forUsername:username];
+                    
+                    NSLog(@"TWITTER: fetched: %u loaded: %d",[(NSArray *)fetched count],loadedFromCacheTweets.count);
+                    
+                    id mentions = [ad.engine getMentionsTimelineWithCount:4];
+                    
+                    
+                    
+                    [tweets addObjectsFromArray:loadedFromCacheTweets];
+                    [tweets addObjectsFromArray:fetched];
+                    
+                    [self addTweetsToTimelineTweetCache:fetched];
+                }
+            }
+            
 
             NSMutableArray *statuses = [[NSMutableArray alloc]init];
             

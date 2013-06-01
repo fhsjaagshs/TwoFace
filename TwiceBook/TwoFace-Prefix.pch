@@ -53,4 +53,10 @@
     #import "HelperFunctions.h"
     #import "InterceptTwitPicLink.h"
 
+    #import "TwitterUser.h"
+    #import "Tweet.h"
+
+    #import "FacebookUser.h"
+    #import "Status.h"
+
 #endif

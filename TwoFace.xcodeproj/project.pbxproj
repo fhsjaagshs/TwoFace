@@ -61,6 +61,10 @@
 		F129B66F157B8237005353EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B66E157B8237005353EB /* AppDelegate.m */; };
 		F129B672157B8237005353EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B671157B8237005353EB /* ViewController.m */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
+		F18042C4175A8802008D191D /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C3175A8802008D191D /* Tweet.m */; };
+		F18042C7175A880C008D191D /* Status.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C6175A880C008D191D /* Status.m */; };
+		F18042CA175A893C008D191D /* TwitterUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C9175A893C008D191D /* TwitterUser.m */; };
+		F18042CD175A896C008D191D /* FacebookUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042CC175A896C008D191D /* FacebookUser.m */; };
 		F188BD671694FF2400BF01E4 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD501694FF2400BF01E4 /* FHSTwitterEngine.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD681694FF2400BF01E4 /* NSString+URLEncoding.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD541694FF2400BF01E4 /* NSString+URLEncoding.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD691694FF2400BF01E4 /* Base64TranscoderFHS.c in Sources */ = {isa = PBXBuildFile; fileRef = F188BD561694FF2400BF01E4 /* Base64TranscoderFHS.c */; };
@@ -172,6 +176,14 @@
 		F129B671157B8237005353EB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		F158D72A15800C1D0061E5A6 /* ReplyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplyViewController.h; sourceTree = "<group>"; };
 		F158D72B15800C1D0061E5A6 /* ReplyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplyViewController.m; sourceTree = "<group>"; };
+		F18042C2175A8802008D191D /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
+		F18042C3175A8802008D191D /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
+		F18042C5175A880C008D191D /* Status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Status.h; sourceTree = "<group>"; };
+		F18042C6175A880C008D191D /* Status.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Status.m; sourceTree = "<group>"; };
+		F18042C8175A893C008D191D /* TwitterUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwitterUser.h; sourceTree = "<group>"; };
+		F18042C9175A893C008D191D /* TwitterUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterUser.m; sourceTree = "<group>"; };
+		F18042CB175A896C008D191D /* FacebookUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookUser.h; sourceTree = "<group>"; };
+		F18042CC175A896C008D191D /* FacebookUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookUser.m; sourceTree = "<group>"; };
 		F188BD4F1694FF2400BF01E4 /* FHSTwitterEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitterEngine.h; sourceTree = "<group>"; };
 		F188BD501694FF2400BF01E4 /* FHSTwitterEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitterEngine.m; sourceTree = "<group>"; };
 		F188BD531694FF2400BF01E4 /* NSString+URLEncoding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+URLEncoding.h"; sourceTree = "<group>"; };
@@ -368,6 +380,7 @@
 				9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */,
 				9B60402F163C9E9C003C5262 /* AboutViewController.h */,
 				9B604030163C9E9C003C5262 /* AboutViewController.m */,
+				F18042C1175A87E3008D191D /* Containers */,
 				F188BD71169500EB00BF01E4 /* Twitpic */,
 				F188BD4E1694FF2400BF01E4 /* FHSTwitterEngine */,
 				9B32A33C160C110D00BA44FB /* Facebook iOS SDK */,
@@ -394,6 +407,21 @@
 				F129B66C157B8237005353EB /* TwoFace-Prefix.pch */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		F18042C1175A87E3008D191D /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				F18042C2175A8802008D191D /* Tweet.h */,
+				F18042C3175A8802008D191D /* Tweet.m */,
+				F18042C8175A893C008D191D /* TwitterUser.h */,
+				F18042C9175A893C008D191D /* TwitterUser.m */,
+				F18042C5175A880C008D191D /* Status.h */,
+				F18042C6175A880C008D191D /* Status.m */,
+				F18042CB175A896C008D191D /* FacebookUser.h */,
+				F18042CC175A896C008D191D /* FacebookUser.m */,
+			);
+			name = Containers;
 			sourceTree = "<group>";
 		};
 		F188BD4E1694FF2400BF01E4 /* FHSTwitterEngine */ = {
@@ -573,6 +601,10 @@
 				F188BD701694FF2400BF01E4 /* OAToken.m in Sources */,
 				F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */,
 				F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */,
+				F18042C4175A8802008D191D /* Tweet.m in Sources */,
+				F18042C7175A880C008D191D /* Status.m in Sources */,
+				F18042CA175A893C008D191D /* TwitterUser.m in Sources */,
+				F18042CD175A896C008D191D /* FacebookUser.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
