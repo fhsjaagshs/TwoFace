@@ -62,7 +62,6 @@
     
     NSMutableDictionary *rt_status = [dictionary objectForKey:@"retweeted_status"];
     
-    
     if (rt_status.allKeys.count > 0) {
         NSString *retweetedUsername = [[rt_status objectForKey:@"user"]objectForKey:@"screen_name"];
         NSString *retweetedText = [rt_status objectForKey:@"text"];

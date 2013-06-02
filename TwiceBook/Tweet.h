@@ -11,7 +11,7 @@
 @interface Tweet : NSObject
 
 @property (nonatomic, strong) NSString *identifier; // id_str
-@property (nonatomic, strong) NSDate *createdAt; // created_at
+@property (nonatomic, strong) NSString *createdAt; // created_at
 @property (nonatomic, strong) NSString *inReplyToUserIdentifier; // in_reply_to_user_id_str
 @property (nonatomic, strong) NSString *inReplyToScreenName; // in_reply_to_screen_name
 @property (nonatomic, strong) NSString *inReplyToTweetIdentifier; // in_reply_to_status_id_str && in_reply_to_status_id

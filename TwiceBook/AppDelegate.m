@@ -108,7 +108,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
-            NSMutableArray *timeline = [self.viewController.timeline mutableCopy];
+            NSMutableArray *timeline = [_viewController.timeline mutableCopy];
             if ([timeline containsObject:@"Loading..."]) {
                 [timeline removeObject:@"Loading..."];
             }

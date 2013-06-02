@@ -35,6 +35,16 @@
     [button addTarget:self action:@selector(showVersion) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button];
     [self.view bringSubviewToFront:button];
+    
+    [self loadTimelineViewDidLoadThreaded];
+    
+    self.protectedUsers = [NSMutableArray array];
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadTableView) name:@"reloadTableView" object:nil];
+    
+    self.pull = [[PullToRefreshView alloc]initWithScrollView:_theTableView];
+    [_pull setDelegate:self];
+    [_theTableView addSubview:_pull];
 }
 
 //
@@ -466,7 +476,7 @@
                     [self reloadCommon];
                     
                     if (savedTimeline.count > 0) {
-                        [self.timeline addObjectsFromArray:savedTimeline];
+                        [_timeline addObjectsFromArray:savedTimeline];
                         
                         BOOL shouldRecacheTimeline = NO;
                         
@@ -484,42 +494,24 @@
                             [ad cacheTimeline];
                         }
 
-                        [self.pull finishedLoading];
+                        [_pull finishedLoading];
                         
                     }
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                    [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+                    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
                 }
             });
         }
     });
 }
 
-//
-// UIViewController Methods
-//
-
 - (void)reloadTableView {
-    [self.theTableView reloadData];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    
-    [self loadTimelineViewDidLoadThreaded];
-
-    self.protectedUsers = [NSMutableArray array];
-    
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadTableView) name:@"reloadTableView" object:nil];
-    
-    self.pull = [[PullToRefreshView alloc]initWithScrollView:self.theTableView];
-    [self.pull setDelegate:self];
-    [self.theTableView addSubview:self.pull];
+    [_theTableView reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if (self.timeline.count == 0) {
-        [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    if (_timeline.count == 0) {
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
 
@@ -584,20 +576,18 @@
 
 - (void)sortedTimeline {
     
-    NSMutableArray *array = [self.timeline mutableCopy];
+    NSMutableArray *array = [_timeline mutableCopy];
     NSMutableDictionary *the = [NSMutableDictionary dictionary];
     
-    for (NSDictionary *dict in array) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:dict]];
-        
-        BOOL isFacebook = [(NSString *)[dict objectForKey:@"social_network_name"] isEqualToString:@"facebook"];
+    for (id item in array) {
+        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:item]];
         
         NSDate *date = nil;
         
-        if (isFacebook) {
-            date = [dict objectForKey:@"poster_created_time"];
+        if ([item isKindOfClass:[Status class]]) {
+            date = [item objectForKey:@"poster_created_time"];
         } else {
-            date = twitterDateFromString([dict objectForKey:@"created_at"]);
+            date = twitterDateFromString([(Tweet *)item createdAt]);
         }
         
         NSString *time = [NSString stringWithFormat:@"%f",[date timeIntervalSince1970]];
@@ -612,217 +602,19 @@
         [penultimateArray addObject:[the objectForKey:number]];
     }
     
-    
     NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
     
     for (NSString *string in penultimateArray) {
-        int index = [string intValue];
-        [final addObject:[array objectAtIndex:index]]; // array obj.. was timeline obj...
+        [final addObject:[array objectAtIndex:[string intValue]]]; // array obj.. was timeline obj...
     }
     
-    [self.timeline removeAllObjects];
-    [self.timeline addObjectsFromArray:final];
+    [_timeline removeAllObjects];
+    [_timeline addObjectsFromArray:final];
 }
 
 // 
 // Tweet Fetching Methods
 //
-
-- (NSMutableArray *)loadTimelineTweetCacheWithCount:(int)count forUsername:(NSString *)username {
-    
-    if (count < 1) {
-        return nil;
-    }
-    
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"timeline_tweet_cache.plist"];
-    NSMutableArray *cache = [[NSMutableArray alloc]initWithContentsOfFile:cacheLocation];
-    
-    if (cache.count == 0 || cache == nil) {
-        return nil;
-    }
-    
-    NSMutableArray *userSpecificTweets = [[NSMutableArray alloc]init];
-    
-    for (NSDictionary *tweet in cache) {
-        NSString *tweetUsername = [[tweet objectForKey:@"user"]objectForKey:@"screen_name"];
-        if ([[tweetUsername lowercaseString] isEqualToString:[username lowercaseString]]) {
-            [userSpecificTweets addObject:tweet];
-        }
-    }
-    
-    if (userSpecificTweets.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *array = [userSpecificTweets mutableCopy];
-    NSMutableDictionary *the = [NSMutableDictionary dictionary];
-    
-    for (NSDictionary *dict in array) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:dict]];
-        NSString *time = [NSString stringWithFormat:@"%f",[twitterDateFromString([dict objectForKey:@"created_at"]) timeIntervalSince1970]];
-        [the setObject:numberInArray forKey:time];
-    }
-    
-    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:[the allKeys]]; // contains sorted dates, use to fetch number in arrays
-    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:NO]]];
-    NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
-    
-    for (NSString *number in arrayZ) {
-        [penultimateArray addObject:[the objectForKey:number]];
-    }
-    
-    
-    NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
-    
-    for (NSString *string in penultimateArray) {
-        int index = [string intValue];
-        [final addObject:[array objectAtIndex:index]]; // array obj.. was timeline obj...
-    }
-    
-    [userSpecificTweets removeAllObjects];
-    [userSpecificTweets addObjectsFromArray:final];
-    
-    if (userSpecificTweets.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *tweetsToReturn = [[NSMutableArray alloc]init];
-    
-    
-    for (int i = 0; i < count; i++) {
-        if (userSpecificTweets.count > i) {
-            [tweetsToReturn addObject:[userSpecificTweets objectAtIndex:i]];
-        }
-    }
-    
-    if (tweetsToReturn.count == 0) {
-        return nil;
-    }
-    
-    for (id obj in userSpecificTweets) {
-        if (![tweetsToReturn containsObject:obj]) {
-            [cache removeObject:obj];
-        }
-    }
-    
-    return tweetsToReturn;
-}
-
-/*- (NSString *)getLatestTweetIDInTimelineCacheForUsername:(NSString *)username {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"timeline_tweet_cache.plist"];
-    NSMutableArray *cache = [[NSMutableArray alloc]initWithContentsOfFile:cacheLocation];
-    
-    if (cache.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *userSpecificTweets = [NSMutableArray array];
-    
-    for (NSDictionary *tweet in cache) {
-        NSString *tweetUsername = [[tweet objectForKey:@"user"]objectForKey:@"screen_name"];
-        if ([[tweetUsername lowercaseString] isEqualToString:[username lowercaseString]]) {
-            [userSpecificTweets addObject:tweet];
-        }
-    }
-    
-    if (userSpecificTweets.count == 0) {
-        return nil;
-    }
-    
-    NSMutableArray *array = [userSpecificTweets mutableCopy];
-    NSMutableDictionary *the = [NSMutableDictionary dictionary];
-    
-    for (NSDictionary *dict in array) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:dict]];
-        NSString *time = [NSString stringWithFormat:@"%f",[twitterDateFromString([dict objectForKey:@"created_at"]) timeIntervalSince1970]];
-        [the setObject:numberInArray forKey:time];
-    }
-    
-    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:[the allKeys]]; // contains sorted dates, use to fetch number in arrays
-    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:NO]]];
-    NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
-    
-    for (NSString *number in arrayZ) {
-        [penultimateArray addObject:[the objectForKey:number]];
-    }
-    
-    NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
-    
-    for (NSString *string in penultimateArray) {
-        int index = [string intValue];
-        [final addObject:[array objectAtIndex:index]]; // array obj.. was timeline obj...
-    }
-    
-    [userSpecificTweets removeAllObjects];
-    [userSpecificTweets addObjectsFromArray:final];
-    
-    if (userSpecificTweets.count == 0) {
-        return nil;
-    }
-    
-    NSDictionary *latestTweet = [userSpecificTweets firstObjectA];
-    NSString *finalID = [latestTweet objectForKey:@"id_str"];
-    
-    if (finalID == nil || finalID.length == 0) {
-        finalID = [NSString stringWithFormat:@"%@",[latestTweet objectForKey:@"id"]];
-    }
-    
-    return finalID;
-}
-
-- (void)addTweetsToTimelineTweetCache:(NSArray *)tweetsToAdd {
-    
-    if (tweetsToAdd.count == 0 || tweetsToAdd == nil) {
-        return;
-    }
-    
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"timeline_tweet_cache.plist"];
-    NSMutableArray *cache = [[NSMutableArray alloc]initWithContentsOfFile:cacheLocation];
-    
-    if (cache == nil) {
-        cache = [NSMutableArray array];
-    }
-    
-    for (id tweet in tweetsToAdd) {
-        if (![cache containsObject:tweet]) {
-            [cache addObject:tweet];
-        }
-    }
-    
-    if (cache.count == 0) {
-        return;
-    }
-    
-    NSMutableArray *array = [cache mutableCopy];
-    NSMutableDictionary *the = [NSMutableDictionary dictionary];
-    
-    for (NSDictionary *dict in array) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:dict]];
-        NSString *time = [NSString stringWithFormat:@"%f",[twitterDateFromString([dict objectForKey:@"created_at"]) timeIntervalSince1970]];
-        [the setObject:numberInArray forKey:time];
-    }
-    
-    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:[the allKeys]]; // contains sorted dates, use to fetch number in arrays
-    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:NO]]];
-    NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
-    
-    for (NSString *number in arrayZ) {
-        [penultimateArray addObject:[the objectForKey:number]];
-    }
-    
-    
-    NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
-    
-    for (NSString *string in penultimateArray) {
-        int index = [string intValue];
-        [final addObject:[array objectAtIndex:index]]; // array obj.. was timeline obj...
-    }
-    
-    [cache removeAllObjects];
-    [cache addObjectsFromArray:final];
-    
-    [cache writeToFile:cacheLocation atomically:YES];
-}*/
 
 - (void)getTweetsForUsernames:(NSArray *)usernames {
     
@@ -859,6 +651,8 @@
                 
                 if ([fetched isKindOfClass:[NSArray class]]) {
                     
+                    NSLog(@"TWITTER: fetched: %u",[(NSArray *)fetched count]);
+                    
                     for (NSDictionary *dict in fetched) {
                         
                         Tweet *tweet = [Tweet tweetWithDictionary:dict];
@@ -884,7 +678,7 @@
                                 Tweet *irt = [Tweet tweetWithDictionary:retrievedTweet];
                                 [usedTweetsFromCache addObject:irt];
                                 [tweets addObject:irt];
-                                NSLog(@"TWITTER: Fetched Contextual Tweet: %@",tweet.inReplyToTweetIdentifier);
+                                NSLog(@"TWITTER: Fetched Contextual Tweet: %@",irt.inReplyToTweetIdentifier);
                             } else if ([retrievedTweet isKindOfClass:[NSError class]]) {
                                 errorEncounteredWhileLoading = YES;
                             }
@@ -893,19 +687,21 @@
                         [tweets addObject:tweet];
                     }
                     
-                    NSLog(@"TWITTER: fetched: %u",[(NSArray *)fetched count]);
+                    NSLog(@" ");
+                    NSLog(@"-----------------------");
+                    NSLog(@" ");
                 }
             }
             
             [usedTweetsFromCache writeToFile:irtTweetCachePath atomically:YES];
             
-            NSLog(@" ");
-            NSLog(@"-----------------------");
-            NSLog(@" ");
-
-            NSLog(@"TWITTER: Duplicate tweets: %d",(tweets.count-[tweets arrayByRemovingDuplicates].count));
+            int duplicateCount = (tweets.count-[tweets arrayByRemovingDuplicates].count);
             
-            [tweets removeDuplicates];
+            if (duplicateCount > 0) {
+                NSLog(@"TWITTER: Deleted %d duplicate tweets",duplicateCount);
+                [tweets removeDuplicates];
+            }
+
             [_timeline addObjectsFromArray:tweets];
 
             finishedLoadingTwitter = YES;
@@ -932,17 +728,17 @@
     
     if (_timeline.count > 0) {
         
-        NSDictionary *item = [[_timeline objectAtIndex:indexPath.row]mutableCopy];
+        id item = [_timeline objectAtIndex:indexPath.row];
         NSString *cellText = nil;
         
-        if ([(NSString *)[item objectForKey:@"social_network_name"]isEqualToString:@"facebook"]) {
+        if ([item isKindOfClass:[Status class]]) {
             cellText = [item objectForKey:@"message"];
             
             if (cellText.length == 0) {
                 cellText = [item objectForKey:@"type"];
             }
         } else {
-            cellText = [item objectForKey:@"text"];
+            cellText = [(Tweet *)item text];
         }
         
         if (cellText.length > 140) {
@@ -957,11 +753,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = _timeline.count;
-    
-    if (count == 0) {
-        return 1;
-    }
-    return count;
+    return (count == 0)?1:count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -1014,11 +806,11 @@
     } else {
         
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        NSMutableDictionary *tweetOrStatus = [[self.timeline objectAtIndex:indexPath.row]mutableCopy];
+        id tweetOrStatus = [_timeline objectAtIndex:indexPath.row];
 
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
-        if ([(NSString *)[tweetOrStatus objectForKey:@"social_network_name"]isEqualToString:@"facebook"]) {
+        if ([tweetOrStatus isKindOfClass:[Status class]]) {
             cell.additionalLabel.text = @"Facebook    ";
             cell.additionalLabel.textColor = [UIColor colorWithRed:59.0/255.0 green:89.0/255.0 blue:152.0/255.0 alpha:1.0];
             cell.textLabel.text = [tweetOrStatus objectForKey:@"poster_name"];
@@ -1029,10 +821,11 @@
             }
             
         } else {
+            Tweet *tweet = (Tweet *)tweetOrStatus;
             cell.additionalLabel.text = @"Twitter    ";
             cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
-            cell.textLabel.text = [[tweetOrStatus objectForKey:@"user"]objectForKey:@"name"];
-            cell.detailTextLabel.text = [[tweetOrStatus objectForKey:@"text"]stringByRemovingHTMLEntities];
+            cell.textLabel.text = tweet.user.name;
+            cell.detailTextLabel.text = tweet.text;
         }
 
         if (cell.detailTextLabel.text.length > 140) {
@@ -1051,15 +844,15 @@
         return;
     }
 
-    NSString *labelText = [self.theTableView cellForRowAtIndexPath:indexPath].textLabel.text;
+    NSString *labelText = [_theTableView cellForRowAtIndexPath:indexPath].textLabel.text;
     
     if (([labelText isEqualToString:@"Not Logged in."] || [labelText isEqualToString:@"Loading..."] || [labelText isEqualToString:@"No Users Selected"])) {
         return;
     }
     
-    NSMutableDictionary *tappedItem = [[_timeline objectAtIndex:indexPath.row]mutableCopy];
+    id tappedItem = [_timeline objectAtIndex:indexPath.row];
     
-    if ([(NSString *)[tappedItem objectForKey:@"social_network_name"]isEqualToString:@"facebook"]) {
+    if ([tappedItem isKindOfClass:[Status class]]) {
         PostDetailViewController *p = [[PostDetailViewController alloc]initWithPost:tappedItem];
         [self presentModalViewController:p animated:YES];
     } else {
