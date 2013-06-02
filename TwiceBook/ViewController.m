@@ -16,10 +16,10 @@
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
     self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44)];
-    self.theTableView.delegate = self;
-    self.theTableView.dataSource = self;
-    [self.view addSubview:self.theTableView];
-    [self.view bringSubviewToFront:self.theTableView];
+    _theTableView.delegate = self;
+    _theTableView.dataSource = self;
+    [self.view addSubview:_theTableView];
+    [self.view bringSubviewToFront:_theTableView];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"TwoFace"];
@@ -84,28 +84,24 @@
     [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     
     if (self.protectedUsers.count > 0) {
-        NSString *protectedUserString = @"";
-        for (NSString *username in self.protectedUsers) {
-            protectedUserString = [protectedUserString stringByAppendingFormat:@"@%@, ",username];
-        }
-        protectedUserString = [protectedUserString substringToIndex:protectedUserString.length-2];
+        NSString *protectedUserString = [@"@" stringByAppendingString:[_protectedUsers componentsJoinedByString:@", @"]];
+        protectedUserString = [protectedUserString substringToIndex:protectedUserString.length-3];
         NSString *message = [NSString stringWithFormat:@"The following users are invalid or have their tweets protected:\n\n%@\n\n Would you like to remove them from your watched list?",protectedUserString];
-        
-        __block NSString *userInQuestion = [protectedUserString mutableCopy];
-        __block NSMutableArray *protectedUsersBlock = [self.protectedUsers mutableCopy];
+
+        __block NSMutableArray *protectedUsersBlock = [_protectedUsers mutableCopy];
         
         UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Protected Users" message:message completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
             
             if (buttonIndex == 0) {
-                NSMutableDictionary *cachedUsers = [NSMutableDictionary dictionaryWithContentsOfFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]];
                 
-                if (cachedUsers.count == 0) {
-                    cachedUsers = [NSMutableDictionary dictionary];
-                } else {
-                    [cachedUsers removeObjectForKey:userInQuestion];
+                NSString *cachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"];
+                
+                NSMutableDictionary *cachedUsers = [NSMutableDictionary dictionaryWithContentsOfFile:cachePath];
+                
+                if (cachedUsers.count > 0) {
+                    [cachedUsers removeObjectsForKeys:protectedUsersBlock];
+                    [cachedUsers writeToFile:cachePath atomically:YES];
                 }
-                
-                [cachedUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
             }
             
             if (buttonIndex == 1) {
@@ -125,18 +121,13 @@
                         [selectedUsers removeObject:obj];
                     }
                 }
-                
-                if (addedUsers.count > 0) {
-                    [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:addedUsernamesListKey];
-                }
-                
-                if (selectedUsers.count > 0) {
-                    [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:usernamesListKey];
-                }
+
+                [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:addedUsernamesListKey];
+                [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:usernamesListKey];
             }
         } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Remove", nil];
         [av show];
-        [self.protectedUsers removeAllObjects];
+        [_protectedUsers removeAllObjects];
     }
     
     if (errorEncounteredWhileLoading) {
@@ -207,7 +198,6 @@
     [req setHTTPMethod:@"POST"];
     
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        
         if (error) {
             facebookDone = YES;
             errorEncounteredWhileLoading = YES;
@@ -324,7 +314,7 @@
                 }
             }
         }
-        [self.timeline addObjectsFromArray:parsedPosts];
+        [_timeline addObjectsFromArray:parsedPosts];
         NSLog(@"Facebook: %d statuses fetched",parsedPosts.count);
     }
     facebookDone = YES;
@@ -339,8 +329,8 @@
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 
-    if (self.timeline.count == 0) {
-        self.timeline = [NSMutableArray array];
+    if (_timeline.count == 0) {
+        _timeline = [NSMutableArray array];
     }
     
     errorEncounteredWhileLoading = NO;
@@ -360,13 +350,13 @@
     }
     
     if (![FHSTwitterEngine isConnectedToInternet]) {
-        [self.pull finishedLoading];
+        [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
 
     if (![ad.engine isAuthorized] && ![ad.facebook isSessionValid]) {
-        [self.pull finishedLoading];
+        [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
@@ -383,15 +373,15 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 
     if (![FHSTwitterEngine isConnectedToInternet]) {
-        [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        [self.pull finishedLoading];
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+        [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
     
     if (usernameArrayTwitter.count == 0 && usernameArrayFacebook.count == 0) {
-        [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        [self.pull finishedLoading];
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+        [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     } else {
         
@@ -403,22 +393,6 @@
             [self fetchPostsForIDs:usernameArrayFacebook];
         }
     }
-}
-
-- (void)reloadTimelinePTR {
-    [self reloadCommon];
-    
-    if (![[kAppDelegate engine]isAuthorized] && ![[kAppDelegate facebook]isSessionValid]) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-    
-    if (![FHSTwitterEngine isConnectedToInternet]) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-    
-    [self reloadCommonFetching];
 }
 
 // 
@@ -451,11 +425,23 @@
         subtitle = @"Nothing to Load";
     }
 
-    [self.pull setSubtitleText:subtitle];
+    [_pull setSubtitleText:subtitle];
 }
 
 - (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view {
-    [self reloadTimelinePTR];
+    [self reloadCommon];
+    
+    if (![[kAppDelegate engine]isAuthorized] && ![[kAppDelegate facebook]isSessionValid]) {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        return;
+    }
+    
+    if (![FHSTwitterEngine isConnectedToInternet]) {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        return;
+    }
+    
+    [self reloadCommonFetching];
 }
 
 //
