@@ -33,7 +33,6 @@
 }
 
 - (void)parseDictionary:(NSDictionary *)dictionary {
-    
     self.identifier = [dictionary objectForKey:@"id_str"];
     self.createdAt = [dictionary objectForKey:@"created_at"];
     self.text = [dictionary objectForKey:@"text"];
