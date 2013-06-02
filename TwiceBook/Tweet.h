@@ -16,6 +16,7 @@
 @property (nonatomic, strong) NSString *inReplyToScreenName; // in_reply_to_screen_name
 @property (nonatomic, strong) NSString *inReplyToTweetIdentifier; // in_reply_to_status_id_str && in_reply_to_status_id
 @property (nonatomic, strong) NSString *text; // text
+@property (nonatomic, strong) NSString *retweetedBy; // retweeted_by
 
 @property (nonatomic, strong) NSString *source; // source
 

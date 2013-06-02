@@ -71,9 +71,13 @@
             if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
                 NSMutableDictionary *newEntities = [[dictionary objectForKey:@"retweeted_status"]objectForKey:@"entities"];
                 if (newEntities.allKeys.count > 0) {
-                    self.text = [NSString stringWithFormat:@"RT @%@: %@",retweetedUsername,retweetedText];
-                    entities = newEntities;
-                    // have the tweet become the retweeted tweet with a new key, "retweeted_by" \
+                    [rt_status removeObjectForKey:@"in_reply_to_screen_name"];
+                    [rt_status removeObjectForKey:@"in_reply_to_user_id_str"];
+                    [rt_status removeObjectForKey:@"in_reply_to_status_id_str"];
+                    [rt_status setObject:_user forKey:@"retweeted_by"];
+                    [self parseDictionary:rt_status];
+                    return;
+                    // have the tweet become the retweeted tweet with a new key, "retweeted_by"
                     // (perhaps removing the in_reply_to_id_str and friends)
                     // Just call through to -parseDictionary: with a slightly modified retweeted_status dict
                 }
