@@ -75,6 +75,7 @@
                     entities = newEntities;
                     // have the tweet become the retweeted tweet with a new key, "retweeted_by" \
                     // (perhaps removing the in_reply_to_id_str and friends)
+                    // Just call through to -parseDictionary: with a slightly modified retweeted_status dict
                 }
             }
         }
