@@ -60,53 +60,61 @@
     
     NSMutableDictionary *entities = [dictionary objectForKey:@"entities"];
     
-    NSString *retweetedUsername = [[[dictionary objectForKey:@"retweeted_status"]objectForKey:@"user"]objectForKey:@"screen_name"];
-    NSString *retweetedText = [[dictionary objectForKey:@"retweeted_status"]objectForKey:@"text"];
+    NSMutableDictionary *rt_status = [dictionary objectForKey:@"retweeted_status"];
     
-    if ([[_text substringToIndex:2]isEqualToString:@"RT"]) {
-        if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
-            NSMutableDictionary *newEntities = [[dictionary objectForKey:@"retweeted_status"]objectForKey:@"entities"];
-            if (newEntities.allKeys.count > 0) {
-                self.text = [NSString stringWithFormat:@"RT @%@: %@",retweetedUsername,retweetedText];
-                entities = newEntities;
+    
+    if (rt_status.allKeys.count > 0) {
+        NSString *retweetedUsername = [[rt_status objectForKey:@"user"]objectForKey:@"screen_name"];
+        NSString *retweetedText = [rt_status objectForKey:@"text"];
+        
+        if ([[_text substringToIndex:2]isEqualToString:@"RT"]) {
+            if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
+                NSMutableDictionary *newEntities = [[dictionary objectForKey:@"retweeted_status"]objectForKey:@"entities"];
+                if (newEntities.allKeys.count > 0) {
+                    self.text = [NSString stringWithFormat:@"RT @%@: %@",retweetedUsername,retweetedText];
+                    entities = newEntities;
+                    // have the tweet become the retweeted tweet with a new key, "retweeted_by" \
+                    // (perhaps removing the in_reply_to_id_str and friends)
+                }
             }
         }
     }
     
-    for (NSMutableDictionary *mediadict in [entities objectForKey:@"media"]) {
-        
-        NSString *picTwitterComLink = [mediadict objectForKey:@"display_url"];
-        NSString *picTwitterURLtoReplace = [mediadict objectForKey:@"url"];
-        NSString *picTwitterComImageLink = [mediadict objectForKey:@"media_url"];
- 
-        BOOL hasTwitPicLink = (picTwitterComImageLink.length > 0);
-        
-        if (hasTwitPicLink) {
-            picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
-            self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-            [kAppDelegate setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
-        }
-    }
-    
-    NSArray *urlEntities = [entities objectForKey:@"urls"];
-    
-    if (urlEntities.count > 0) {
-        for (NSDictionary *entity in urlEntities) {
-            NSString *shortenedURL = [entity objectForKey:@"url"];
-            NSString *fullURL = [entity objectForKey:@"expanded_url"];
+    if (entities.allKeys.count > 0) {
+        for (NSMutableDictionary *mediadict in [entities objectForKey:@"media"]) {
             
-            NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""]componentsSeparatedByString:@"/"]firstObjectA]componentsSeparatedByString:@"."]lastObject];
+            NSString *picTwitterComLink = [mediadict objectForKey:@"display_url"];
+            NSString *picTwitterURLtoReplace = [mediadict objectForKey:@"url"];
+            NSString *picTwitterComImageLink = [mediadict objectForKey:@"media_url"];
             
-            if (([dotWhatever isEqualToString:@"com"] || [dotWhatever isEqualToString:@"net"] || [dotWhatever isEqualToString:@"gov"] || [dotWhatever isEqualToString:@"us"] || [dotWhatever isEqualToString:@"me"] || [dotWhatever isEqualToString:@"org"] || [dotWhatever isEqualToString:@"edu"])) {
-                fullURL = [fullURL stringByReplacingOccurrencesOfString:@"http://" withString:@""];
+            BOOL hasTwitPicLink = (picTwitterComImageLink.length > 0);
+            
+            if (hasTwitPicLink) {
+                picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
+                self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
+                [kAppDelegate setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
             }
-            
-            self.text = [_text stringByReplacingOccurrencesOfString:shortenedURL withString:fullURL];
+        }
+        
+        NSArray *urlEntities = [entities objectForKey:@"urls"];
+        
+        if (urlEntities.count > 0) {
+            for (NSDictionary *entity in urlEntities) {
+                NSString *shortenedURL = [entity objectForKey:@"url"];
+                NSString *fullURL = [entity objectForKey:@"expanded_url"];
+                
+                NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""]componentsSeparatedByString:@"/"]firstObjectA]componentsSeparatedByString:@"."]lastObject];
+                
+                if (([dotWhatever isEqualToString:@"com"] || [dotWhatever isEqualToString:@"net"] || [dotWhatever isEqualToString:@"gov"] || [dotWhatever isEqualToString:@"us"] || [dotWhatever isEqualToString:@"me"] || [dotWhatever isEqualToString:@"org"] || [dotWhatever isEqualToString:@"edu"])) {
+                    fullURL = [fullURL stringByReplacingOccurrencesOfString:@"http://" withString:@""];
+                }
+                
+                self.text = [_text stringByReplacingOccurrencesOfString:shortenedURL withString:fullURL];
+            }
         }
     }
     
     self.text = [[_text stringByRemovingHTMLEntities]stringByTrimmingWhitespace];
-    
 }
 
 - (id)initWithDictionary:(NSDictionary *)dictionary {
