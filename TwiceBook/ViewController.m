@@ -708,7 +708,7 @@
     return tweetsToReturn;
 }
 
-- (NSString *)getLatestTweetIDInTimelineCacheForUsername:(NSString *)username {
+/*- (NSString *)getLatestTweetIDInTimelineCacheForUsername:(NSString *)username {
     NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"timeline_tweet_cache.plist"];
     NSMutableArray *cache = [[NSMutableArray alloc]initWithContentsOfFile:cacheLocation];
     
@@ -822,7 +822,7 @@
     [cache addObjectsFromArray:final];
     
     [cache writeToFile:cacheLocation atomically:YES];
-}
+}*/
 
 - (void)getTweetsForUsernames:(NSArray *)usernames {
     
@@ -869,7 +869,7 @@
                             
                             if (cachedRepliedToTweets.count > 0) {
                                 for (NSDictionary *dict_cached in cachedRepliedToTweets) {
-                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:tweet.inReplyToTweetIdentifier]) {
+                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:[dict_cached objectForKey:@"in_reply_to_status_id_str"]]) {
                                         retrievedTweet = dict_cached;
                                         break;
                                     }
@@ -902,218 +902,11 @@
             NSLog(@" ");
             NSLog(@"-----------------------");
             NSLog(@" ");
-            
-            
-            
-            
-            
-
-          /*  NSMutableArray *statuses = [[NSMutableArray alloc]init];
-            
-            NSMutableDictionary *cachedInvalidUsers = [[NSMutableDictionary alloc]initWithContentsOfFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]];
-            
-            if (cachedInvalidUsers == nil) {
-                cachedInvalidUsers = [NSMutableDictionary dictionary];
-            }
-            
-            NSString *cachedPath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
-            NSMutableArray *cachedRepliedToTweets = [[NSMutableArray alloc]initWithContentsOfFile:cachedPath];
-            
-            if (cachedRepliedToTweets == nil) {
-                cachedRepliedToTweets = [NSMutableArray array];
-            }
-            
-            NSMutableArray *potentialBadUsers = [NSMutableArray array];
-            
-            for (NSString *username in usernames) {
-                NSLog(@"%@",username);
-                
-                if (username.length > 0) {
-                    id badUsername = [cachedInvalidUsers objectForKey:username];
-                    
-                    if (badUsername) {
-                        if ([(NSString *)[badUsername objectForKey:@"invalid"]isEqualToString:@"yes"] || ([(NSString *)[badUsername objectForKey:@"protected"]isEqualToString:@"yes"] && ![ad.theFetchedUsernames containsObject:username])) {
-                            [self.protectedUsers addObject:username];
-                        }
-                        continue;
-                    }
-                }
-                
-                NSString *identifier = [self getLatestTweetIDInTimelineCacheForUsername:username];
-                
-                NSLog(@"identifier: %@",identifier);
-                
-                id fetched = [ad.engine getTimelineForUser:username isID:NO count:3 sinceID:identifier maxID:nil];
-                
-                if ([fetched isKindOfClass:[NSError class]]) {
-                    if ([(NSError *)fetched code] == 404) {
-                        [self.protectedUsers addObject:username];
-                        [cachedInvalidUsers setObject:[NSDictionary dictionaryWithObjectsAndKeys:@"no", @"protected", @"yes", @"invalid", nil] forKey:username];
-                        [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
-                    } else {
-                        if (![self.protectedUsers containsObject:username]) {
-                            [potentialBadUsers addObject:username];
-                        }
-                    }
-                }
-                
-                if ([fetched isKindOfClass:[NSArray class]]) {
-                    int numberOfTweetsToLoad = 3-[(NSArray *)fetched count];
-
-                    NSMutableArray *loadedFromCacheTweets = [self loadTimelineTweetCacheWithCount:numberOfTweetsToLoad forUsername:username];
-                    
-                    NSLog(@"TWITTER: fetched: %u loaded: %d",[(NSArray *)fetched count],loadedFromCacheTweets.count);
-                    
-                    [statuses addObjectsFromArray:loadedFromCacheTweets];
-                    [statuses addObjectsFromArray:fetched];
-                    [self addTweetsToTimelineTweetCache:fetched];
-                }
-                NSLog(@" ");
-            }*/
-            
-            //
-            // Bad User checking
-            //
-            
-            /*id lookup = [ad.engine lookupUsers:potentialBadUsers areIDs:YES];
-            
-            if ([lookup isKindOfClass:[NSArray class]]) {
-                for (NSDictionary *entry in lookup) {
-                    NSString *username = [entry objectForKey:@"screen_name"];
-                    if ([entry objectForKey:@"protected"] && ![usernamesListArray containsObject:username]) {
-                        [self.protectedUsers addObject:username];
-                        [cachedInvalidUsers setObject:[NSDictionary dictionaryWithObjectsAndKeys:@"yes", @"protected", @"no", @"invalid", nil] forKey:username];
-                        [cachedInvalidUsers writeToFile:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] atomically:YES];
-                    }
-                }
-                
-            } else if ([lookup isKindOfClass:[NSError class]]) {
-                NSLog(@"TWITTER: Lookup error: %@",lookup);
-                errorEncounteredWhileLoading = YES;
-            }*/
-            
-            
-            //
-            // Replied to tweet fetching
-            //
-
-            /*NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
-            NSMutableArray *cachedRepliedToTweets = [[NSMutableArray alloc]initWithContentsOfFile:irtTweetCachePath];
-            
-            if (cachedRepliedToTweets == nil) {
-                cachedRepliedToTweets = [NSMutableArray array];
-            }
-            
-            NSMutableArray *irts = [NSMutableArray array];
-            
-            NSMutableArray *unusedStatusesFromCache = [tweets mutableCopy];
-            
-            for (NSMutableDictionary *dict in tweets) {
-                
-                NSString *inReplyToID = [dict objectForKey:@"in_reply_to_status_id_str"];
-                if (!inReplyToID.length == 0) {
-                    
-                    id retrievedTweet = nil;
-                    
-                    if (cachedRepliedToTweets.count > 0) {
-                        for (NSDictionary *dict_cached in cachedRepliedToTweets) {
-                            if ([[dict_cached objectForKey:@"in_reply_to_status_id_str"]isEqualToString:inReplyToID]) {
-                                retrievedTweet = dict_cached;
-                                break;
-                            }
-                        }
-                    }
-                    
-                    if (retrievedTweet == nil) {
-                        retrievedTweet = [ad.engine getDetailsForTweet:inReplyToID];
-                    }
-                    
-                    if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
-                        [cachedRepliedToTweets addObject:retrievedTweet];
-                        [tweets addObject:retrievedTweet];
-                        [unusedStatusesFromCache removeObject:retrievedTweet];
-                        NSLog(@"TWITTER: Fetched Contextual Tweet: %@",inReplyToID);
-                    } else if ([retrievedTweet isKindOfClass:[NSError class]]) {
-                        errorEncounteredWhileLoading = YES;
-                    }
-                }
-            }
-
-            NSLog(@" ");
-            NSLog(@"-----------------------");
-            NSLog(@" ");
-            
-            [cachedRepliedToTweets removeObjectsInArray:unusedStatusesFromCache];
-            [cachedRepliedToTweets writeToFile:irtTweetCachePath atomically:YES];*/
-            
-           /* for (NSMutableDictionary *dict in [statuses mutableCopy]) {
-                [dict setValue:@"twitter" forKey:@"social_network_name"];
-                
-                NSString *text = [dict objectForKey:@"text"];
-                
-                NSString *retweetedUsername = [[[dict objectForKey:@"retweeted_status"]objectForKey:@"user"]objectForKey:@"screen_name"];
-                NSString *retweetedText = [[dict objectForKey:@"retweeted_status"]objectForKey:@"text"];
-                
-                if ([[text substringToIndex:2]isEqualToString:@"RT"]) {
-                    if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
-                        NSArray *newEntities = [[dict objectForKey:@"retweeted_status"]objectForKey:@"entities"];
-                        if (newEntities != nil) {
-                            text = [NSString stringWithFormat:@"RT @%@: %@",retweetedUsername,retweetedText];
-                            [dict setObject:newEntities forKey:@"entities"];
-                        } 
-                    }
-                }
-                
-                text = [[text stringByRemovingHTMLEntities]stringByTrimmingWhitespace];
-                [dict removeObjectForKey:@"geo"];
-                [dict removeObjectForKey:@"retweeted_status"];
-                [dict removeObjectForKey:@"source"];
-                
-                for (NSMutableDictionary *mediadict in [[dict objectForKey:@"entities"]objectForKey:@"media"]) {
-                    
-                    NSString *picTwitterComLink = [mediadict objectForKey:@"display_url"];
-                    NSString *picTwitterURLtoReplace = [mediadict objectForKey:@"url"];
-                    NSString *picTwitterComImageLink = [mediadict objectForKey:@"media_url"];
-                    
-                    BOOL hasTwitPicLink = !((picTwitterComLink.length == 0) && (picTwitterComLink == nil) && (picTwitterURLtoReplace.length == 0) && (picTwitterURLtoReplace == nil) && (picTwitterComImageLink.length == 0) && (picTwitterComImageLink == nil));
-                    
-                    if (hasTwitPicLink) {
-                        picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
-                        text = [text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-                        [ad setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
-                    }
-                }
-                
-                NSArray *urlEntities = [[dict objectForKey:@"entities"]objectForKey:@"urls"];
-                
-                if (urlEntities.count > 0) {
-                    for (NSDictionary *entity in urlEntities) {
-                        NSString *shortenedURL = [entity objectForKey:@"url"];
-                        NSString *fullURL = [entity objectForKey:@"expanded_url"];
-                        
-                        NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""] componentsSeparatedByString:@"/"]firstObjectA]componentsSeparatedByString:@"."]lastObject];
-
-                        BOOL shouldRemoveHttp = ([dotWhatever isEqualToString:@"com"] || [dotWhatever isEqualToString:@"net"] || [dotWhatever isEqualToString:@"gov"] || [dotWhatever isEqualToString:@"us"] || [dotWhatever isEqualToString:@"me"] || [dotWhatever isEqualToString:@"org"] || [dotWhatever isEqualToString:@"edu"] || [dotWhatever isEqualToString:@"er"]);
-                        
-                        if (shouldRemoveHttp) {
-                            fullURL = [fullURL stringByReplacingOccurrencesOfString:@"http://" withString:@""];
-                        }
-                        
-                        text = [text stringByReplacingOccurrencesOfString:shortenedURL withString:fullURL];
-                    }
-                }
-
-                [dict setValue:text forKey:@"text"];
-                
-                NSMutableDictionary *user = [dict objectForKey:@"user"];
-                [user removeObjectsForKeys:[NSArray arrayWithObjects:@"entities", @"geo_enabled", @"utc_offset", nil]];
-                [dict setObject:user forKey:@"user"];
-                [dict removeObjectForKey:@"place"];
-            }*/
 
             NSLog(@"TWITTER: Duplicate tweets: %d",(tweets.count-[tweets arrayByRemovingDuplicates].count));
             
-            [self.timeline addObjectsFromArray:tweets];
+            [tweets removeDuplicates];
+            [_timeline addObjectsFromArray:tweets];
 
             finishedLoadingTwitter = YES;
             

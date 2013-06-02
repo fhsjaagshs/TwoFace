@@ -8,13 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NSMutableArray (RemoveDuplicates)
+@interface NSMutableArray (removeDuplicates)
 
 - (void)removeDuplicates;
 
 @end
 
-@interface NSArray (RemoveDuplicates)
+@interface NSArray (arrayByRemovingDuplicates)
 
 - (NSArray *)arrayByRemovingDuplicates;
 

@@ -8,7 +8,7 @@
 
 #import "NSArray+RemoveDuplicates.h"
 
-@implementation NSMutableArray (RemoveDuplicates)
+@implementation NSMutableArray (removeDuplicates)
 
 - (void)removeDuplicates {
     NSArray *nonDupes = [[NSSet setWithArray:self]allObjects];
@@ -19,10 +19,26 @@
 
 @end
 
-@implementation NSArray (RemoveDuplicates)
+@implementation NSArray (arrayByRemovingDuplicates)
 
 - (NSArray *)arrayByRemovingDuplicates {
     return [[NSSet setWithArray:self]allObjects];
 }
 
 @end
+
+/*@implementation NSMutableArray (removeDuplicates)
+
+- (void)removeDuplicates {
+    NSMutableArray *ret = [NSMutableArray array];
+    
+    for (id obj in [self mutableCopy]) {
+        if (![ret containsObject:obj]) {
+            [ret addObject:obj];
+        } else {
+            [self removeObject:obj];
+        }
+    }
+}
+
+@end*/
