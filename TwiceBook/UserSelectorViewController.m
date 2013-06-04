@@ -198,7 +198,7 @@
         @autoreleasepool {
             
             AppDelegate *ad = kAppDelegate;
-            id retIDs = [ad.engine getFriendsIDs];
+            id retIDs = [[FHSTwitterEngine sharedEngine]getFriendsIDs];
             if ([retIDs isKindOfClass:[NSError class]]) {
                 NSError *theError = (NSError *)retIDs;
                 dispatch_sync(GCDMainThread, ^{
@@ -227,10 +227,10 @@
                 }
                 
                 if (idsToLookUp.count > 0) {
-                    NSArray *idConcatStrings = [ad.engine generateRequestStringsFromArray:idsToLookUp];
+                    NSArray *idConcatStrings = [[FHSTwitterEngine sharedEngine]generateRequestStringsFromArray:idsToLookUp];
                     
                     for (NSString *idconcatstr in idConcatStrings) {
-                        id usersRet = [ad.engine lookupUsers:[idconcatstr componentsSeparatedByString:@","] areIDs:YES];
+                        id usersRet = [[FHSTwitterEngine sharedEngine]lookupUsers:[idconcatstr componentsSeparatedByString:@","] areIDs:YES];
                         
                         if ([usersRet isKindOfClass:[NSError class]]) {
                             NSError *theError = (NSError *)usersRet;
@@ -678,14 +678,14 @@
             _navBar.topItem.title = @"Select Users";
         }
         
-        if (![ad.engine isAuthorized]) {
-            [ad.engine loadAccessToken];
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+            [[FHSTwitterEngine sharedEngine]loadAccessToken];
         }
         
         _savedSelectedArrayTwitter = usernamesListArray;
         
         if (ad.theFetchedUsernames.count == 0) {
-            if ([ad.engine isAuthorized]) {
+            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [ad showHUDWithTitle:@"Loading..."];
                 [self fetchFriends];
             }

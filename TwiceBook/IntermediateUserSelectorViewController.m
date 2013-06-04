@@ -54,7 +54,7 @@
     
     if (indexPath.row == 0) {
         cell.textLabel.text = @"Twitter";
-        BOOL authorized = [[kAppDelegate engine]isAuthorized];
+        BOOL authorized = [[FHSTwitterEngine sharedEngine]isAuthorized];
         cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",usernamesListArray.count]:@"Login Required";
         
         if (!authorized) {
@@ -74,7 +74,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     if (indexPath.row == 0) {
-        if ([[kAppDelegate engine]isAuthorized]) {
+        if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:NO];
             [self presentModalViewController:userSelector animated:YES];
         }
