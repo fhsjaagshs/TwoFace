@@ -8,17 +8,12 @@
 
 #import "CachesViewController.h"
 
-#define invalidUsersCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]
-#define contextualTweetCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"]
-#define noncontextualTweetCachePath [kCachesDirectory stringByAppendingPathComponent:@"timeline_tweet_cache.plist"]
-#define usernamesListCachePath [kCachesDirectory stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]
-
 @implementation CachesViewController
 
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
-    self.view = [[UIView alloc]initWithFrame:screenBounds];
+    //self.view = [[UIView alloc]initWithFrame:screenBounds];
     [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     UITableView *theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
     theTableView.delegate = self;
@@ -107,17 +102,12 @@
     int row = indexPath.row;
     
     if (section == 0) {
-        
         if (row == 0) {
             cell.textLabel.text = @"Clear Image Cache";
         }
-        
     } else if (section == 1) {
-        
         if (row == 0) {
-            cell.textLabel.text = @"Clear Contexual Tweet Cache";
-        } else if (row == 1) {
-            cell.textLabel.text = @"Clear General Tweet Cache";
+            cell.textLabel.text = @"Clear Tweet Cache";
         }
     } else if (section == 2) {
         if (row == 0) {
@@ -129,7 +119,6 @@
         }
     }
     cell.textLabel.textAlignment = UITextAlignmentCenter;
-    
     return cell;
 }
 
@@ -144,11 +133,8 @@
             [kAppDelegate clearImageCache];
         }
     } else if (section == 1) {
-        
         if (row == 0) {
             [[NSFileManager defaultManager]removeItemAtPath:contextualTweetCachePath error:nil];
-        } else if (row == 1) {
-            [[NSFileManager defaultManager]removeItemAtPath:noncontextualTweetCachePath error:nil];
         }
     } else if (section == 2) {
         if (row == 0) {

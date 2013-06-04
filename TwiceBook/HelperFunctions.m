@@ -27,13 +27,6 @@ BOOL oneIsCorrect(BOOL one, BOOL two) {
     return ((one || two) || (one && two));
 }
 
-NSDate * twitterDateFromString(NSString *twitterDate) {
-    NSDateFormatter *df = [[NSDateFormatter alloc]init];
-    [df setDateFormat:@"eee MMM dd HH:mm:ss ZZZZ yyyy"];
-    NSDate *date = [df dateFromString:twitterDate];
-    return date;
-}
-
 NSString * encodeForURL(NSString *urlString) {
     CFStringRef url = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)urlString, nil, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8);
     NSString *result = (__bridge NSString *)url;

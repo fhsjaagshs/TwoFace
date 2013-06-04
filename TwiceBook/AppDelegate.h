@@ -14,6 +14,11 @@
 // All headers in Prefix.pch
 //
 
+// Cache paths
+#define invalidUsersCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]
+#define contextualTweetCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"]
+#define usernamesListCachePath [kCachesDirectory stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]
+
 // General
 #define kAppDelegate (AppDelegate *)[[UIApplication sharedApplication]delegate]
 #define kDocumentsDirectory [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]

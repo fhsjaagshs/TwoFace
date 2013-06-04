@@ -11,7 +11,7 @@
 @implementation TwitterUser
 
 - (NSString *)description {
-    return [self dictionaryValue].description;
+    return [[self dictionaryValue]description];
 }
 
 - (NSDictionary *)dictionaryValue {

@@ -77,7 +77,7 @@
     self.replyZone.inputAccessoryView = self.bar;
 
     if (self.tweet) {
-        self.replyZone.text = [NSString stringWithFormat:@"@%@ ", [[self.tweet objectForKey:@"user"]objectForKey:@"screen_name"]];
+        self.replyZone.text = [NSString stringWithFormat:@"@%@ ",_tweet.user.screename];
         self.navBar.topItem.title = @"Reply";
     }
     
@@ -105,7 +105,7 @@
             NSError *error = nil;
             
             if (self.tweet) {
-                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody inReplyTo:[self.tweet objectForKey:@"id_str"]];
+                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody inReplyTo:_tweet.identifier];
             } else {
                 error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody];
             }
@@ -237,7 +237,7 @@
     [self.replyZone becomeFirstResponder];
 }
 
-- (id)initWithTweet:(NSDictionary *)aTweet {
+- (id)initWithTweet:(Tweet *)aTweet {
     self = [super init];
     if (self) {
         self.tweet = aTweet;

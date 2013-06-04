@@ -100,7 +100,14 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 - (NSMutableArray *)getCachedTimeline {
     NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedTimeline.plist"];
-    NSMutableArray *cachedTimeline = [[NSMutableArray alloc]initWithContentsOfFile:cacheLocation];
+    NSMutableArray *cachedTimeline = [NSMutableArray arrayWithContentsOfFile:cacheLocation];
+    
+    if ([[cachedTimeline firstObjectA]isKindOfClass:[NSDictionary class]]) {
+        for (NSString *file in [[NSFileManager defaultManager]contentsOfDirectoryAtPath:kCachesDirectory error:nil]) {
+            [[NSFileManager defaultManager]removeItemAtPath:[kCachesDirectory stringByAppendingPathComponent:file] error:nil];
+        }
+    }
+    
     return cachedTimeline;
 }
 

@@ -210,12 +210,13 @@
 
 - (void)parseResult:(id)result {
     
+    if ([result objectForKey:@"error"]) {
+        errorEncounteredWhileLoading = YES;
+        return;
+    }
+    
     for (NSDictionary *dictionary in result) {
-        NSString *body = [dictionary objectForKey:@"body"];
-        
-        NSData *bodydata = [body dataUsingEncoding:NSUTF8StringEncoding];
-        
-        id parsedJSONResponse = removeNull([NSJSONSerialization JSONObjectWithData:bodydata options:NSJSONReadingMutableContainers error:nil]);
+        id parsedJSONResponse = removeNull([NSJSONSerialization JSONObjectWithData:[[dictionary objectForKey:@"body"] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil]);
         
         NSMutableArray *parsedPosts = [NSMutableArray array];
         
@@ -229,7 +230,39 @@
                 continue;
             }
             
-            NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];
+            NSMutableDictionary *minusComments = [post mutableCopy];
+            [minusComments removeObjectForKey:@"comments"];
+            
+            Status *status = [Status statusWithDictionary:minusComments];
+
+            if (!([(NSString *)[post objectForKey:@"story"]length] > 0 && [status.type isEqualToString:@"status"])) {
+                BOOL shouldAddPost = YES;
+                
+                if (status.message.length == 0) {
+                    
+                    if ([status.type isEqualToString:@"link"]) {
+                        if (status.link.length == 0) {
+                            shouldAddPost = NO;
+                        }
+                    }
+                    
+                    if ([status.type isEqualToString:@"photo"]) {
+                        if (status.objectIdentifier.length == 0) {
+                            shouldAddPost = NO;
+                        }
+                    }
+                    
+                    if ([status.type isEqualToString:@"status"]) {
+                        shouldAddPost = NO;
+                    }
+                }
+                
+                if (shouldAddPost) {
+                    [parsedPosts addObject:status];
+                }
+            }
+            
+          /*  NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];
             
             NSString *toID = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"id"];
             NSString *toName = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"name"];
@@ -312,7 +345,7 @@
                 if (shouldAddPost) {
                     [parsedPosts addObject:restructured];
                 }
-            }
+            }*/
         }
         [_timeline addObjectsFromArray:parsedPosts];
         NSLog(@"Facebook: %d statuses fetched",parsedPosts.count);
@@ -361,12 +394,11 @@
         return;
     }
     
-    [self.timeline removeAllObjects];
-    [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    [_timeline removeAllObjects];
+    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)reloadCommonFetching {
-    AppDelegate *ad = kAppDelegate;
     NSMutableArray *usernameArrayTwitter = [usernamesListArray mutableCopy];
     NSArray *usernameArrayFacebook = [kSelectedFriendsDictionary allKeys];
     
@@ -389,7 +421,7 @@
             [self getTweetsForUsernames:usernameArrayTwitter];
         }
         
-        if ([ad.facebook isSessionValid]) {
+        if ([[kAppDelegate facebook]isSessionValid]) {
             [self fetchPostsForIDs:usernameArrayFacebook];
         }
     }
@@ -561,22 +593,12 @@
 //
 
 - (void)sortedTimeline {
-    
     NSMutableArray *array = [_timeline mutableCopy];
     NSMutableDictionary *the = [NSMutableDictionary dictionary];
     
     for (id item in array) {
         NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:item]];
-        
-        NSDate *date = nil;
-        
-        if ([item isKindOfClass:[Status class]]) {
-            date = [item objectForKey:@"poster_created_time"];
-        } else {
-            date = twitterDateFromString([(Tweet *)item createdAt]);
-        }
-        
-        NSString *time = [NSString stringWithFormat:@"%f",[date timeIntervalSince1970]];
+        NSString *time = [NSString stringWithFormat:@"%f",[[item createdAt]timeIntervalSince1970]];
         [the setObject:numberInArray forKey:time];
     }
     
@@ -614,6 +636,10 @@
             
             NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
             NSMutableArray *cachedRepliedToTweets = [NSMutableArray arrayWithContentsOfFile:irtTweetCachePath];
+            
+            if ([[cachedRepliedToTweets firstObjectA]isKindOfClass:[NSDictionary class]]) {
+                cachedRepliedToTweets = nil;
+            }
             
             if (cachedRepliedToTweets == nil) {
                 cachedRepliedToTweets = [NSMutableArray array];
@@ -716,12 +742,9 @@
         NSString *cellText = nil;
         
         if ([item isKindOfClass:[Status class]]) {
-            cellText = [item objectForKey:@"message"];
-            
-            if (cellText.length == 0) {
-                cellText = [item objectForKey:@"type"];
-            }
-        } else {
+            Status *status = (Status *)item;
+            cellText = (status.message.length > 0)?status.message:status.type;
+        } else if ([item isKindOfClass:[Tweet class]]) {
             cellText = [(Tweet *)item text];
         }
         
@@ -795,16 +818,17 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
         if ([tweetOrStatus isKindOfClass:[Status class]]) {
+            Status *status = (Status *)tweetOrStatus;
             cell.additionalLabel.text = @"Facebook    ";
             cell.additionalLabel.textColor = [UIColor colorWithRed:59.0/255.0 green:89.0/255.0 blue:152.0/255.0 alpha:1.0];
-            cell.textLabel.text = [tweetOrStatus objectForKey:@"poster_name"];
-            cell.detailTextLabel.text = [tweetOrStatus objectForKey:@"message"];
+            cell.textLabel.text = status.from.name;
+            cell.detailTextLabel.text = status.message;
             
             if (cell.detailTextLabel.text.length == 0) {
-                cell.detailTextLabel.text = [[tweetOrStatus objectForKey:@"type"]stringByCapitalizingFirstLetter];
+                cell.detailTextLabel.text = [status.type stringByCapitalizingFirstLetter];
             }
             
-        } else {
+        } else if ([tweetOrStatus isKindOfClass:[Tweet class]]) {
             Tweet *tweet = (Tweet *)tweetOrStatus;
             cell.additionalLabel.text = @"Twitter    ";
             cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
@@ -839,7 +863,7 @@
     if ([tappedItem isKindOfClass:[Status class]]) {
         PostDetailViewController *p = [[PostDetailViewController alloc]initWithPost:tappedItem];
         [self presentModalViewController:p animated:YES];
-    } else {
+    } else if ([tappedItem isKindOfClass:[Tweet class]]) {
         TweetDetailViewController *d = [[TweetDetailViewController alloc]initWithTweet:tappedItem];
         [self presentModalViewController:d animated:YES];
     }

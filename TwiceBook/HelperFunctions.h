@@ -13,4 +13,3 @@ CGRect resizeRectToWidth(CGRect rect, CGFloat newWidth);
 BOOL is5();
 BOOL oneIsCorrect(BOOL one, BOOL two);
 NSString * encodeForURL(NSString *urlString);
-NSDate * twitterDateFromString(NSString *twitterDate);

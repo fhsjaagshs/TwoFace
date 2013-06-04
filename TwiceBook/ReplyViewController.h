@@ -16,7 +16,7 @@
 
 // Twitter
 @property (strong, nonatomic) UILabel *charactersLeft;
-@property (strong, nonatomic) NSDictionary *tweet;
+@property (strong, nonatomic) Tweet *tweet;
 
 // UI
 @property (strong, nonatomic) UITextView *replyZone;
@@ -29,7 +29,7 @@
 @property (assign, nonatomic) BOOL isLoadedDraft;
 @property (assign, nonatomic) CGRect originalTextViewFrame;
 
-- (id)initWithTweet:(NSDictionary *)tweets;
+- (id)initWithTweet:(Tweet *)tweets;
 - (void)refreshCounter;
 
 @end

@@ -15,9 +15,9 @@
 @property (strong, nonatomic) UILabel *username;
 @property (strong, nonatomic) UIImageView *theImageView;
 @property (strong, nonatomic) UINavigationBar *navBar;
-@property (strong, nonatomic) NSDictionary *tweet;
+@property (strong, nonatomic) Tweet *tweet;
 
-- (id)initWithTweet:(NSDictionary *)aTweet;
+- (id)initWithTweet:(Tweet *)aTweet;
 - (void)getProfileImage;
 
 @end

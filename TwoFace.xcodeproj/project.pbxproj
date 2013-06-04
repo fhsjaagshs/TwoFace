@@ -409,17 +409,33 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		F18042C1175A87E3008D191D /* Containers */ = {
+		F13964ED175E9DC50073EE5E /* Twitter */ = {
 			isa = PBXGroup;
 			children = (
 				F18042C2175A8802008D191D /* Tweet.h */,
 				F18042C3175A8802008D191D /* Tweet.m */,
 				F18042C8175A893C008D191D /* TwitterUser.h */,
 				F18042C9175A893C008D191D /* TwitterUser.m */,
+			);
+			name = Twitter;
+			sourceTree = "<group>";
+		};
+		F13964EE175E9DD40073EE5E /* Facebook */ = {
+			isa = PBXGroup;
+			children = (
 				F18042C5175A880C008D191D /* Status.h */,
 				F18042C6175A880C008D191D /* Status.m */,
 				F18042CB175A896C008D191D /* FacebookUser.h */,
 				F18042CC175A896C008D191D /* FacebookUser.m */,
+			);
+			name = Facebook;
+			sourceTree = "<group>";
+		};
+		F18042C1175A87E3008D191D /* Containers */ = {
+			isa = PBXGroup;
+			children = (
+				F13964ED175E9DC50073EE5E /* Twitter */,
+				F13964EE175E9DD40073EE5E /* Facebook */,
 			);
 			name = Containers;
 			sourceTree = "<group>";
