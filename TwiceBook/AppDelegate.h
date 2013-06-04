@@ -78,7 +78,7 @@ extern NSString * const kEnteringForegroundNotif;
 // Twitter
 //
 
-@property (nonatomic, strong) FHSTwitterEngine *engine;
+//@property (nonatomic, strong) FHSTwitterEngine *engine;
 @property (nonatomic, strong) NSMutableArray *theFetchedUsernames;
 
 - (void)makeSureUsernameListArraysAreNotNil;

@@ -716,8 +716,11 @@ NSString * const kFacebookAppID = @"314352998657355";
     
     self.keychain = [[KeychainItemWrapper alloc]initWithIdentifier:@"TwoFaceID" accessGroup:nil];
     
-    self.engine = [[FHSTwitterEngine alloc]initWithConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
-    self.engine.delegate = self;
+    [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
+    [[FHSTwitterEngine sharedEngine]setDelegate:self];
+    
+  //  self.engine = [[FHSTwitterEngine alloc]initWithConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
+   // self.engine.delegate = self;
     
     DBSession *session = [[DBSession alloc]initWithAppKey:@"9fxkta36zv81dc6" appSecret:@"6xbgfmggidmb66a" root:kDBRootAppFolder];
 	session.delegate = self;
@@ -757,8 +760,8 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     
-    if (![self.engine isAuthorized]) {
-        [self.engine loadAccessToken];
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        [[FHSTwitterEngine sharedEngine]loadAccessToken];
     }
     
     if (![self.facebook isSessionValid]) {

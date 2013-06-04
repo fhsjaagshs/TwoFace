@@ -81,7 +81,7 @@
     
     if (section == 0) {
         
-        NSString *twitterUsername = ad.engine.loggedInUsername;
+        NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]loggedInUsername];
         NSString *fbUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"fbName"];
         
         if (fbUsername.length == 0 && [ad.facebook isSessionValid]) {
@@ -144,7 +144,7 @@
     
     if (section == 0) {
         if (row == 0) {
-            if ([ad.engine isAuthorized]) {
+            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 cell.textLabel.text = @"Log out of Twitter";
             } else {
                 cell.textLabel.text = @"Sign into Twitter" ;
@@ -179,17 +179,17 @@
     
     if (section == 0) {
         if (row == 0) {
-            if ([ad.engine isAuthorized]) {
+            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [ad.theFetchedUsernames removeAllObjects];
                 [ad cacheFetchedUsernames];
-                [ad.engine clearAccessToken];
+                [[FHSTwitterEngine sharedEngine]clearAccessToken];
             } else {
                 if (![FHSTwitterEngine isConnectedToInternet]) {
                     qAlert(@"Connection Offline", @"Your Internet connection appears to be offline. Please verify that your connection is valid.");
                     return;
                 }
-                [ad.engine clearAccessToken];
-                [ad.engine showOAuthLoginControllerFromViewController:self];
+                [[FHSTwitterEngine sharedEngine]clearAccessToken];
+                [[FHSTwitterEngine sharedEngine]showOAuthLoginControllerFromViewController:self];
             }
         } else if (row == 1) {
             BOOL isLoggedIn = [ad.facebook isSessionValid];
@@ -230,7 +230,7 @@
         shouldReload = YES;
     }
     
-    if (![ad.engine isAuthorized]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
         [ad removeTwitterFromTimeline];
         shouldReload = YES;
     }

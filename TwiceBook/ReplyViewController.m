@@ -105,9 +105,9 @@
             NSError *error = nil;
             
             if (self.tweet) {
-                error = [ad.engine postTweet:messageBody inReplyTo:[self.tweet objectForKey:@"id_str"]];
+                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody inReplyTo:[self.tweet objectForKey:@"id_str"]];
             } else {
-                error = [ad.engine postTweet:messageBody];
+                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody];
             }
             
             dispatch_sync(GCDMainThread, ^{
@@ -486,7 +486,7 @@
             
             dispatch_async(GCDBackgroundThread, ^{
                 @autoreleasepool {
-                    id returnValue = [FHSTwitPicEngine uploadPictureToTwitPic:UIImageJPEGRepresentation(self.imageFromCameraRoll, 0.8) withMessage:message withConsumer:[[OAConsumer alloc]initWithKey:kOAuthConsumerKey secret:kOAuthConsumerSecret] accessToken:ad.engine.accessToken andTwitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
+                    id returnValue = [FHSTwitPicEngine uploadPictureToTwitPic:UIImageJPEGRepresentation(self.imageFromCameraRoll, 0.8) withMessage:message withConsumer:[[OAConsumer alloc]initWithKey:kOAuthConsumerKey secret:kOAuthConsumerSecret] accessToken:[[FHSTwitterEngine sharedEngine]accessToken] andTwitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
                     
                     dispatch_sync(GCDMainThread, ^{
                         @autoreleasepool {

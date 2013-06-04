@@ -179,7 +179,7 @@
 
 - (void)replyOrRetweet {
     AppDelegate *ad = kAppDelegate;
-    BOOL isLoggedInUser = [[[self.tweet objectForKey:@"user"]objectForKey:@"screen_name"]isEqualToString:ad.engine.loggedInUsername];
+    BOOL isLoggedInUser = [[[self.tweet objectForKey:@"user"]objectForKey:@"screen_name"]isEqualToString:[[FHSTwitterEngine sharedEngine]loggedInUsername]];
 
     __block BOOL isFavorite = [[self.tweet objectForKey:@"favorited"]boolValue];
     
@@ -198,7 +198,7 @@
                 dispatch_async(GCDBackgroundThread, ^{
                     @autoreleasepool {
                         
-                        NSError *error = [ad.engine retweet:[self.tweet objectForKey:@"id_str"]];
+                        NSError *error = [[FHSTwitterEngine sharedEngine]retweet:[self.tweet objectForKey:@"id_str"]];
                         
                         dispatch_sync(GCDMainThread, ^{
                             @autoreleasepool {
@@ -221,7 +221,7 @@
                 dispatch_async(GCDBackgroundThread, ^{
                     @autoreleasepool {
                         
-                        NSError *error = [ad.engine markTweet:[self.tweet objectForKey:@"id_str"] asFavorite:!isFavorite];
+                        NSError *error = [[FHSTwitterEngine sharedEngine]markTweet:[self.tweet objectForKey:@"id_str"] asFavorite:!isFavorite];
                         
                         dispatch_sync(GCDMainThread, ^{
                             @autoreleasepool {

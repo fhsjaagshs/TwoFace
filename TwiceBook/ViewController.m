@@ -145,7 +145,7 @@
         facebookDoneD = YES;
     }
     
-    if (![ad.engine isAuthorized]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
         twitterDone = YES;
     }
     
@@ -345,8 +345,8 @@
         }
     }
     
-    if (![ad.engine isAuthorized]) {
-        [ad.engine loadAccessToken];
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        [[FHSTwitterEngine sharedEngine]loadAccessToken];
     }
     
     if (![FHSTwitterEngine isConnectedToInternet]) {
@@ -355,7 +355,7 @@
         return;
     }
 
-    if (![ad.engine isAuthorized] && ![ad.facebook isSessionValid]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
         [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
@@ -385,7 +385,7 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     } else {
         
-        if ([ad.engine isAuthorized]) {
+        if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [self getTweetsForUsernames:usernameArrayTwitter];
         }
         
@@ -406,7 +406,7 @@
     NSMutableArray *usernameArrayTwitter = usernamesListArray;
     NSArray *usernameArrayFacebook = [kSelectedFriendsDictionary allKeys];
     
-    BOOL twitterIsAuthorized = [ad.engine isAuthorized] && (usernameArrayTwitter.count > 0);
+    BOOL twitterIsAuthorized = [[FHSTwitterEngine sharedEngine]isAuthorized] && (usernameArrayTwitter.count > 0);
     BOOL facebookIsSessionValid = [ad.facebook isSessionValid] && (usernameArrayFacebook.count > 0);
     
     if (twitterIsAuthorized && !facebookIsSessionValid) {
@@ -431,7 +431,7 @@
 - (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view {
     [self reloadCommon];
     
-    if (![[kAppDelegate engine]isAuthorized] && ![[kAppDelegate facebook]isSessionValid]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![[kAppDelegate facebook]isSessionValid]) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
@@ -471,7 +471,7 @@
                             shouldRecacheTimeline = YES;
                         }
                         
-                        if (![ad.engine isAuthorized]) {
+                        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
                             [ad removeTwitterFromTimeline];
                             shouldRecacheTimeline = YES;
                         }
@@ -533,7 +533,7 @@
     
     AppDelegate *ad = kAppDelegate;
     
-    BOOL twitter = [ad.engine isAuthorized];
+    BOOL twitter = [[FHSTwitterEngine sharedEngine]isAuthorized];
     BOOL facebook = [ad.facebook isSessionValid];
     
     if (twitter) {
@@ -604,8 +604,6 @@
 
 - (void)getTweetsForUsernames:(NSArray *)usernames {
     
-    AppDelegate *ad = kAppDelegate;
-    
     finishedLoadingTwitter = NO;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
@@ -627,7 +625,7 @@
                 
                 NSLog(@"TWITTER: Starting User: %@",username);
                 
-                id fetched = [ad.engine getTimelineForUser:username isID:NO count:3];
+                id fetched = [[FHSTwitterEngine sharedEngine]getTimelineForUser:username isID:NO count:3];
                 
                 if ([fetched isKindOfClass:[NSError class]]) {
                     if ([(NSError *)fetched code] == 404) {
@@ -657,7 +655,7 @@
                             }
                             
                             if (retrievedTweet == nil) {
-                                retrievedTweet = [ad.engine getDetailsForTweet:tweet.inReplyToTweetIdentifier];
+                                retrievedTweet = [[FHSTwitterEngine sharedEngine]getDetailsForTweet:tweet.inReplyToTweetIdentifier];
                             }
                             
                             if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
@@ -764,7 +762,7 @@
         
         AppDelegate *ad = kAppDelegate;
         
-        if (![ad.engine isAuthorized]) {
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [ad loadAccessToken];
         }
             
@@ -772,7 +770,7 @@
             [ad tryLoginFromSavedCreds];
         }
         
-        if (![ad.engine isAuthorized] && ![ad.facebook isSessionValid]) {
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
