@@ -32,8 +32,6 @@ extern NSString * const kEnteringForegroundNotif;
 + (NSString *)documentsDirectory;
 + (NSString *)cachesDirectory;
 + (NSString *)invalidUsersCachePath;
-+ (NSString *)tweetCachePath;
-+ (NSMutableArray *)tweetCache;
 + (NSString *)usernameLookupCachePath;
 + (NSString *)draftsPath;
 + (NSMutableArray *)drafts;

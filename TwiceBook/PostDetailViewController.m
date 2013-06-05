@@ -22,15 +22,15 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadTheCommentsMethinks) name:@"commentsNotif" object:nil];
     
-    NSString *posterName = [_post objectForKey:@"poster_name"];
-    NSString *postBody = [[_post objectForKey:@"message"]stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    NSString *imageURL = [_post objectForKey:@"image_url"];
-    NSString *linkURL = [_post objectForKey:@"link"];
-    NSString *type = [_post objectForKey:@"type"];
-    NSArray *comments = [_post objectForKey:@"comments"];
-    NSString *toName = [_post objectForKey:@"to_name"];
+    NSString *posterName = _post.from.name;
+    NSString *postBody = _post.message;
+    NSString *imageURL = _post.pictureURL;
+    NSString *linkURL = _post.link;
+    NSString *type = _post.type;
+    NSMutableArray *comments = _post.comments;
+    NSString *toName = _post.to.name;
     
-    BOOL hasActions = [[self.post objectForKey:@"actions_available"]isEqualToString:@"yes"];
+    BOOL hasActions = [_post.actionsAvailable isEqualToString:@"yes"];//[[self.post objectForKey:@"actions_available"]isEqualToString:@"yes"];
     BOOL hasImage = (imageURL.length > 0);
     BOOL hasLink = (linkURL.length > 0);
     BOOL isPhoto = [type isEqualToString:@"photo"];
@@ -38,7 +38,7 @@
     self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]applicationFrame]];
     self.view.backgroundColor = [UIColor underPageBackgroundColor];
     
-    NSString *timestamp = [[self.post objectForKey:@"poster_created_time"]timeElapsedSinceCurrentDate];
+    NSString *timestamp = [_post.createdAt timeElapsedSinceCurrentDate];
     NSString *title = [[type stringByCapitalizingFirstLetter]stringByAppendingFormat:@" - %@ ago",timestamp];
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 44)];
     UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:title];
@@ -153,7 +153,7 @@
 
 - (void)adjustImageDimentions {
     
-    if (![[_post objectForKey:@"type"]isEqualToString:@"photo"]) {
+    if (![_post.type isEqualToString:@"photo"]) {
         if (oneIsCorrect(!_theImageView.image, _theImageView.hidden)) {
             return;
         }
@@ -183,8 +183,7 @@
 }
 
 - (NSString *)imageInCachesDir {
-    NSString *imageName = [[_post objectForKey:@"id"]stringByAppendingString:@".png"];
-    return [[Settings cachesDirectory]stringByAppendingPathComponent:imageName];
+    return [[Settings cachesDirectory]stringByAppendingPathComponent:[_post.identifier stringByAppendingString:@".png"]];
 }
 
 - (void)removeImageViewSpinner {
@@ -227,7 +226,7 @@
     
     AppDelegate *ad = [Settings appDelegate];
     
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL([self.post objectForKey:@"object_id"]),ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL(_post.objectIdentifier),ad.facebook.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
     [req setHTTPMethod:@"GET"];
@@ -261,7 +260,7 @@
 
 - (void)loadTheCommentsMethinks {
     
-    if ([[_post objectForKey:@"actions_available"]isEqualToString:@"no"]) {
+    if ([_post.actionsAvailable isEqualToString:@"no"]) {
         return;
     }
     
@@ -270,7 +269,7 @@
         return;
     }
 
-    if ([(NSArray *)[self.post objectForKey:@"comments"]count] == 0) {
+    if (_post.comments.count == 0) {
         [_aivy startAnimating];
     }
     
@@ -279,7 +278,7 @@
     
     AppDelegate *ad = [Settings appDelegate];
     
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL([_post objectForKey:@"id"]),ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL(_post.identifier),ad.facebook.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
     [req setHTTPMethod:@"GET"];
@@ -304,15 +303,14 @@
             NSMutableArray *parsedComments = [[NSMutableArray alloc]init];
             
             NSDateFormatter *df = [[NSDateFormatter alloc]init];
-            // [df setTimeZone:[NSTimeZone timeZoneWithName:@"America/Los_Angeles"]];
             [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
-            
             NSLocale *usLocale = [[NSLocale alloc]initWithLocaleIdentifier:@"en_US"];
             [df setLocale:usLocale];
             [df setDateStyle:NSDateFormatterLongStyle];
             [df setFormatterBehavior:NSDateFormatterBehavior10_4];
             
             for (NSDictionary *rawComment in comments) {
+                
                 NSMutableDictionary *comment = [[NSMutableDictionary alloc]init];
                 
                 NSString *postID = [rawComment objectForKey:@"id"];
@@ -336,12 +334,14 @@
                 [parsedComments addObject:dictionary];
             }
             
-            int index = [timeline indexOfObject:_post];
-            
-            if (index < INT_MAX) {
-                [_post setObject:parsedComments forKey:@"comments"];
-                [ad.viewController.timeline replaceObjectAtIndex:index withObject:self.post];
-                [ad cacheTimeline];
+            if ([ad.viewController.timeline containsObject:_post]) {
+                int index = [timeline indexOfObject:_post];
+                
+                if (index < INT_MAX) {
+                    _post.comments = parsedComments;
+                    [ad.viewController.timeline replaceObjectAtIndex:index withObject:_post];
+                    [ad cacheTimeline];
+                }
             }
             
             [_commentsTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
@@ -412,7 +412,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *cellText = [[[_post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"message"];
+    NSString *cellText = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"message"];
     UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
     CGSize constraintSize = CGSizeMake(300.0f, MAXFLOAT);
     CGSize labelSize = [cellText sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:UILineBreakModeWordWrap];
@@ -420,7 +420,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[_post objectForKey:@"comments"]count];
+    return _post.comments.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -438,8 +438,8 @@
     cell.detailTextLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    cell.textLabel.text = [[[self.post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"poster_name"];
-    cell.detailTextLabel.text = [[[self.post objectForKey:@"comments"]objectAtIndex:indexPath.row]objectForKey:@"message"];
+    cell.textLabel.text = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"poster_name"];
+    cell.detailTextLabel.text = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"message"];
     return cell;
 }
 
@@ -448,7 +448,7 @@
 }
 
 - (void)showReply {
-    CommentViewController *cvc = [[CommentViewController alloc]initWithPostID:[_post objectForKey:@"id"]];
+    CommentViewController *cvc = [[CommentViewController alloc]initWithPostID:_post.identifier];
     [self presentModalViewController:cvc animated:YES];
 }
 
@@ -458,7 +458,7 @@
     [self dismissModalViewControllerAnimated:YES];
 }
 
-- (id)initWithPost:(NSMutableDictionary *)posty {
+- (id)initWithPost:(Status *)posty {
     self = [super init];
     if (self) {
         [self setPost:posty];
@@ -509,8 +509,7 @@
 }
 
 - (void)linkAction {
-    NSString *linkURL = [_post objectForKey:@"link"];
-    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:linkURL]];
+    [[UIApplication sharedApplication]openURL:[NSURL URLWithString:_post.link]];
 }
 
 - (void)showImageDetailViewer {
@@ -650,7 +649,7 @@
 
 - (void)layoutViews {
     
-    NSString *type = (NSString *)[self.post objectForKey:@"type"];
+    NSString *type = _post.type;
     
     if (([type isEqualToString:@"photo"] || [type isEqualToString:@"link"]) && [[NSFileManager defaultManager]fileExistsAtPath:[self imageInCachesDir]]) {
         [self adjustImageDimentions];
@@ -680,9 +679,7 @@
     }    
 }
 - (void)setTitleText {
-    NSString *type = [self.post objectForKey:@"type"];
-    NSString *timestamp = [[self.post objectForKey:@"poster_created_time"]timeElapsedSinceCurrentDate];
-    _navBar.topItem.title = [NSString stringWithFormat:@"%@ - %@ ago",[type stringByCapitalizingFirstLetter],timestamp];
+    _navBar.topItem.title = [NSString stringWithFormat:@"%@ - %@ ago",[_post.type stringByCapitalizingFirstLetter],[_post.createdAt timeElapsedSinceCurrentDate]];
     [self performSelector:@selector(setTitleText) withObject:nil afterDelay:5.0f];
 }
 

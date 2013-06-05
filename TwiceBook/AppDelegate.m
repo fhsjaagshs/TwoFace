@@ -31,7 +31,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 //
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
-    NSString *writeLocation = [kCachesDirectory stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
+    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
     
     if (dict.allKeys.count == 0) {
@@ -43,17 +43,9 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
-    NSString *writeLocation = [kCachesDirectory stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
+    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
     return [dict objectForKey:linkURL];
-}
-
-//
-// Keychain
-//
-
-- (void)resetKeychain {
-    [self.keychain resetKeychainItem];
 }
 
 //
@@ -98,116 +90,43 @@ NSString * const kFacebookAppID = @"314352998657355";
 // Caching
 //
 
-- (NSMutableArray *)getCachedTimeline {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedTimeline.plist"];
-    NSMutableArray *cachedTimeline = [NSMutableArray arrayWithContentsOfFile:cacheLocation];
-    
-    if ([[cachedTimeline firstObjectA]isKindOfClass:[NSDictionary class]]) {
-        for (NSString *file in [[NSFileManager defaultManager]contentsOfDirectoryAtPath:kCachesDirectory error:nil]) {
-            [[NSFileManager defaultManager]removeItemAtPath:[kCachesDirectory stringByAppendingPathComponent:file] error:nil];
-        }
-    }
-    
-    return cachedTimeline;
-}
 
-- (void)cacheTimeline {
-    
-    dispatch_async(GCDBackgroundThread, ^{
-        @autoreleasepool {
-            NSMutableArray *timeline = [_viewController.timeline mutableCopy];
-            if ([timeline containsObject:@"Loading..."]) {
-                [timeline removeObject:@"Loading..."];
-            }
-                
-            if ([timeline containsObject:@"Please log in"]) {
-                [timeline removeObject:@"Please log in"];
-            }
-                
-            if ([timeline containsObject:@"No Users Selected"]) {
-                [timeline removeObject:@"No Users Selected"];
-            }
-                
-            if (timeline.count > 0) {
-                NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedTimeline.plist"];
-                [timeline writeToFile:cacheLocation atomically:YES];
-            }
-        }
-    });
-}
-
-- (void)cacheFetchedUsernames {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
-    [self.theFetchedUsernames writeToFile:cacheLocation atomically:YES];
-}
-
-- (NSMutableArray *)getCachedFetchedUsernames {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
-    return [NSMutableArray arrayWithContentsOfFile:cacheLocation];
-}
-
-- (void)cacheFetchedFacebookFriends {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedFacebookFriends.plist"];
-    [self.facebookFriendsDict writeToFile:cacheLocation atomically:YES];
-}
-
-- (NSMutableDictionary *)getCachedFetchedFacebookFriends {
-    NSString *cacheLocation = [kCachesDirectory stringByAppendingPathComponent:@"cachedFetchedFacebookFriends.plist"];
-    return [NSMutableDictionary dictionaryWithContentsOfFile:cacheLocation];
-}
-
-- (void)clearImageCache {
-    [[NSUserDefaults standardUserDefaults]setDouble:[[NSDate date]timeIntervalSince1970] forKey:@"previousClearTime"];
-    NSArray *cachedFiles = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:kCachesDirectory error:nil];
-    
-    for (NSString *filename in cachedFiles) {
-        if (![filename.pathExtension isEqualToString:@"plist"]) {
-            NSString *file = [kCachesDirectory stringByAppendingPathComponent:filename];
-            [[NSFileManager defaultManager]removeItemAtPath:file error:nil];
-        }
-    }
-}
 
 - (void)makeSureUsernameListArraysAreNotNil {
     
     NSMutableArray *blankArray = [NSMutableArray array];
     NSMutableDictionary *blankDict = [NSMutableDictionary dictionary];
     
-    NSMutableDictionary *deletedDictFacebook = kDBSyncDeletedFBDict;
-    if (deletedDictFacebook.allKeys.count == 0) {
+    if ([Settings dropboxDeletedFacebookDictionary].allKeys.count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankDict forKey:kDBSyncDeletedFBDictKey];
     }
     
-    NSMutableArray *deletedTwitter = kDBSyncDeletedTArray;
-    if (deletedTwitter.count == 0) {
+    if ([Settings dropboxDeletedTwitterArray].count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kDBSyncDeletedTArrayKey];
     }
-    
-    NSMutableDictionary *selectedFriendsDict = kSelectedFriendsDictionary;
-    if (selectedFriendsDict.allKeys.count == 0) {
+
+    if ([Settings selectedFacebookFriends].allKeys.count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankDict forKey:kSelectedFriendsDictionaryKey];
     }
     
-    NSMutableArray *addedUsernamesArray = addedUsernamesListArray;
-    if (addedUsernamesArray.count == 0) {
+    if ([Settings addedTwitterUsernames].count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:addedUsernamesListKey];
     }
-    
-    NSMutableArray *usernamesArray = [[NSMutableArray alloc]initWithArray:[[NSUserDefaults standardUserDefaults]objectForKey:usernamesListKey]];
-    if (usernamesArray.count == 0) {
+
+    if ([Settings selectedTwitterUsernames].count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:usernamesListKey];
     }
     
-    if (self.facebookFriendsDict.allKeys.count == 0) {
+    if (_facebookFriendsDict.allKeys.count == 0) {
         self.facebookFriendsDict = [self getCachedFetchedFacebookFriends];
-        if (self.facebookFriendsDict.allKeys.count == 0) {
+        if (_facebookFriendsDict.allKeys.count == 0) {
             self.facebookFriendsDict = blankDict;
         }
     }
     
-    if (self.theFetchedUsernames.count == 0) {
+    if (_theFetchedUsernames.count == 0) {
         self.theFetchedUsernames = [self getCachedFetchedUsernames];
-        if (self.theFetchedUsernames.count == 0) {
+        if (_theFetchedUsernames.count == 0) {
             self.theFetchedUsernames = blankArray;
         }
     }
@@ -220,7 +139,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted {
     UIImage *checkmarkImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Checkmark" ofType:@"png"]];
     UIImageView *checkmark = [[UIImageView alloc]initWithImage:checkmarkImage];
-    
+
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
     hud.mode = MBProgressHUDModeCustomView;
     hud.labelText = shouldSayCompleted?@"Completed":@"Success";
@@ -718,24 +637,22 @@ NSString * const kFacebookAppID = @"314352998657355";
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     self.viewController = [[ViewController alloc]init];
-    self.window.rootViewController = self.viewController;
-    [self.window makeKeyAndVisible];
+    _window.rootViewController = _viewController;
+    [_window makeKeyAndVisible];
     
-    self.keychain = [[KeychainItemWrapper alloc]initWithIdentifier:@"TwoFaceID" accessGroup:nil];
+    [[Cache sharedCache]loadCaches];
+    
+    [[Keychain sharedKeychain]setIdentifier:@"TwoFaceID"];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
     [[FHSTwitterEngine sharedEngine]setDelegate:self];
-    
-  //  self.engine = [[FHSTwitterEngine alloc]initWithConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
-   // self.engine.delegate = self;
     
     DBSession *session = [[DBSession alloc]initWithAppKey:@"9fxkta36zv81dc6" appSecret:@"6xbgfmggidmb66a" root:kDBRootAppFolder];
 	session.delegate = self;
 	[DBSession setSharedSession:session];
 
     self.restClient = [[DBRestClient alloc]initWithSession:[DBSession sharedSession]];
-    self.restClient.delegate = self;
-    
+    _restClient.delegate = self;
     return YES;
 }
 
@@ -763,6 +680,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     [self cacheTimeline];
     [self cacheFetchedUsernames];
     [self cacheFetchedFacebookFriends];
+    [[Cache sharedCache]cache];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {

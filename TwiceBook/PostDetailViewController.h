@@ -12,7 +12,7 @@
 
 @interface PostDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, PullToRefreshViewDelegate>
 
-- (id)initWithPost:(NSMutableDictionary *)posty;
+- (id)initWithPost:(Status *)posty;
 
 @property (strong, nonatomic) UIButton *linkButton;
 
@@ -25,7 +25,7 @@
 @property (strong, nonatomic) PullToRefreshView *pull;
 @property (strong, nonatomic) UIActivityIndicatorView *aivy;
 
-@property (strong, nonatomic) NSMutableDictionary *post;
+@property (strong, nonatomic) Status *post;
 
 @property (assign, nonatomic) BOOL isLoadingImage;
 @property (assign, nonatomic) BOOL isLoadingComments;

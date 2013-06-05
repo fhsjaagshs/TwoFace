@@ -35,9 +35,9 @@
     #import "UIImage+NSCoder.h"
     #import "NSArray+FirstObject.h"
 
-    
-
     #import "Settings.h"
+    #import "Cache.h"
+    #import "Keychain.h"
 
     #import "TwitterUser.h"
     #import "Tweet.h"

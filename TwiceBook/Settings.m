@@ -46,14 +46,6 @@ NSString * const kFacebookAppID = @"314352998657355";
     return [[Settings cachesDirectory]stringByAppendingPathComponent:@"invalid_users.plist"];
 }
 
-+ (NSString *)tweetCachePath {
-    return [[Settings cachesDirectory]stringByAppendingPathComponent:@"cached_tweets.plist"];
-}
-
-+ (NSMutableArray *)tweetCache {
-    return [NSMutableArray arrayWithContentsOfFile:[Settings tweetCachePath]];
-}
-
 + (NSString *)usernameLookupCachePath {
     return [[Settings cachesDirectory]stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"];
 }
