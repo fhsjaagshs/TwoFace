@@ -71,7 +71,7 @@
 }
 
 - (void)post {
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     [_commentField resignFirstResponder];
     [ad showHUDWithTitle:@"Posting..."];

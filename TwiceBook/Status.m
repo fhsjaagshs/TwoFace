@@ -79,46 +79,43 @@
     
     self.comments = [NSMutableArray arrayWithArray:[dict objectForKey:@"comments"]];
     
-   /* NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];
-    
-    
-    NSString *toID = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"id"];
-    NSString *toName = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"name"];
-    NSString *objectID = [post objectForKey:@"object_id"];
-    NSString *imageIcon = [post objectForKey:@"icon"];
-    NSString *fromName = [[post objectForKey:@"from"]objectForKey:@"name"];
-    NSString *fromID = [[post objectForKey:@"from"]objectForKey:@"id"];
-    NSString *message = [[post objectForKey:@"message"]stringByTrimmingWhitespace];
-    NSString *type = [post objectForKey:@"type"];
-    NSString *imageURL = [post objectForKey:@"picture"];
-    NSString *link = [post objectForKey:@"link"];
-    NSString *linkName = [post objectForKey:@"name"];
-    NSString *linkCaption = [post objectForKey:@"caption"];
-    NSString *linkDescription = [post objectForKey:@"description"];
-    NSString *actionsAvailable = ([(NSArray *)[post objectForKey:@"actions"]count] > 0)?@"yes":@"no";
-    NSString *postID = [post objectForKey:@"id"];
-    NSDate *created_time = [NSDate dateWithTimeIntervalSince1970:[[post objectForKey:@"updated_time"]floatValue]+1800];
-    
-    [restructured setValue:toID forKey:@"to_id"];
-    [restructured setValue:toName forKey:@"to_name"];
-    [restructured setValue:objectID forKey:@"object_id"];
-    [restructured setValue:imageIcon forKey:@"icon"];
-    [restructured setValue:postID forKey:@"id"];
-    [restructured setValue:type forKey:@"type"];
-    [restructured setValue:created_time forKey:@"poster_created_time"];
-    [restructured setValue:fromName forKey:@"poster_name"];
-    [restructured setValue:fromID forKey:@"poster_id"];
-    [restructured setValue:message forKey:@"message"];
-    [restructured setValue:imageURL forKey:@"image_url"];
-    [restructured setValue:link forKey:@"link"];
-    [restructured setValue:linkName forKey:@"link_name"];
-    [restructured setValue:linkCaption forKey:@"link_caption"];
-    [restructured setValue:linkDescription forKey:@"link_description"];
-    [restructured setValue:actionsAvailable forKey:@"actions_available"];
-    
-    if ([type isEqualToString:@"link"]) {
-        message = [post objectForKey:@"story"];
-    }*/
+    /*
+     NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];
+     
+     NSString *toID = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"id"];
+     NSString *toName = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"name"];
+     NSString *objectID = [post objectForKey:@"object_id"];
+     NSString *imageIcon = [post objectForKey:@"icon"];
+     NSString *fromName = [[post objectForKey:@"from"]objectForKey:@"name"];
+     NSString *fromID = [[post objectForKey:@"from"]objectForKey:@"id"];
+     NSString *message = [[post objectForKey:@"message"]stringByTrimmingWhitespace];
+     NSString *type = [post objectForKey:@"type"];
+     NSString *imageURL = [post objectForKey:@"picture"];
+     NSString *link = [post objectForKey:@"link"];
+     NSString *linkName = [post objectForKey:@"name"];
+     NSString *linkCaption = [post objectForKey:@"caption"];
+     NSString *linkDescription = [post objectForKey:@"description"];
+     NSString *actionsAvailable = ([(NSArray *)[post objectForKey:@"actions"]count] > 0)?@"yes":@"no";
+     NSString *postID = [post objectForKey:@"id"];
+     NSDate *created_time = [NSDate dateWithTimeIntervalSince1970:[[post objectForKey:@"updated_time"]floatValue]+1800];
+     
+     [restructured setValue:toID forKey:@"to_id"];
+     [restructured setValue:toName forKey:@"to_name"];
+     [restructured setValue:objectID forKey:@"object_id"];
+     [restructured setValue:imageIcon forKey:@"icon"];
+     [restructured setValue:postID forKey:@"id"];
+     [restructured setValue:type forKey:@"type"];
+     [restructured setValue:created_time forKey:@"poster_created_time"];
+     [restructured setValue:fromName forKey:@"poster_name"];
+     [restructured setValue:fromID forKey:@"poster_id"];
+     [restructured setValue:message forKey:@"message"];
+     [restructured setValue:imageURL forKey:@"image_url"];
+     [restructured setValue:link forKey:@"link"];
+     [restructured setValue:linkName forKey:@"link_name"];
+     [restructured setValue:linkCaption forKey:@"link_caption"];
+     [restructured setValue:linkDescription forKey:@"link_description"];
+     [restructured setValue:actionsAvailable forKey:@"actions_available"];
+     */
 }
 
 - (id)initWithDictionary:(NSDictionary *)dict {

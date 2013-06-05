@@ -85,8 +85,7 @@
 }
 
 - (NSString *)imageInCachesDir {
-    NSString *imageName = [[_tweet.user.profileImageURL componentsSeparatedByString:@"/"]lastObject];
-    return [kCachesDirectory stringByAppendingPathComponent:imageName];
+    return [[Settings cachesDirectory]stringByAppendingPathComponent:[[_tweet.user.profileImageURL componentsSeparatedByString:@"/"]lastObject]];
 }
 
 - (void)getProfileImage {
@@ -178,7 +177,7 @@
 }
 
 - (void)replyOrRetweet {
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
 
     __block BOOL isFavorite = _tweet.isFavorited;
     
@@ -229,7 +228,7 @@
                                 if (error) {
                                     [ad showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
                                 } else {
-                                    int index = [[[kAppDelegate viewController]timeline]indexOfObject:self.tweet];
+                                    int index = [[[[Settings appDelegate]viewController]timeline]indexOfObject:self.tweet];
                                     if (index != INT_MAX) {
                                         [self.tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
                                         [[[ad viewController]timeline]replaceObjectAtIndex:index withObject:self.tweet];
@@ -249,12 +248,12 @@
 
 - (void)openURL:(NSNotification *)notif {
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             
-            NSString *cachePath = [kCachesDirectory stringByAppendingPathComponent:[notif.object lastPathComponent]];
+            NSString *cachePath = [[Settings cachesDirectory]stringByAppendingPathComponent:[notif.object lastPathComponent]];
             NSData *imageData = [NSData dataWithContentsOfFile:cachePath];
             
             if (imageData.length == 0) {

@@ -55,15 +55,15 @@
     if (indexPath.row == 0) {
         cell.textLabel.text = @"Twitter";
         BOOL authorized = [[FHSTwitterEngine sharedEngine]isAuthorized];
-        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",usernamesListArray.count]:@"Login Required";
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[Settings selectedTwitterUsernames]count]]:@"Login Required";
         
         if (!authorized) {
             cell.detailTextLabel.textColor = [UIColor redColor];
         } 
     } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Facebook";
-        BOOL authorized = [[kAppDelegate facebook]isSessionValid];
-        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",kSelectedFriendsDictionary.allKeys.count]:@"Login Required";
+        BOOL authorized = [[[Settings appDelegate]facebook]isSessionValid];
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[[Settings selectedFacebookFriends]allKeys]count]]:@"Login Required";
         
         if (!authorized) {
             cell.detailTextLabel.textColor = [UIColor redColor];
@@ -79,7 +79,7 @@
             [self presentModalViewController:userSelector animated:YES];
         }
     } else if (indexPath.row == 1) {
-        if ([[kAppDelegate facebook]isSessionValid]) {
+        if ([[[Settings appDelegate]facebook]isSessionValid]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:YES];
             [self presentModalViewController:userSelector animated:YES];
         }

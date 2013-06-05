@@ -57,8 +57,8 @@
     double remainder = time-previousTime; 
     if (remainder > 172800) { // 2 days (172800 seconds)
         [[NSUserDefaults standardUserDefaults]setDouble:time forKey:@"previousClearTime"];
-        [kAppDelegate clearImageCache];
-        [[NSFileManager defaultManager]removeItemAtPath:[kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"] error:nil];
+        [[Settings appDelegate]clearImageCache];
+        [[NSFileManager defaultManager]removeItemAtPath:[Settings invalidUsersCachePath] error:nil];
     }
 }
 
@@ -73,7 +73,7 @@
         }
     });
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
 
     [self sortedTimeline];
     [ad cacheTimeline];
@@ -93,20 +93,17 @@
         UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Protected Users" message:message completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
             
             if (buttonIndex == 0) {
-                
-                NSString *cachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"];
-                
-                NSMutableDictionary *cachedUsers = [NSMutableDictionary dictionaryWithContentsOfFile:cachePath];
+                NSMutableDictionary *cachedUsers = [NSMutableDictionary dictionaryWithContentsOfFile:[Settings invalidUsersCachePath]];
                 
                 if (cachedUsers.count > 0) {
                     [cachedUsers removeObjectsForKeys:protectedUsersBlock];
-                    [cachedUsers writeToFile:cachePath atomically:YES];
+                    [cachedUsers writeToFile:[Settings invalidUsersCachePath] atomically:YES];
                 }
             }
             
             if (buttonIndex == 1) {
-                NSMutableArray *addedUsers = addedUsernamesListArray;
-                NSMutableArray *selectedUsers = usernamesListArray;
+                NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
+                NSMutableArray *selectedUsers = [Settings selectedTwitterUsernames];
                 
                 for (NSString *obj in protectedUsersBlock) {
                     if ([addedUsers containsObject:obj]) {
@@ -122,8 +119,8 @@
                     }
                 }
 
-                [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:addedUsernamesListKey];
-                [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:usernamesListKey];
+                [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
+                [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
             }
         } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Remove", nil];
         [av show];
@@ -136,7 +133,7 @@
 }
 
 - (BOOL)isLoadingPosts {
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     BOOL facebookDoneD = facebookDone;
     BOOL twitterDone = finishedLoadingTwitter;
@@ -175,7 +172,7 @@
     
     facebookDone = NO;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     NSString *reqString = @"[";
     
@@ -261,91 +258,6 @@
                     [parsedPosts addObject:status];
                 }
             }
-            
-          /*  NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];
-            
-            NSString *toID = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"id"];
-            NSString *toName = [[[[post objectForKey:@"to"]objectForKey:@"data"]firstObjectA]objectForKey:@"name"];
-            NSString *objectID = [post objectForKey:@"object_id"];
-            NSString *imageIcon = [post objectForKey:@"icon"];
-            NSString *fromName = [[post objectForKey:@"from"]objectForKey:@"name"];
-            NSString *fromID = [[post objectForKey:@"from"]objectForKey:@"id"];
-            NSString *message = [[post objectForKey:@"message"]stringByTrimmingWhitespace];
-            NSString *type = [post objectForKey:@"type"];
-            NSString *imageURL = [post objectForKey:@"picture"];
-            NSString *link = [post objectForKey:@"link"];
-            NSString *linkName = [post objectForKey:@"name"];
-            NSString *linkCaption = [post objectForKey:@"caption"];
-            NSString *linkDescription = [post objectForKey:@"description"];
-            NSString *actionsAvailable = ([(NSArray *)[post objectForKey:@"actions"]count] > 0)?@"yes":@"no";
-            NSString *postID = [post objectForKey:@"id"];
-            NSDate *created_time = [NSDate dateWithTimeIntervalSince1970:[[post objectForKey:@"updated_time"]floatValue]+1800];
-            
-            [restructured setValue:toID forKey:@"to_id"];
-            [restructured setValue:toName forKey:@"to_name"];
-            [restructured setValue:objectID forKey:@"object_id"];
-            [restructured setValue:imageIcon forKey:@"icon"];
-            [restructured setValue:postID forKey:@"id"];
-            [restructured setValue:type forKey:@"type"];
-            [restructured setValue:created_time forKey:@"poster_created_time"];
-            [restructured setValue:fromName forKey:@"poster_name"];
-            [restructured setValue:fromID forKey:@"poster_id"];
-            [restructured setValue:message forKey:@"message"];
-            [restructured setValue:imageURL forKey:@"image_url"];
-            [restructured setValue:link forKey:@"link"];
-            [restructured setValue:linkName forKey:@"link_name"];
-            [restructured setValue:linkCaption forKey:@"link_caption"];
-            [restructured setValue:linkDescription forKey:@"link_description"];
-            [restructured setValue:actionsAvailable forKey:@"actions_available"];
-            
-            if ([type isEqualToString:@"link"]) {
-                message = [post objectForKey:@"story"];
-            }
-            
-            [restructured setValue:@"facebook" forKey:@"social_network_name"];
-            
-            // Whether or not the status being parsed is one of those dumbass posts that says "Person X is friends with Person Y."
-            if (!([(NSString *)[post objectForKey:@"story"]length] > 0 && [type isEqualToString:@"status"])) {
-                
-                BOOL shouldAddPost = YES;
-                
-                if (message.length == 0) {
-                    NSString *story = [post objectForKey:@"story"];
-                    NSString *description = [post objectForKey:@"description"];
-                    
-                    if (description.length > 0) {
-                        [restructured setObject:description forKey:@"message"];
-                        message = [description copy];
-                        
-                    } else if (story.length > 0) {
-                        [restructured setObject:story forKey:@"message"];
-                        message = [story copy];
-                    }
-                }
-                
-                if (message.length == 0) {
-                    
-                    if ([type isEqualToString:@"link"]) {
-                        if (link.length == 0) {
-                            shouldAddPost = NO;
-                        }
-                    }
-                    
-                    if ([type isEqualToString:@"photo"]) {
-                        if (objectID.length == 0) {
-                            shouldAddPost = NO;
-                        }
-                    }
-                    
-                    if ([type isEqualToString:@"status"]) {
-                        shouldAddPost = NO;
-                    }
-                }
-                
-                if (shouldAddPost) {
-                    [parsedPosts addObject:restructured];
-                }
-            }*/
         }
         [_timeline addObjectsFromArray:parsedPosts];
         NSLog(@"Facebook: %d statuses fetched",parsedPosts.count);
@@ -368,7 +280,7 @@
     
     errorEncounteredWhileLoading = NO;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
         
     if (!ad.facebook) {
         [ad startFacebook];
@@ -399,8 +311,8 @@
 }
 
 - (void)reloadCommonFetching {
-    NSMutableArray *usernameArrayTwitter = [usernamesListArray mutableCopy];
-    NSArray *usernameArrayFacebook = [kSelectedFriendsDictionary allKeys];
+    NSMutableArray *usernameArrayTwitter = [Settings selectedTwitterUsernames];
+    NSArray *usernameArrayFacebook = [[Settings selectedFacebookFriends]allKeys];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 
@@ -421,7 +333,7 @@
             [self getTweetsForUsernames:usernameArrayTwitter];
         }
         
-        if ([[kAppDelegate facebook]isSessionValid]) {
+        if ([[[Settings appDelegate]facebook]isSessionValid]) {
             [self fetchPostsForIDs:usernameArrayFacebook];
         }
     }
@@ -433,10 +345,10 @@
 
 - (void)pullToRefreshViewWasShown:(PullToRefreshView *)view {
     NSString *subtitle = @"";
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
-    NSMutableArray *usernameArrayTwitter = usernamesListArray;
-    NSArray *usernameArrayFacebook = [kSelectedFriendsDictionary allKeys];
+    NSMutableArray *usernameArrayTwitter = [Settings selectedTwitterUsernames];
+    NSArray *usernameArrayFacebook = [[Settings selectedFacebookFriends]allKeys];
     
     BOOL twitterIsAuthorized = [[FHSTwitterEngine sharedEngine]isAuthorized] && (usernameArrayTwitter.count > 0);
     BOOL facebookIsSessionValid = [ad.facebook isSessionValid] && (usernameArrayFacebook.count > 0);
@@ -463,7 +375,7 @@
 - (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view {
     [self reloadCommon];
     
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![[kAppDelegate facebook]isSessionValid]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![[[Settings appDelegate]facebook]isSessionValid]) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
@@ -483,7 +395,7 @@
 - (void)loadTimelineViewDidLoadThreaded {
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
-            AppDelegate *ad = kAppDelegate;
+            AppDelegate *ad = [Settings appDelegate];
             
             [ad makeSureUsernameListArraysAreNotNil];
             
@@ -563,7 +475,7 @@
     } cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     BOOL twitter = [[FHSTwitterEngine sharedEngine]isAuthorized];
     BOOL facebook = [ad.facebook isSessionValid];
@@ -633,9 +545,8 @@
         @autoreleasepool {
             
             NSMutableArray *tweets = [NSMutableArray array];
-            
-            NSString *irtTweetCachePath = [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"];
-            NSMutableArray *cachedRepliedToTweets = [NSMutableArray arrayWithContentsOfFile:irtTweetCachePath];
+
+            NSMutableArray *cachedRepliedToTweets = [Settings tweetCache];
             
             if ([[cachedRepliedToTweets firstObjectA]isKindOfClass:[NSDictionary class]]) {
                 cachedRepliedToTweets = nil;
@@ -703,7 +614,7 @@
                 }
             }
             
-            [usedTweetsFromCache writeToFile:irtTweetCachePath atomically:YES];
+            [usedTweetsFromCache writeToFile:[Settings tweetCachePath] atomically:YES];
             
             int duplicateCount = (tweets.count-[tweets arrayByRemovingDuplicates].count);
             
@@ -783,7 +694,7 @@
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.additionalLabel.text = nil;
         
-        AppDelegate *ad = kAppDelegate;
+        AppDelegate *ad = [Settings appDelegate];
         
         if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [ad loadAccessToken];
@@ -797,7 +708,7 @@
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
-            if (oneIsCorrect(kSelectedFriendsDictionary.allKeys.count > 0, usernamesListArray.count > 0)) {
+            if (oneIsCorrect([[[Settings selectedFacebookFriends]allKeys]count] > 0, [[Settings selectedTwitterUsernames]count] > 0)) {
                 if (_pull.state == kPullToRefreshViewStateNormal) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";

@@ -184,7 +184,7 @@
 
 - (NSString *)imageInCachesDir {
     NSString *imageName = [[_post objectForKey:@"id"]stringByAppendingString:@".png"];
-    return [kCachesDirectory stringByAppendingPathComponent:imageName];
+    return [[Settings cachesDirectory]stringByAppendingPathComponent:imageName];
 }
 
 - (void)removeImageViewSpinner {
@@ -225,7 +225,7 @@
     [self.view bringSubviewToFront:aiv];
     [aiv startAnimating];
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL([self.post objectForKey:@"object_id"]),ad.facebook.accessToken];
     
@@ -277,7 +277,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     self.isLoadingComments = YES;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL([_post objectForKey:@"id"]),ad.facebook.accessToken];
     
@@ -361,7 +361,7 @@
         NSData *data = [NSData dataWithContentsOfFile:cachepath];
         [_theImageView setImage:[UIImage imageWithData:data]];
 
-        if (![[kAppDelegate facebook]isPendingRequests]) {
+        if (![[[Settings appDelegate]facebook]isPendingRequests]) {
             if (!_isLoadingComments) {
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             }
@@ -397,7 +397,7 @@
 
             _isLoadingImage = NO;
             
-            if (![[kAppDelegate facebook]isPendingRequests]) {
+            if (![[[Settings appDelegate]facebook]isPendingRequests]) {
                 if (!_isLoadingComments) {
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 }
@@ -453,9 +453,8 @@
 }
 
 - (void)close {
-    [[kAppDelegate facebook]cancelAllRequests];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"imageOpen" object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"commentsNotif" object:nil];
+    [[[Settings appDelegate]facebook]cancelAllRequests];
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
     [self dismissModalViewControllerAnimated:YES];
 }
 
@@ -473,14 +472,15 @@
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             
-            NSString *cachePath = [kCachesDirectory stringByAppendingPathComponent:[notif.object lastPathComponent]];
+            AppDelegate *ad = [Settings appDelegate];
             
+            NSString *cachePath = [[Settings cachesDirectory]stringByAppendingPathComponent:[notif.object lastPathComponent]];
             NSData *imageDataD = [NSData dataWithContentsOfFile:cachePath];
             
             if (imageDataD.length == 0) {
                 dispatch_sync(GCDMainThread, ^{
                     @autoreleasepool {
-                        [kAppDelegate showHUDWithTitle:@"Loading Image..."];
+                        [[Settings appDelegate]showHUDWithTitle:@"Loading Image..."];
                     }
                 });
                 imageDataD = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[notif object]] returningResponse:nil error:nil];
@@ -489,15 +489,15 @@
             if (imageDataD.length == 0) {
                 dispatch_sync(GCDMainThread, ^{
                     @autoreleasepool {
-                        [kAppDelegate hideHUD];
-                        [kAppDelegate showSelfHidingHudWithTitle:@"Error Loading Image"];
+                        [ad hideHUD];
+                        [ad showSelfHidingHudWithTitle:@"Error Loading Image"];
                     }
                 });
             } else {
                 [imageDataD writeToFile:cachePath atomically:YES];
                 dispatch_sync(GCDMainThread, ^{
                     @autoreleasepool {
-                        [kAppDelegate hideHUD];
+                        [ad hideHUD];
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageDataD];
                         vc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
                         [self presentModalViewController:vc animated:YES];

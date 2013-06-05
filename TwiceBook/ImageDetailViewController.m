@@ -116,7 +116,8 @@
 - (void)saveImage {
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if (buttonIndex == 0) {
-            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:[kAppDelegate window] animated:YES];
+            UIWindow *window = [[Settings appDelegate]window];
+            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:window animated:YES];
             hud.mode = MBProgressHUDModeIndeterminate;
             hud.labelText = @"Saving...";
             
@@ -124,7 +125,9 @@
                 @autoreleasepool {
                     UIImageWriteToSavedPhotosAlbum(self.image, nil, nil, nil);
                     dispatch_sync(GCDMainThread, ^{
-                        [MBProgressHUD hideHUDForView:[kAppDelegate window] animated:YES];
+                        @autoreleasepool {
+                            [MBProgressHUD hideHUDForView:window animated:YES];
+                        }
                     });
                 }
             });

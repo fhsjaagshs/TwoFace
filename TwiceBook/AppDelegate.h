@@ -15,7 +15,7 @@
 //
 
 // Cache paths
-#define invalidUsersCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]
+/*#define invalidUsersCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_invalid_users.plist"]
 #define contextualTweetCachePath [kCachesDirectory stringByAppendingPathComponent:@"cached_replied_to_tweets.plist"]
 #define usernamesListCachePath [kCachesDirectory stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]
 
@@ -23,10 +23,6 @@
 #define kAppDelegate (AppDelegate *)[[UIApplication sharedApplication]delegate]
 #define kDocumentsDirectory [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject]
 #define kCachesDirectory [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject]
-
-// GCD
-#define GCDBackgroundThread dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)
-#define GCDMainThread dispatch_get_main_queue()
 
 // Main Table View
 
@@ -61,7 +57,7 @@ extern NSString * const kFacebookAppID;
 
 // App State Notifs
 
-extern NSString * const kEnteringForegroundNotif;
+extern NSString * const kEnteringForegroundNotif;*/
 
 @class ViewController;
 

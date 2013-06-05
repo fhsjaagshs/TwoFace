@@ -34,7 +34,7 @@
     BOOL isImage = ([extension isEqualToString:@"png"] || [extension isEqualToString:@"jpg"] || [extension isEqualToString:@"tif"] || [extension isEqualToString:@"jpe"] || [urlString containsString:@"pic.twitter.com/"]);
     
     if (isImage) {
-        NSString *newURL = [kAppDelegate getImageURLForLinkURL:[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
+        NSString *newURL = [[Settings appDelegate]getImageURLForLinkURL:[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
         
         if (!(newURL.length == 0 || newURL == nil)) {
             urlString = newURL;

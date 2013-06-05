@@ -7,14 +7,9 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
-    
     #import <QuartzCore/QuartzCore.h>
 
-    #import "TwitterUser.h"
-    #import "Tweet.h"
-
-    #import "FacebookUser.h"
-    #import "Status.h"
+    #import "HelperFunctions.h"
 
     #import "Facebook.h"
     #import <DropboxSDK/DropboxSDK.h>
@@ -40,6 +35,16 @@
     #import "UIImage+NSCoder.h"
     #import "NSArray+FirstObject.h"
 
+    
+
+    #import "Settings.h"
+
+    #import "TwitterUser.h"
+    #import "Tweet.h"
+
+    #import "FacebookUser.h"
+    #import "Status.h"
+
     #import "AppDelegate.h"
     #import "ViewController.h"
     #import "TweetDetailViewController.h"
@@ -56,7 +61,6 @@
     #import "AboutViewController.h"
     #import "UserSelectorViewController.h"
 
-    #import "HelperFunctions.h"
     #import "InterceptTwitPicLink.h"
 
 #endif
