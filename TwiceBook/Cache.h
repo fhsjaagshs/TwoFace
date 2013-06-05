@@ -13,10 +13,16 @@
 @property (nonatomic, strong) NSMutableArray *twitterFriends; // theFetchedUsernames
 @property (nonatomic, strong) NSMutableDictionary *facebookFriends; // facebookFriendsDict
 @property (nonatomic, strong) NSMutableArray *timeline;
+@property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
 
 - (void)cache;
 - (void)loadCaches;
 
 + (Cache *)sharedCache;
+
++ (void)clearImageCache;
++ (UIImage *)imageFromCache:(NSString *)imageName;
++ (void)setImage:(UIImage *)image forName:(NSString *)name;
+
 
 @end

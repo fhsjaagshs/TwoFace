@@ -21,94 +21,83 @@
 
 - (void)loadCaches {
     
-}
-
-- (void)cache {
+    NSString *cd = [Settings cachesDirectory];
+    self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];;
+    self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
     
-}
-
-+ (NSString *)tweetCachePath {
-    return [[Settings cachesDirectory]stringByAppendingPathComponent:@"cached_tweets.plist"];
-}
-
-+ (NSMutableArray *)tweetCache {
-    return [NSMutableArray arrayWithContentsOfFile:[Cache tweetCachePath]];
-}
-
-+ (NSMutableArray *)cachedTimeline {
-    NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedTimeline.plist"];
-    NSMutableArray *cachedTimeline = [NSMutableArray arrayWithContentsOfFile:cacheLocation];
+    self.timeline = [NSMutableArray array];
+    NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
     
-    if ([[cachedTimeline firstObjectA]isKindOfClass:[NSDictionary class]]) {
-        for (NSString *file in [[NSFileManager defaultManager]contentsOfDirectoryAtPath:[Settings cachesDirectory] error:nil]) {
-            [[NSFileManager defaultManager]removeItemAtPath:[[Settings cachesDirectory]stringByAppendingPathComponent:file] error:nil];
+    for (NSDictionary *dict in timelineTemp) {
+        if ([dict objectForKey:@"id_str"]) {
+            [_timeline addObject:[Tweet tweetWithDictionary:dict]];
+        } else {
+            [_timeline addObject:[Status statusWithDictionary:dict]];
         }
     }
     
-    return cachedTimeline;
-}
-
-+ (void)cacheTimeline:(NSMutableArray *)timeline {
+    NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_tweets.plist"]];
+    self.nonTimelineTweets = [NSMutableArray array];
     
-    dispatch_async(GCDBackgroundThread, ^{
-        @autoreleasepool {
-            //NSMutableArray *timeline = [_viewController.timeline mutableCopy];
-            if ([timeline containsObject:@"Loading..."]) {
-                [timeline removeObject:@"Loading..."];
-            }
-            
-            if ([timeline containsObject:@"Please log in"]) {
-                [timeline removeObject:@"Please log in"];
-            }
-            
-            if ([timeline containsObject:@"No Users Selected"]) {
-                [timeline removeObject:@"No Users Selected"];
-            }
-            
-            if (timeline.count > 0) {
-                NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedTimeline.plist"];
-                [timeline writeToFile:cacheLocation atomically:YES];
-            }
-        }
-    });
+    for (NSDictionary *dict in nonTimelineTweetsTemp) {
+        [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
+    }
 }
 
-- (void)cacheFetchedUsernames {
-    NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
-    [_theFetchedUsernames writeToFile:cacheLocation atomically:YES];
+- (void)cache {
+    NSString *cd = [Settings cachesDirectory];
+    [_facebookFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"] atomically:YES];
+    [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
+    
+    NSMutableArray *timelineTemp = [NSMutableArray array];
+    
+    for (id obj in _timeline) {
+        [timelineTemp addObject:[obj dictionaryValue]];
+    }
+    
+    [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timeline.plist"] atomically:YES];
+    
+    
+    NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray array];
+    
+    for (Tweet *tweet in _nonTimelineTweets) {
+        [nonTimelineTweetsTemp addObject:[tweet dictionaryValue]];
+    }
+    
+    [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_tweets.plist"] atomically:YES];
 }
 
-- (NSMutableArray *)cachedFetchedUsernames {
-    NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedFetchedTwitterUsernames.plist"];
-    return [NSMutableArray arrayWithContentsOfFile:cacheLocation];
++ (void)setImage:(UIImage *)image forName:(NSString *)name {
+    
+    if (!image) {
+        return;
+    }
+    
+    if (name.length == 0) {
+        return;
+    }
+    
+    name = [[[name pathComponents]objectAtIndex:0]stringByAppendingPathExtension:@"png"];
+    [UIImagePNGRepresentation(image) writeToFile:[[Settings cachesDirectory]stringByAppendingPathComponent:name] atomically:YES];
 }
 
-- (void)cacheFetchedFacebookFriends {
-    NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedFetchedFacebookFriends.plist"];
-    [_facebookFriendsDict writeToFile:cacheLocation atomically:YES];
-}
-
-- (NSMutableDictionary *)getCachedFetchedFacebookFriends {
-    NSString *cacheLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"cachedFetchedFacebookFriends.plist"];
-    return [NSMutableDictionary dictionaryWithContentsOfFile:cacheLocation];
-}
-
-+ (UIImage *)loadImageFromCache:(NSString *)imageName {
++ (UIImage *)imageFromCache:(NSString *)imageName {
     
     if (imageName.length == 0) {
         return nil;
     }
     
     imageName = [[[imageName pathComponents]objectAtIndex:0]stringByAppendingPathExtension:@"png"];
+    return [UIImage imageWithContentsOfFile:[[Settings cachesDirectory]stringByAppendingPathComponent:imageName]];
 }
 
-- (void)clearImageCache {
-    [[NSUserDefaults standardUserDefaults]setDouble:[[NSDate date]timeIntervalSince1970] forKey:@"previousClearTime"];
-    NSArray *cachedFiles = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:[Settings cachesDirectory] error:nil];
++ (void)clearImageCache {
+    NSString *cachesDirectory = [Settings cachesDirectory];
+    NSArray *cachedFiles = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:cachesDirectory error:nil];
     
     for (NSString *filename in cachedFiles) {
         if (![filename.pathExtension isEqualToString:@"plist"]) {
-            NSString *file = [[Settings cachesDirectory]stringByAppendingPathComponent:filename];
+            NSString *file = [cachesDirectory stringByAppendingPathComponent:filename];
             [[NSFileManager defaultManager]removeItemAtPath:file error:nil];
         }
     }

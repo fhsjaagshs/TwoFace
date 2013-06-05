@@ -16,7 +16,6 @@
     #import "FHSTwitterEngine.h"
 
     #import "AdditionalLabelCell.h"
-    #import "KeychainItemWrapper.h"
     #import "FHSGradientView.h"
     #import "ZoomingImageView.h"
     #import "MBProgressHUD.h"

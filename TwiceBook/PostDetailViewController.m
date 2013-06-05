@@ -294,7 +294,7 @@
         }
         
         if (!error) {
-            NSMutableArray *timeline = [ad.viewController timeline];
+            NSMutableArray *timeline = [[Cache sharedCache]timeline];
             
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             
@@ -334,12 +334,12 @@
                 [parsedComments addObject:dictionary];
             }
             
-            if ([ad.viewController.timeline containsObject:_post]) {
+            if ([timeline containsObject:_post]) {
                 int index = [timeline indexOfObject:_post];
                 
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;
-                    [ad.viewController.timeline replaceObjectAtIndex:index withObject:_post];
+                    [[[Cache sharedCache]timeline]replaceObjectAtIndex:index withObject:_post];
                     [ad cacheTimeline];
                 }
             }
@@ -348,7 +348,6 @@
             [self layoutViews];
             [_aivy stopAnimating];
         }
-        
         [_pull finishedLoading];
     }];
 }

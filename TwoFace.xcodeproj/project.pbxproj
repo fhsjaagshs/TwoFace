@@ -13,7 +13,6 @@
 		9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B127A15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m */; };
 		9B0B127E15CF2DCF00217981 /* UIAlertView+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B127C15CF2DCF00217981 /* UIAlertView+BlockExtensions.m */; };
 		9B2378DE15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2378DD15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m */; };
-		9B298C5D15B62CDF00A7C594 /* KeychainItemWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B298C5C15B62CDF00A7C594 /* KeychainItemWrapper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9B298C6415B62E2F00A7C594 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B298C6315B62E2F00A7C594 /* Security.framework */; };
 		9B2A621415AF8CEB00C4A426 /* ZoomingImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2A621315AF8CEB00C4A426 /* ZoomingImageView.m */; };
 		9B2A621E15AF8D5000C4A426 /* CommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B2A621615AF8D5000C4A426 /* CommentViewController.m */; };
@@ -93,8 +92,6 @@
 		9B0B127C15CF2DCF00217981 /* UIAlertView+BlockExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+BlockExtensions.m"; sourceTree = "<group>"; };
 		9B2378DC15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+UIScrollView_ZoomToPoint.h"; sourceTree = "<group>"; };
 		9B2378DD15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+UIScrollView_ZoomToPoint.m"; sourceTree = "<group>"; };
-		9B298C5B15B62CDF00A7C594 /* KeychainItemWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeychainItemWrapper.h; sourceTree = "<group>"; };
-		9B298C5C15B62CDF00A7C594 /* KeychainItemWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeychainItemWrapper.m; sourceTree = "<group>"; };
 		9B298C6315B62E2F00A7C594 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		9B2A621215AF8CEB00C4A426 /* ZoomingImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZoomingImageView.h; sourceTree = "<group>"; };
 		9B2A621315AF8CEB00C4A426 /* ZoomingImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ZoomingImageView.m; sourceTree = "<group>"; };
@@ -241,7 +238,6 @@
 		9B298C6615B62EBE00A7C594 /* Custom Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9B857FA615F5AB8C00DE25E8 /* Wrappers */,
 				9B857FA515F5AB5000DE25E8 /* Subclasses */,
 				9B857FA415F5AAD500DE25E8 /* Categories */,
 				9B0B127515CF2A0400217981 /* HelperFunctions.h */,
@@ -313,15 +309,6 @@
 				9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */,
 			);
 			name = Subclasses;
-			sourceTree = "<group>";
-		};
-		9B857FA615F5AB8C00DE25E8 /* Wrappers */ = {
-			isa = PBXGroup;
-			children = (
-				9B298C5B15B62CDF00A7C594 /* KeychainItemWrapper.h */,
-				9B298C5C15B62CDF00A7C594 /* KeychainItemWrapper.m */,
-			);
-			name = Wrappers;
 			sourceTree = "<group>";
 		};
 		F129B64F157B8237005353EB = {
@@ -603,7 +590,6 @@
 				9B2A621E15AF8D5000C4A426 /* CommentViewController.m in Sources */,
 				9B2A622015AF8D5000C4A426 /* ImageDetailViewController.m in Sources */,
 				9B2A622215AF8D5000C4A426 /* PostDetailViewController.m in Sources */,
-				9B298C5D15B62CDF00A7C594 /* KeychainItemWrapper.m in Sources */,
 				9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */,
 				9BA753BB15BF1A2000717D94 /* NSDate+Helper.m in Sources */,
 				9B0B127715CF2A0400217981 /* HelperFunctions.m in Sources */,

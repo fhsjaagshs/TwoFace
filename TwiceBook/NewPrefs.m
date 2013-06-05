@@ -77,7 +77,7 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     if (section == 0) {
         
@@ -138,7 +138,7 @@
     int section = indexPath.section;
     int row = indexPath.row;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     cell.textLabel.textAlignment = UITextAlignmentCenter;
     
@@ -175,13 +175,12 @@
     int section = indexPath.section;
     int row = indexPath.row;
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     if (section == 0) {
         if (row == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [ad.theFetchedUsernames removeAllObjects];
-                [ad cacheFetchedUsernames];
+                [[[Cache sharedCache]twitterFriends]removeAllObjects];
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
             } else {
                 if (![FHSTwitterEngine isConnectedToInternet]) {
@@ -192,8 +191,7 @@
                 [[FHSTwitterEngine sharedEngine]showOAuthLoginControllerFromViewController:self];
             }
         } else if (row == 1) {
-            BOOL isLoggedIn = [ad.facebook isSessionValid];
-            if (isLoggedIn) {
+            if ([ad.facebook isSessionValid]) {
                 [ad logoutFacebook];
                 [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"fbName"];
             } else {
@@ -221,7 +219,7 @@
 
 - (void)close {
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     
     BOOL shouldReload = NO;
     

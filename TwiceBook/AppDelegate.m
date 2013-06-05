@@ -59,10 +59,12 @@ NSString * const kFacebookAppID = @"314352998657355";
 - (void)removeFacebookFromTimeline {
     BOOL cachedTimelineShouldChange = NO;
     
-    for (NSDictionary *dict in [self.viewController.timeline mutableCopy]) {
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    for (NSDictionary *dict in timeline) {
         if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"facebook"]) {
             cachedTimelineShouldChange = YES;
-            [self.viewController.timeline removeObject:dict];
+            [[[Cache sharedCache]timeline]removeObject:dict];
         }
     }
     
@@ -74,10 +76,12 @@ NSString * const kFacebookAppID = @"314352998657355";
 - (void)removeTwitterFromTimeline {
     BOOL cachedTimelineShouldChange = NO;
     
-    for (NSDictionary *dict in [self.viewController.timeline mutableCopy]) {
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    for (NSDictionary *dict in timeline) {
         if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"twitter"]) {
             cachedTimelineShouldChange = YES;
-            [self.viewController.timeline removeObject:dict];
+            [[[Cache sharedCache]timeline]removeObject:dict];
         }
     }
     
@@ -89,7 +93,6 @@ NSString * const kFacebookAppID = @"314352998657355";
 //
 // Caching
 //
-
 
 
 - (void)makeSureUsernameListArraysAreNotNil {
@@ -115,20 +118,6 @@ NSString * const kFacebookAppID = @"314352998657355";
 
     if ([Settings selectedTwitterUsernames].count == 0) {
         [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:usernamesListKey];
-    }
-    
-    if (_facebookFriendsDict.allKeys.count == 0) {
-        self.facebookFriendsDict = [self getCachedFetchedFacebookFriends];
-        if (_facebookFriendsDict.allKeys.count == 0) {
-            self.facebookFriendsDict = blankDict;
-        }
-    }
-    
-    if (_theFetchedUsernames.count == 0) {
-        self.theFetchedUsernames = [self getCachedFetchedUsernames];
-        if (_theFetchedUsernames.count == 0) {
-            self.theFetchedUsernames = blankArray;
-        }
     }
 }
 
@@ -185,7 +174,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 //
 
 - (void)clearSavedToken {
-    [self.keychain setObject:@"" forKey:(__bridge id)kSecValueData];
+    [[Keychain sharedKeychain]setObject:@"" forKey:(__bridge id)kSecValueData];
 }
 
 - (void)tryLoginFromSavedCreds {
@@ -193,7 +182,7 @@ NSString * const kFacebookAppID = @"314352998657355";
         return;
     }
 
-    NSString *keychainData = (NSString *)[self.keychain objectForKey:(__bridge id)kSecValueData];
+    NSString *keychainData = (NSString *)[[Keychain sharedKeychain]objectForKey:(__bridge id)kSecValueData];
     NSArray *components = [keychainData componentsSeparatedByString:@" "];
     
     if (components.count < 2) {
@@ -206,8 +195,8 @@ NSString * const kFacebookAppID = @"314352998657355";
     NSDate *expirationDate = [NSDate dateWithTimeIntervalSince1970:sinceUNIXEpoch];
 
     if (accessToken && expirationDate) {
-        self.facebook.accessToken = accessToken;
-        self.facebook.expirationDate = expirationDate;
+        _facebook.accessToken = accessToken;
+        _facebook.expirationDate = expirationDate;
     }
 }
 
@@ -215,7 +204,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     NSTimeInterval sinceUNIXEpoch = [date timeIntervalSince1970];
     NSString *dateString = [NSString stringWithFormat:@"%f",sinceUNIXEpoch];
     NSString *finalString = [NSString stringWithFormat:@"%@ %@",accessToken,dateString];
-    [self.keychain setObject:finalString forKey:(__bridge id)kSecValueData];
+    [[Keychain sharedKeychain]setObject:finalString forKey:(__bridge id)kSecValueData];
 }
 
 - (void)logoutFacebook {
@@ -347,11 +336,11 @@ NSString * const kFacebookAppID = @"314352998657355";
 //
 
 - (NSString *)loadAccessToken {
-    return (NSString *)[self.keychain objectForKey:(__bridge id)kSecAttrAccount];
+    return (NSString *)[[Keychain sharedKeychain]objectForKey:(__bridge id)kSecAttrAccount];
 }
 
 - (void)storeAccessToken:(NSString *)accessToken {
-    [self.keychain setObject:accessToken forKey:(__bridge id)kSecAttrAccount];
+    [[Keychain sharedKeychain]setObject:accessToken forKey:(__bridge id)kSecAttrAccount];
 }
 
 
@@ -371,15 +360,15 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)uploadSyncFile {
-    [self.restClient uploadFile:@"selectedUsernameSync.plist" toPath:@"/" withParentRev:savedRev fromPath:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
+    [self.restClient uploadFile:@"selectedUsernameSync.plist" toPath:@"/" withParentRev:savedRev fromPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
 }
 
 - (void)downloadSyncFile {
-    [self.restClient loadFile:@"/selectedUsernameSync.plist" intoPath:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
+    [self.restClient loadFile:@"/selectedUsernameSync.plist" intoPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
 }
 
 - (NSMutableDictionary *)getSyncDict {
-    return [NSMutableDictionary dictionaryWithContentsOfFile:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
+    return [NSMutableDictionary dictionaryWithContentsOfFile:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
 }
 
 - (void)checkForSyncingFile {
@@ -458,7 +447,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     NSMutableArray *autcA = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)autc];
     NSMutableArray *autlA = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)autl];
     
-    NSMutableArray *deleteArray = [[NSMutableArray alloc]initWithArray:kDBSyncDeletedTArray];
+    NSMutableArray *deleteArray = [Settings dropboxDeletedTwitterArray];
     
     NSMutableArray *cloudDeleteArray = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)dac];
     

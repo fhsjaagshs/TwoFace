@@ -55,7 +55,7 @@
     } else {
         if ([[DBSession sharedSession]isLinked]) {
             [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            [[kAppDelegate restClient]loadAccountInfo];
+            [[[Settings appDelegate]restClient]loadAccountInfo];
         }
     }
 }
@@ -180,14 +180,14 @@
         }
         
         if (row == 0) {
-            [kAppDelegate dropboxSync];
+            [[Settings appDelegate]dropboxSync];
         } else if (row == 1) {
             UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Are You Sure?" message:@"Resetting your Dropbox sync cannot be undone." completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
                 
                 if (buttonIndex == 1) {
                     [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
                     [self.theTableView reloadData];
-                    [kAppDelegate resetDropboxSync];
+                    [[Settings appDelegate]resetDropboxSync];
                 }
                 
             } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Reset",nil];

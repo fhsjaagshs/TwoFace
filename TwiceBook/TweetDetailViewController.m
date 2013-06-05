@@ -228,10 +228,10 @@
                                 if (error) {
                                     [ad showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
                                 } else {
-                                    int index = [[[[Settings appDelegate]viewController]timeline]indexOfObject:self.tweet];
+                                    int index = [[[Cache sharedCache]timeline]indexOfObject:_tweet];
                                     if (index != INT_MAX) {
-                                        [self.tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
-                                        [[[ad viewController]timeline]replaceObjectAtIndex:index withObject:self.tweet];
+                                        [_tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
+                                        [[[Cache sharedCache]timeline]replaceObjectAtIndex:index withObject:_tweet];
                                     }
                                 }
                             }

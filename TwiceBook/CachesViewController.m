@@ -130,7 +130,7 @@
     
     if (section == 0) {
         if (row == 0) {
-            [kAppDelegate clearImageCache];
+            [Cache clearImageCache];
         }
     } else if (section == 1) {
         if (row == 0) {

@@ -57,7 +57,7 @@
     double remainder = time-previousTime; 
     if (remainder > 172800) { // 2 days (172800 seconds)
         [[NSUserDefaults standardUserDefaults]setDouble:time forKey:@"previousClearTime"];
-        [[Settings appDelegate]clearImageCache];
+        [Cache clearImageCache];
         [[NSFileManager defaultManager]removeItemAtPath:[Settings invalidUsersCachePath] error:nil];
     }
 }
@@ -109,8 +109,8 @@
                     if ([addedUsers containsObject:obj]) {
                         [addedUsers removeObject:obj];
                         
-                        if ([ad.theFetchedUsernames containsObject:obj]) {
-                            [ad.theFetchedUsernames removeObject:obj];
+                        if ([[[Cache sharedCache]twitterFriends]containsObject:obj]) {
+                            [[[Cache sharedCache]twitterFriends]removeObject:obj];
                         }
                     }
                     
@@ -259,7 +259,7 @@
                 }
             }
         }
-        [_timeline addObjectsFromArray:parsedPosts];
+        [[[Cache sharedCache]timeline]addObjectsFromArray:parsedPosts];
         NSLog(@"Facebook: %d statuses fetched",parsedPosts.count);
     }
     facebookDone = YES;
@@ -273,10 +273,6 @@
 - (void)reloadCommon {
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-
-    if (_timeline.count == 0) {
-        _timeline = [NSMutableArray array];
-    }
     
     errorEncounteredWhileLoading = NO;
     
@@ -306,7 +302,7 @@
         return;
     }
     
-    [_timeline removeAllObjects];
+    [[[Cache sharedCache]timeline]removeAllObjects];
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
@@ -395,37 +391,25 @@
 - (void)loadTimelineViewDidLoadThreaded {
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
-            AppDelegate *ad = [Settings appDelegate];
             
-            [ad makeSureUsernameListArraysAreNotNil];
-            
-            NSMutableArray *savedTimeline = [ad getCachedTimeline];
         
             dispatch_sync(GCDMainThread, ^{
                 @autoreleasepool {
                     [self reloadCommon];
                     
-                    if (savedTimeline.count > 0) {
-                        [_timeline addObjectsFromArray:savedTimeline];
-                        
-                        BOOL shouldRecacheTimeline = NO;
+                    if ([[Cache sharedCache]timeline].count > 0) {
+
+                        AppDelegate *ad = [Settings appDelegate];
                         
                         if (![ad.facebook isSessionValid]) {
                             [ad removeFacebookFromTimeline];
-                            shouldRecacheTimeline = YES;
                         }
                         
                         if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
                             [ad removeTwitterFromTimeline];
-                            shouldRecacheTimeline = YES;
                         }
                         
-                        if (shouldRecacheTimeline) {
-                            [ad cacheTimeline];
-                        }
-
                         [_pull finishedLoading];
-                        
                     }
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
@@ -440,7 +424,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if (_timeline.count == 0) {
+    if ([[Cache sharedCache]timeline].count == 0) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
@@ -505,7 +489,7 @@
 //
 
 - (void)sortedTimeline {
-    NSMutableArray *array = [_timeline mutableCopy];
+    NSMutableArray *array = [[Cache sharedCache]timeline];
     NSMutableDictionary *the = [NSMutableDictionary dictionary];
     
     for (id item in array) {
@@ -528,8 +512,8 @@
         [final addObject:[array objectAtIndex:[string intValue]]]; // array obj.. was timeline obj...
     }
     
-    [_timeline removeAllObjects];
-    [_timeline addObjectsFromArray:final];
+    [[[Cache sharedCache]timeline]removeAllObjects];
+    [[[Cache sharedCache]timeline]addObjectsFromArray:final];
 }
 
 // 
@@ -545,18 +529,10 @@
         @autoreleasepool {
             
             NSMutableArray *tweets = [NSMutableArray array];
-
-            NSMutableArray *cachedRepliedToTweets = [Settings tweetCache];
-            
-            if ([[cachedRepliedToTweets firstObjectA]isKindOfClass:[NSDictionary class]]) {
-                cachedRepliedToTweets = nil;
-            }
-            
-            if (cachedRepliedToTweets == nil) {
-                cachedRepliedToTweets = [NSMutableArray array];
-            }
             
             NSMutableArray *usedTweetsFromCache = [NSMutableArray array];
+            
+            NSMutableArray *nonTimelineTweets = [[Cache sharedCache]nonTimelineTweets];
             
             for (NSString *username in usernames) {
                 
@@ -582,10 +558,10 @@
                             
                             id retrievedTweet = nil;
                             
-                            if (cachedRepliedToTweets.count > 0) {
-                                for (NSDictionary *dict_cached in cachedRepliedToTweets) {
-                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:[dict_cached objectForKey:@"in_reply_to_status_id_str"]]) {
-                                        retrievedTweet = dict_cached;
+                            if (nonTimelineTweets.count > 0) {
+                                for (NSDictionary *dict in nonTimelineTweets) {
+                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:[dict objectForKey:@"in_reply_to_status_id_str"]]) {
+                                        retrievedTweet = dict;
                                         break;
                                     }
                                 }
@@ -614,7 +590,8 @@
                 }
             }
             
-            [usedTweetsFromCache writeToFile:[Settings tweetCachePath] atomically:YES];
+            [[[Cache sharedCache]nonTimelineTweets]removeAllObjects];
+            [[[Cache sharedCache]nonTimelineTweets]addObjectsFromArray:usedTweetsFromCache];
             
             int duplicateCount = (tweets.count-[tweets arrayByRemovingDuplicates].count);
             
@@ -623,7 +600,7 @@
                 [tweets removeDuplicates];
             }
 
-            [_timeline addObjectsFromArray:tweets];
+            [[[Cache sharedCache]timeline]addObjectsFromArray:tweets];
 
             finishedLoadingTwitter = YES;
             
@@ -647,9 +624,11 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    if (_timeline.count > 0) {
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    if (timeline.count > 0) {
         
-        id item = [_timeline objectAtIndex:indexPath.row];
+        id item = [timeline objectAtIndex:indexPath.row];
         NSString *cellText = nil;
         
         if ([item isKindOfClass:[Status class]]) {
@@ -670,7 +649,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = _timeline.count;
+    int count = [[Cache sharedCache]timeline].count;
     return (count == 0)?1:count;
 }
 
@@ -689,7 +668,9 @@
     cell.detailTextLabel.numberOfLines = 0;
     cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
     
-    if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, _timeline.count == 0)) {
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.additionalLabel.text = nil;
@@ -724,7 +705,7 @@
     } else {
         
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        id tweetOrStatus = [_timeline objectAtIndex:indexPath.row];
+        id tweetOrStatus = [timeline objectAtIndex:indexPath.row];
 
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
@@ -759,7 +740,9 @@
     
     [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    if (_timeline.count == 0) {
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    if (timeline.count == 0) {
         return;
     }
 
@@ -769,7 +752,7 @@
         return;
     }
     
-    id tappedItem = [_timeline objectAtIndex:indexPath.row];
+    id tappedItem = [timeline objectAtIndex:indexPath.row];
     
     if ([tappedItem isKindOfClass:[Status class]]) {
         PostDetailViewController *p = [[PostDetailViewController alloc]initWithPost:tappedItem];

@@ -16,7 +16,7 @@
 
 @property (strong, nonatomic) PullToRefreshView *pull;
 @property (strong, nonatomic) UITableView *theTableView;
-@property (strong, nonatomic) NSMutableArray *timeline;
+//@property (strong, nonatomic) NSMutableArray *timeline;
 @property (strong, nonatomic) NSMutableArray *protectedUsers;
 
 - (void)getTweetsForUsernames:(NSArray *)usernames;
