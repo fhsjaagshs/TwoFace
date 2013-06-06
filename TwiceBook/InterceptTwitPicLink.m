@@ -30,13 +30,10 @@
     if (extension.length >= 3) {
         extension = [extension substringToIndex:3];
     }
-
-    BOOL isImage = ([extension isEqualToString:@"png"] || [extension isEqualToString:@"jpg"] || [extension isEqualToString:@"tif"] || [extension isEqualToString:@"jpe"] || [urlString containsString:@"pic.twitter.com/"]);
     
-    if (isImage) {
-        NSString *newURL = [[Settings appDelegate]getImageURLForLinkURL:[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
-        
-        if (!(newURL.length == 0 || newURL == nil)) {
+    if (([extension isEqualToString:@"png"] || [extension isEqualToString:@"jpg"] || [extension isEqualToString:@"tif"] || [extension isEqualToString:@"jpe"] || [urlString containsString:@"pic.twitter.com/"])) {
+        NSString *newURL = [[[Cache sharedCache]pictwitterURLs]objectForKey:[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
+        if (newURL.length > 0) {
             urlString = newURL;
             url = [NSURL URLWithString:urlString];
         }

@@ -93,7 +93,7 @@
             if (hasTwitPicLink) {
                 picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
                 self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-                [[Settings appDelegate]setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
+                [[[Cache sharedCache]pictwitterURLs]setObject:picTwitterComImageLink forKey:picTwitterComLink];
             }
         }
         

@@ -16,6 +16,7 @@
 @property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
 @property (nonatomic, strong) NSMutableArray *invalidUsers; // protectedUsers
 @property (nonatomic, strong) NSMutableDictionary *twitterIdToUsername;
+@property (nonatomic, strong) NSMutableDictionary *pictwitterURLs; // link url is key, image url is object
 
 - (void)cache;
 - (void)loadCaches;

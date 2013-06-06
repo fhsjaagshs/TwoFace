@@ -19,17 +19,6 @@
 @property (strong, nonatomic) UIWindow *window;
 @property (strong, nonatomic) ViewController *viewController;
 
-//
-// picTwitter image URL handling
-//
-
-- (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL;
-- (NSString *)getImageURLForLinkURL:(NSString *)linkURL;
-
-//
-// Twitter
-//
-
 - (void)reloadMainTableView;
 
 // HUD View methods
@@ -39,9 +28,8 @@
 - (void)showSelfHidingHudWithTitle:(NSString *)title;
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
 
-//
 // Facebook
-//
+@property (strong, nonatomic) Facebook *facebook;
 
 - (void)loginFacebook;
 - (void)logoutFacebook;
@@ -49,21 +37,11 @@
 - (void)tryLoginFromSavedCreds;
 - (NSString *)getFacebookUsernameSync;
 
-@property (strong, nonatomic) Facebook *facebook;
-
-
-//
 // Timeline management
-//
-
 - (void)removeFacebookFromTimeline;
 - (void)removeTwitterFromTimeline;
 
-
-//
 // Dropbox Sync
-//
-
 @property (strong, nonatomic) DBRestClient *restClient;
 
 - (void)dropboxSync;

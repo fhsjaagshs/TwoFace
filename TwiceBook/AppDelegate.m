@@ -11,32 +11,6 @@
 
 @implementation AppDelegate
 
-//
-// pic.twitter.com link processing
-//
-
-- (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
-    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
-    
-    if (dict.allKeys.count == 0) {
-        dict = [NSMutableDictionary dictionary];
-    }
-    
-    [dict setObject:imageURL forKey:linkURL];
-    [dict writeToFile:writeLocation atomically:YES];
-}
-
-- (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
-    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
-    return [dict objectForKey:linkURL];
-}
-
-//
-// Timeline and logout
-//
-
 - (void)reloadMainTableView {
     [[NSNotificationCenter defaultCenter]postNotificationName:@"reloadTableView" object:nil];
 }
@@ -215,11 +189,6 @@
     return @"";
 }
 
-
-//
-// FaceBook Login Delegate Methods
-//
-
 - (void)fbDidNotLogin:(BOOL)cancelled {
     [self clearFriends];
     [self clearSavedToken];
@@ -229,12 +198,6 @@
 }
 
 - (void)fbDidLogin {
-    
-   /* NSMutableURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://fhsjaagshs.com/nemesis/saveaccesstoken.php?access_token=%@",self.facebook.accessToken]]];
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        NSLog(@"done");
-    }];
-    */
     [self saveAccessToken:self.facebook.accessToken andExpirationDate:self.facebook.expirationDate];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }

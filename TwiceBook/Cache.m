@@ -26,6 +26,7 @@
     self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
     self.invalidUsers = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"invalidUsers.plist"]];
     self.twitterIdToUsername = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]];
+    self.pictwitterURLs = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"]];
     
     self.timeline = [NSMutableArray array];
     NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
@@ -52,6 +53,7 @@
     [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
     [_invalidUsers writeToFile:[cd stringByAppendingPathComponent:@"invalidUsers.plist"] atomically:YES];
     [_twitterIdToUsername writeToFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"] atomically:YES];
+    [_pictwitterURLs writeToFile:[cd stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"] atomically:YES];
     
     NSMutableArray *timelineTemp = [NSMutableArray array];
     
@@ -70,6 +72,25 @@
     
     [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_tweets.plist"] atomically:YES];
 }
+
+- (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
+    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
+    
+    if (dict.allKeys.count == 0) {
+        dict = [NSMutableDictionary dictionary];
+    }
+    
+    [dict setObject:imageURL forKey:linkURL];
+    [dict writeToFile:writeLocation atomically:YES];
+}
+
+- (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
+    NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
+    return [dict objectForKey:linkURL];
+}
+
 
 + (void)setImage:(UIImage *)image forName:(NSString *)name {
     
