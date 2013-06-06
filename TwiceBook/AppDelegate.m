@@ -57,36 +57,23 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)removeFacebookFromTimeline {
-    BOOL cachedTimelineShouldChange = NO;
-    
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     for (NSDictionary *dict in timeline) {
         if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"facebook"]) {
-            cachedTimelineShouldChange = YES;
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
-    }
-    
-    if (cachedTimelineShouldChange) {
-        [self cacheTimeline];
     }
 }
 
 - (void)removeTwitterFromTimeline {
-    BOOL cachedTimelineShouldChange = NO;
-    
+
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     for (NSDictionary *dict in timeline) {
         if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"twitter"]) {
-            cachedTimelineShouldChange = YES;
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
-    }
-    
-    if (cachedTimelineShouldChange) {
-        [self cacheTimeline];
     }
 }
 
@@ -237,8 +224,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 //
 
 - (void)clearFriends {
-    [self.facebookFriendsDict removeAllObjects];
-    [self cacheFetchedFacebookFriends];
+    [[[Cache sharedCache]facebookFriends]removeAllObjects];
 }
 
 
@@ -372,7 +358,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)checkForSyncingFile {
-    NSString *path = [kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
+    NSString *path = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
     if (![[NSFileManager defaultManager]fileExistsAtPath:path]) {
         [[NSFileManager defaultManager]createFileAtPath:path contents:nil attributes:nil];
     }
@@ -407,7 +393,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     NSMutableDictionary *localFriendsDict = [[NSMutableDictionary alloc]initWithDictionary:(NSMutableDictionary *)fdl];
     NSMutableDictionary *cloudDeletionDict = [[NSMutableDictionary alloc]initWithDictionary:(NSMutableDictionary *)ddc]; // from sync-before-this-sync
 
-    NSMutableDictionary *deleteDict = kDBSyncDeletedFBDict; // our offender (no longer)
+    NSMutableDictionary *deleteDict = [Settings dropboxDeletedFacebookDictionary];
 
     for (id key in cloudDeletionDict.allKeys) {
         [localFriendsDict removeObjectForKey:key];
@@ -520,7 +506,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     [defaults setObject:finalArrayF forKey:@"usernames_twitter"];
 
     [defaults synchronize];
-    [cloudData writeToFile:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"] atomically:YES];
+    [cloudData writeToFile:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] atomically:YES];
     [self uploadSyncFile];
 }
 
@@ -562,7 +548,7 @@ NSString * const kFacebookAppID = @"314352998657355";
         }
     }
     
-    [[NSFileManager defaultManager]removeItemAtPath:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
+    [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory] stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
     
     if ([filenames containsObject:@"selectedUsernameSync.plist"]) {
         [self checkForSyncingFile]; // makes sure that the selectedUsernameSync.plist is there
@@ -574,7 +560,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 - (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error {
     [self hideHUD];
-    [[NSFileManager defaultManager]removeItemAtPath:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
+    [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
     qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
@@ -588,7 +574,7 @@ NSString * const kFacebookAppID = @"314352998657355";
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self hideHUD];
     if (error.code != 404) {
-        [[NSFileManager defaultManager]removeItemAtPath:[kDocumentsDirectory stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
+        [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
         qAlert(@"Error Resetting Dropbox Sync", @"TwoFace failed to delete the data stored on Dropbox.");
     }
 }
@@ -666,9 +652,6 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [self cacheTimeline];
-    [self cacheFetchedUsernames];
-    [self cacheFetchedFacebookFriends];
     [[Cache sharedCache]cache];
 }
 
@@ -685,9 +668,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    [self cacheTimeline];
-    [self cacheFetchedUsernames];
-    [self cacheFetchedFacebookFriends];
+    
 }
 
 @end

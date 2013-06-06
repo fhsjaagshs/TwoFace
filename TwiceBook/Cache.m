@@ -24,6 +24,8 @@
     NSString *cd = [Settings cachesDirectory];
     self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];;
     self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
+    self.invalidUsers = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"invalidUsers.plist"]];
+    self.twitterIdToUsername = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]];
     
     self.timeline = [NSMutableArray array];
     NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
@@ -48,6 +50,8 @@
     NSString *cd = [Settings cachesDirectory];
     [_facebookFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"] atomically:YES];
     [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
+    [_invalidUsers writeToFile:[cd stringByAppendingPathComponent:@"invalidUsers.plist"] atomically:YES];
+    [_twitterIdToUsername writeToFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"] atomically:YES];
     
     NSMutableArray *timelineTemp = [NSMutableArray array];
     

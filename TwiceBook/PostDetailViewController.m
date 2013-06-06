@@ -340,7 +340,6 @@
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;
                     [[[Cache sharedCache]timeline]replaceObjectAtIndex:index withObject:_post];
-                    [ad cacheTimeline];
                 }
             }
             

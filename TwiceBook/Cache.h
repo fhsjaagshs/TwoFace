@@ -14,6 +14,8 @@
 @property (nonatomic, strong) NSMutableDictionary *facebookFriends; // facebookFriendsDict
 @property (nonatomic, strong) NSMutableArray *timeline;
 @property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
+@property (nonatomic, strong) NSMutableArray *invalidUsers; // protectedUsers
+@property (nonatomic, strong) NSMutableDictionary *twitterIdToUsername;
 
 - (void)cache;
 - (void)loadCaches;

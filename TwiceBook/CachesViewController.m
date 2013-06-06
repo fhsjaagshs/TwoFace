@@ -126,24 +126,16 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     int section = indexPath.section;
-    int row = indexPath.row;
     
     if (section == 0) {
-        if (row == 0) {
-            [Cache clearImageCache];
-        }
+        [Cache clearImageCache];
     } else if (section == 1) {
-        if (row == 0) {
-            [[NSFileManager defaultManager]removeItemAtPath:contextualTweetCachePath error:nil];
-        }
+        [[[Cache sharedCache]nonTimelineTweets]removeAllObjects];
     } else if (section == 2) {
-        if (row == 0) {
-            [[NSFileManager defaultManager]removeItemAtPath:invalidUsersCachePath error:nil];
-        }
+        [[[Cache sharedCache]invalidUsers]removeAllObjects];
     } else if (section == 3) {
-        if (row == 0) {
-            [[NSFileManager defaultManager]removeItemAtPath:usernamesListCachePath error:nil];
-        }
+       // [[[Cache sharedCache]twitterIdToUsername]removeAllObjects];
+        [[NSFileManager defaultManager]removeItemAtPath:usernamesListCachePath error:nil];
     }
 }
 

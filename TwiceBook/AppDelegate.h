@@ -61,17 +61,6 @@
 
 - (void)removeFacebookFromTimeline;
 - (void)removeTwitterFromTimeline;
-- (NSMutableArray *)getCachedTimeline;
-- (void)cacheTimeline;
-
-//
-// Fetched Users Caching
-//
-
-- (void)cacheFetchedUsernames;
-- (NSMutableArray *)getCachedFetchedUsernames;
-- (void)cacheFetchedFacebookFriends;
-- (NSMutableDictionary *)getCachedFetchedFacebookFriends;
 
 
 //
