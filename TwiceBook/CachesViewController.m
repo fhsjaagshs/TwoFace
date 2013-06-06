@@ -13,8 +13,7 @@
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
-    //self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
+    self.view.backgroundColor = [UIColor underPageBackgroundColor];
     UITableView *theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
     theTableView.delegate = self;
     theTableView.dataSource = self;
@@ -43,14 +42,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    
-    if (section == 0) {
-        return 1;
-    } else if (section == 1) {
-        return 2;
-    } else if (section == 2) {
-        return 1;
-    } else if (section == 3) {
+    if (section < 4) {
         return 1;
     }
     return 0;
@@ -64,34 +56,31 @@
     if (section == 0) {
         return @"Image Cache";
     } else if (section == 1) {
-        return @"Tweet Caches";
+        return @"Twitter Cache";
     } else if (section == 2) {
-        return @"Invalid Users Cache";
+        return @"Facebook Cache";
     } else if (section == 3) {
-        return @"Twitter Friends Cache";
+        return @"Timeline";
     }
     return nil;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section == 0) {
-        // return @"I cache images to cut loading time. Clear the cache if you experience problems.";
-        return @"Images are cached to cut loading times.";
+        return @"Images from Facebook and Twitter";
     } else if (section == 1) {
-        // return @"I cache tweets to cut refreshing times. Clear the cache if you experience problems.";
-        return @"Tweets are cached to speed up refreshing times.";
+        return @"Tweets and Twitter Users";
     } else if (section == 2) {
-        // return @"I cache a list of invalid users to cut loading times. Clear the cache if you experience problems";
-        return @"Invalid users are cached to speed up error checking.";
-    } else if (section == 3) {
-        return @"Cached Twitter Friends speed up the loading of Twitter friends.";
+        return @"Statuses and Facebook Users";
+    } else {
+        return @"The timeline";
     }
     return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    static NSString *CellIdentifier = @"Cell4";
+    static NSString *CellIdentifier = @"CellCaches";
     
     UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
@@ -99,24 +88,15 @@
     }
     
     int section = indexPath.section;
-    int row = indexPath.row;
-    
+
     if (section == 0) {
-        if (row == 0) {
-            cell.textLabel.text = @"Clear Image Cache";
-        }
+        cell.textLabel.text = @"Clear Image Cache";
     } else if (section == 1) {
-        if (row == 0) {
-            cell.textLabel.text = @"Clear Tweet Cache";
-        }
+        cell.textLabel.text = @"Clear Twitter Cache";
     } else if (section == 2) {
-        if (row == 0) {
-            cell.textLabel.text = @"Clear Invalid User Cache";
-        }
+        cell.textLabel.text = @"Clear Facebook Cache";
     } else if (section == 3) {
-        if (row == 0) {
-            cell.textLabel.text = @"Clear Twitter Friends Cache";
-        }
+        cell.textLabel.text = @"Clear Timeline";
     }
     cell.textLabel.textAlignment = UITextAlignmentCenter;
     return cell;
@@ -131,11 +111,13 @@
         [Cache clearImageCache];
     } else if (section == 1) {
         [[[Cache sharedCache]nonTimelineTweets]removeAllObjects];
-    } else if (section == 2) {
+        [[[Cache sharedCache]twitterIdToUsername]removeAllObjects];
         [[[Cache sharedCache]invalidUsers]removeAllObjects];
+        [[[Cache sharedCache]twitterFriends]removeAllObjects];
+    } else if (section == 2) {
+        [[[Cache sharedCache]facebookFriends]removeAllObjects];
     } else if (section == 3) {
-       // [[[Cache sharedCache]twitterIdToUsername]removeAllObjects];
-        [[NSFileManager defaultManager]removeItemAtPath:usernamesListCachePath error:nil];
+        [[[Cache sharedCache]timeline]removeAllObjects];
     }
 }
 

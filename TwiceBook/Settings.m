@@ -21,15 +21,6 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 @implementation Settings
 
-/*+ (Settings *)sharedSettings {
-    static Settings *sharedSettings;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedSettings = [[Settings alloc]init];
-    });
-    return sharedSettings;
-}*/
-
 + (AppDelegate *)appDelegate {
     return (AppDelegate *)[[UIApplication sharedApplication]delegate];
 }

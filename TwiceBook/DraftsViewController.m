@@ -43,12 +43,12 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    int count = [kDraftsArray count];
+    int count = [[Settings drafts]count];
     return (count == 0)?@"There are no saved drafts.":[NSString stringWithFormat:@"There %@ %d draft%@.",(count == 1)?@"is":@"are",count,(count == 1)?@"":@"s"];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [kDraftsArray count];
+    return [[Settings drafts]count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -69,7 +69,7 @@
         cell.accessoryView = imageView;
     }
 
-    NSDictionary *draft = [kDraftsArray objectAtIndex:indexPath.row];
+    NSDictionary *draft = [[Settings drafts]objectAtIndex:indexPath.row];
     NSString *thumbnailImagePath = (NSString *)[draft objectForKey:@"thumbnailImagePath"];
     
     UIImage *image = [UIImage imageWithContentsOfFile:thumbnailImagePath.length?thumbnailImagePath:[draft objectForKey:@"imagePath"]];
@@ -93,9 +93,9 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSMutableArray *draftsArray = kDraftsArray;
+    NSMutableArray *draftsArray = [Settings drafts];
     [draftsArray removeObjectAtIndex:indexPath.row];
-    [draftsArray writeToFile:kDraftsPath atomically:YES];
+    [draftsArray writeToFile:[Settings draftsPath] atomically:YES];
     
     [tableView beginUpdates];
     [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObjects:[NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section], nil] withRowAnimation:UITableViewRowAnimationLeft];
@@ -108,7 +108,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[kDraftsArray objectAtIndex:indexPath.row]];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[[Settings drafts]objectAtIndex:indexPath.row]];
     [self dismissModalViewControllerAnimated:YES];
 }
 

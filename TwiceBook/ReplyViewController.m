@@ -14,7 +14,7 @@
 
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[kAppDelegate facebookFriendsDict]objectForKey:self.toID]componentsSeparatedByString:@" "]firstObjectA]];
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[[Cache sharedCache]facebookFriends]objectForKey:_toID]componentsSeparatedByString:@" "]firstObjectA]];
 }
 
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
@@ -97,9 +97,8 @@
 }
 
 - (void)kickoffTweetPost {
-    AppDelegate *ad = kAppDelegate;
-    NSString *messageBody = [self.replyZone.text stringByTrimmingWhitespace];
-    [ad showHUDWithTitle:@"Tweeting..."];
+    NSString *messageBody = [_replyZone.text stringByTrimmingWhitespace];
+    [[Settings appDelegate] showHUDWithTitle:@"Tweeting..."];
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
             NSError *error = nil;
@@ -299,7 +298,7 @@
 
 - (void)dismissModalViewControllerAnimated:(BOOL)animated {
     [self purgeDraftImages];
-    [kAppDelegate hideHUD];
+    [[Settings appDelegate]hideHUD];
     [self removeObservers];
     [super dismissModalViewControllerAnimated:animated];
 }
@@ -315,19 +314,19 @@
 }
 
 - (void)deletePostedDraft {
-    NSMutableArray *drafts = kDraftsArray;
+    NSMutableArray *drafts = [Settings drafts];
     
-    if ([drafts containsObject:self.loadedDraft]) {
-        [[NSFileManager defaultManager]removeItemAtPath:[self.loadedDraft objectForKey:@"thumbnailImagePath"] error:nil];
-        [[NSFileManager defaultManager]removeItemAtPath:[self.loadedDraft objectForKey:@"imagePath"] error:nil];
-        [drafts removeObject:self.loadedDraft];
-        [drafts writeToFile:kDraftsPath atomically:YES];
+    if ([drafts containsObject:_loadedDraft]) {
+        [[NSFileManager defaultManager]removeItemAtPath:[_loadedDraft objectForKey:@"thumbnailImagePath"] error:nil];
+        [[NSFileManager defaultManager]removeItemAtPath:[_loadedDraft objectForKey:@"imagePath"] error:nil];
+        [drafts removeObject:_loadedDraft];
+        [drafts writeToFile:[Settings draftsPath] atomically:YES];
     }
 }
 
 - (void)purgeDraftImages {
-    NSString *imageDir = [kDocumentsDirectory stringByAppendingPathComponent:@"draftImages"];
-    NSMutableArray *drafts = kDraftsArray;
+    NSString *imageDir = [[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"];
+    NSMutableArray *drafts = [Settings drafts];
     
     NSMutableArray *imagesToKeep = [NSMutableArray array];
     NSMutableArray *allFiles = [NSMutableArray arrayWithArray:[[NSFileManager defaultManager]contentsOfDirectoryAtPath:imageDir error:nil]];
@@ -355,7 +354,7 @@
 }
 
 - (void)saveDraft {
-    NSMutableArray *drafts = kDraftsArray;
+    NSMutableArray *drafts = [Settings drafts];
     
     if (drafts == nil) {
         drafts = [NSMutableArray array];
@@ -363,27 +362,27 @@
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     
-    NSString *thetoID = self.isFacebook?self.toID:[self.loadedDraft objectForKey:@"toID"];
+    NSString *thetoID = _isFacebook?_toID:[_loadedDraft objectForKey:@"toID"];
     
     if (thetoID.length > 0) {
         [dict setObject:thetoID forKey:@"toID"];
     }
     
-    if (self.replyZone.text.length > 0) {
-        [dict setObject:self.replyZone.text forKey:@"text"];
+    if (_replyZone.text.length > 0) {
+        [dict setObject:_replyZone.text forKey:@"text"];
     }
     
     if (self.imageFromCameraRoll) {
         NSString *filename = [NSString stringWithFormat:@"%lld.jpg",arc4random()%9999999999999999];
-        NSString *path = [[kDocumentsDirectory stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
+        NSString *path = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
 
-        if (![[NSFileManager defaultManager]fileExistsAtPath:[kDocumentsDirectory stringByAppendingPathComponent:@"draftImages"] isDirectory:nil]) {
-            [[NSFileManager defaultManager]createDirectoryAtPath:[kDocumentsDirectory stringByAppendingPathComponent:@"draftImages"] withIntermediateDirectories:NO attributes:nil error:nil];
+        if (![[NSFileManager defaultManager]fileExistsAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"] isDirectory:nil]) {
+            [[NSFileManager defaultManager]createDirectoryAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"] withIntermediateDirectories:NO attributes:nil error:nil];
         }
         
         do {
             filename = [NSString stringWithFormat:@"%lld.jpg",arc4random()%9999999999999999];
-            path = [[kDocumentsDirectory stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
+            path = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
         } while ([[NSFileManager defaultManager]fileExistsAtPath:path]);
         
         [UIImageJPEGRepresentation(self.imageFromCameraRoll, 1.0) writeToFile:path atomically:YES];
@@ -404,7 +403,7 @@
     [dict setObject:[NSDate date] forKey:@"time"];
     
     [drafts addObject:dict];
-    [drafts writeToFile:kDraftsPath atomically:YES];
+    [drafts writeToFile:[Settings draftsPath] atomically:YES];
 }
 
 - (void)loadDraft:(NSNotification *)notif {
@@ -451,7 +450,7 @@
         }
     }
     
-    AppDelegate *ad = kAppDelegate;
+    AppDelegate *ad = [Settings appDelegate];
     [self.replyZone resignFirstResponder];
     
     if (self.isFacebook) {
@@ -552,7 +551,7 @@
 - (void)close {
     [self.replyZone resignFirstResponder];
     
-    if (self.isLoadedDraft && [kDraftsArray containsObject:self.loadedDraft]) {
+    if (self.isLoadedDraft && [[Settings drafts]containsObject:_loadedDraft]) {
         [self dismissModalViewControllerAnimated:YES];
         return;
     }
