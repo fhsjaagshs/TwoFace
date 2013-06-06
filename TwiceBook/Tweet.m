@@ -52,12 +52,20 @@
 
 - (void)parseDictionary:(NSDictionary *)dictionary {
     self.identifier = [dictionary objectForKey:@"id_str"];
-    self.createdAt = [[FHSTwitterEngine sharedEngine]getDateFromTwitterCreatedAt:[dictionary objectForKey:@"created_at"]];
+    
     self.text = [dictionary objectForKey:@"text"];
     self.source = [dictionary objectForKey:@"source"];
     self.inReplyToScreenName = [dictionary objectForKey:@"in_reply_to_screen_name"];
     self.inReplyToUserIdentifier = [dictionary objectForKey:@"in_reply_to_user_id_str"];
     self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id_str"];
+    
+    id created_at = [dictionary objectForKey:@"created_at"];
+    
+    if ([created_at isKindOfClass:[NSString class]]) {
+        self.createdAt = [[FHSTwitterEngine sharedEngine]getDateFromTwitterCreatedAt:created_at];
+    } else if ([created_at isKindOfClass:[NSDate class]]) {
+        self.createdAt = (NSDate *)created_at;
+    }
     
     if (_inReplyToTweetIdentifier.length == 0) {
         self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id"];

@@ -20,8 +20,6 @@
 }
 
 - (void)loadCaches {
-    
-    NSLog(@"Start loading cache");
     NSString *cd = [Settings cachesDirectory];
     self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];;
     self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
@@ -39,19 +37,16 @@
             [_timeline addObject:[Status statusWithDictionary:dict]];
         }
     }
-    
+
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
     self.nonTimelineTweets = [NSMutableArray array];
     
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
         [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
     }
-    
-    NSLog(@"Finished loading caches");
 }
 
 - (void)cache {
-    NSLog(@"start caching");
     NSString *cd = [Settings cachesDirectory];
     [_facebookFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"] atomically:YES];
     [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
