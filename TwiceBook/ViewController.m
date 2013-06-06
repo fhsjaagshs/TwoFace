@@ -194,11 +194,6 @@
 
 - (void)parseResult:(id)result {
     
-    if ([result objectForKey:@"error"]) {
-        errorEncounteredWhileLoading = YES;
-        return;
-    }
-    
     for (NSDictionary *dictionary in result) {
         id parsedJSONResponse = removeNull([NSJSONSerialization JSONObjectWithData:[[dictionary objectForKey:@"body"] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil]);
         
@@ -378,8 +373,6 @@
 - (void)loadTimelineViewDidLoadThreaded {
     dispatch_async(GCDBackgroundThread, ^{
         @autoreleasepool {
-            
-        
             dispatch_sync(GCDMainThread, ^{
                 @autoreleasepool {
                     [self reloadCommon];
@@ -517,8 +510,6 @@
             
             NSMutableArray *tweets = [NSMutableArray array];
             
-            NSMutableArray *usedTweetsFromCache = [NSMutableArray array];
-            
             NSMutableArray *nonTimelineTweets = [[Cache sharedCache]nonTimelineTweets];
             
             for (NSString *username in usernames) {
@@ -538,7 +529,6 @@
                     NSLog(@"TWITTER: fetched: %u",[(NSArray *)fetched count]);
                     
                     for (NSDictionary *dict in fetched) {
-                        
                         Tweet *tweet = [Tweet tweetWithDictionary:dict];
                         
                         if (!tweet.inReplyToTweetIdentifier.length == 0) {
@@ -546,9 +536,9 @@
                             id retrievedTweet = nil;
                             
                             if (nonTimelineTweets.count > 0) {
-                                for (NSDictionary *dict in nonTimelineTweets) {
-                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:[dict objectForKey:@"in_reply_to_status_id_str"]]) {
-                                        retrievedTweet = dict;
+                                for (Tweet *fromcache in nonTimelineTweets) {
+                                    if ([tweet.inReplyToTweetIdentifier isEqualToString:fromcache.inReplyToTweetIdentifier]) {
+                                        retrievedTweet = fromcache;
                                         break;
                                     }
                                 }
@@ -560,9 +550,12 @@
                             
                             if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
                                 Tweet *irt = [Tweet tweetWithDictionary:retrievedTweet];
-                                [usedTweetsFromCache addObject:irt];
+                                [[[Cache sharedCache]nonTimelineTweets]addObject:irt];
                                 [tweets addObject:irt];
                                 NSLog(@"TWITTER: Fetched Contextual Tweet: %@",irt.inReplyToTweetIdentifier);
+                            } else if ([retrievedTweet isKindOfClass:[Tweet class]]) {
+                                [tweets addObject:retrievedTweet];
+                                NSLog(@"TWITTER: Loaded Contextual Tweet: %@",((Tweet *)retrievedTweet).inReplyToTweetIdentifier);
                             } else if ([retrievedTweet isKindOfClass:[NSError class]]) {
                                 errorEncounteredWhileLoading = YES;
                             }
@@ -576,9 +569,6 @@
                     NSLog(@" ");
                 }
             }
-            
-            [[[Cache sharedCache]nonTimelineTweets]removeAllObjects];
-            [[[Cache sharedCache]nonTimelineTweets]addObjectsFromArray:usedTweetsFromCache];
             
             int duplicateCount = (tweets.count-[tweets arrayByRemovingDuplicates].count);
             

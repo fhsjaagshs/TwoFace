@@ -39,7 +39,7 @@
         }
     }
     
-    NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_tweets.plist"]];
+    NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
     self.nonTimelineTweets = [NSMutableArray array];
     
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
@@ -48,6 +48,7 @@
 }
 
 - (void)cache {
+    NSLog(@"start caching");
     NSString *cd = [Settings cachesDirectory];
     [_facebookFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"] atomically:YES];
     [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
@@ -58,11 +59,10 @@
     NSMutableArray *timelineTemp = [NSMutableArray array];
     
     for (id obj in _timeline) {
-        [timelineTemp addObject:[obj dictionaryValue]];
+        [timelineTemp addObject:[obj dictionaryValue]]; // dictionaryValue is crash prone
     }
     
     [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timeline.plist"] atomically:YES];
-    
     
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray array];
     
@@ -70,7 +70,8 @@
         [nonTimelineTweetsTemp addObject:[tweet dictionaryValue]];
     }
     
-    [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_tweets.plist"] atomically:YES];
+    [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
+    NSLog(@"Stop caching");
 }
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {

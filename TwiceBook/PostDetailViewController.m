@@ -317,7 +317,7 @@
                 NSString *posterName = [[rawComment objectForKey:@"from"]objectForKey:@"name"];
                 NSString *posterID = [[rawComment objectForKey:@"from"]objectForKey:@"id"];
                 NSString *message = [rawComment objectForKey:@"message"];
-                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"created_time"]];
+                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"updated_time"]];
                 
                 [comment setObject:created_time forKey:@"created_time"];
                 [comment setObject:postID forKey:@"post_id"];

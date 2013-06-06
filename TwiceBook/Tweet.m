@@ -42,7 +42,7 @@
     self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id_str"];
     
     if (_inReplyToTweetIdentifier.length == 0) {
-        self.inReplyToTweetIdentifier = [[dictionary objectForKey:@"in_reply_to_status_id"]stringValue];
+        self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id"];
     }
     
     self.isFavorited = [[dictionary objectForKey:@"favorited"]boolValue];
