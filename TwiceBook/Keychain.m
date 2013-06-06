@@ -12,7 +12,7 @@
 @interface Keychain ()
 
 @property (nonatomic, strong) NSMutableDictionary *keychainItemData;
-@property (nonatomic, strong) NSString *identifier;
+@property (nonatomic, strong) NSString *keychainidentifier;
 
 @end
 
@@ -28,15 +28,15 @@
 }
 
 - (void)setIdentifier:(NSString *)anIdentifier {
-    self.identifier = anIdentifier;
-    NSDictionary *query = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:(__bridge id)kSecClassGenericPassword, _identifier, (__bridge id)kSecMatchLimitOne, (id)kCFBooleanTrue, nil] forKeys:[NSArray arrayWithObjects:(__bridge id)kSecClass, (__bridge id)kSecAttrGeneric, (__bridge id)kSecMatchLimit, (__bridge id)kSecReturnAttributes, nil]];
+    self.keychainidentifier = anIdentifier;
+    NSDictionary *query = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:(__bridge id)kSecClassGenericPassword, _keychainidentifier, (__bridge id)kSecMatchLimitOne, (id)kCFBooleanTrue, nil] forKeys:[NSArray arrayWithObjects:(__bridge id)kSecClass, (__bridge id)kSecAttrGeneric, (__bridge id)kSecMatchLimit, (__bridge id)kSecReturnAttributes, nil]];
     
     NSMutableDictionary *outDictionary = nil;
     CFTypeRef ref = (__bridge CFTypeRef)outDictionary;
     
     if (!SecItemCopyMatching((__bridge CFDictionaryRef)query, &ref) == noErr) {
         [self reset];
-        [_keychainItemData setObject:_identifier forKey:(__bridge id)kSecAttrGeneric];
+        [_keychainItemData setObject:_keychainidentifier forKey:(__bridge id)kSecAttrGeneric];
     } else {
         self.keychainItemData = [self secItemFormatToDictionary:outDictionary];
     }
@@ -104,7 +104,7 @@
     NSDictionary *attributes = nil;
     NSMutableDictionary *updateItem = nil;
     
-    NSDictionary *query = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:(__bridge id)kSecClassGenericPassword, _identifier, (__bridge id)kSecMatchLimitOne, (id)kCFBooleanTrue, nil] forKeys:[NSArray arrayWithObjects:(__bridge id)kSecClass, (__bridge id)kSecAttrGeneric, (__bridge id)kSecMatchLimit, (__bridge id)kSecReturnAttributes, nil]];
+    NSDictionary *query = [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:(__bridge id)kSecClassGenericPassword, _keychainidentifier, (__bridge id)kSecMatchLimitOne, (id)kCFBooleanTrue, nil] forKeys:[NSArray arrayWithObjects:(__bridge id)kSecClass, (__bridge id)kSecAttrGeneric, (__bridge id)kSecMatchLimit, (__bridge id)kSecReturnAttributes, nil]];
     
     CFTypeRef ref = (__bridge CFTypeRef)attributes;
     
