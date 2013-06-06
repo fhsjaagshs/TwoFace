@@ -11,7 +11,7 @@
 
 @interface Keychain ()
 
-@property (nonatomic, retain) NSMutableDictionary *keychainItemData;
+@property (nonatomic, strong) NSMutableDictionary *keychainItemData;
 @property (nonatomic, strong) NSString *identifier;
 
 @end

@@ -119,7 +119,6 @@
     }
     
     if (section == 2) {
-        //return @"I cache images to cut loading time. Clear the cache if you have problems.";
         return @"Opens a menu with a list of caches that you can clear if you encounter problems.";
     }
     

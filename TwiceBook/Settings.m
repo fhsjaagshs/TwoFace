@@ -11,7 +11,7 @@
 
 NSString * const kOAuthConsumerKey = @"ZII6ta1CbVKy8TnBNaasAQ";
 NSString * const kOAuthConsumerSecret = @"b6cqaoefVkKZsWFVxiD32o6AUjaf0oAcsJHxHz1E";
-NSString * const kSelectedusernamesListKey = @"usernames_twitter";
+NSString * const kSelectedUsernamesListKey = @"usernames_twitter";
 NSString * const kAddedUsernamesListKey = @"addedUsernames_twitter";
 NSString * const kSelectedFriendsDictionaryKey = @"FBSelectedFriendsDict";
 NSString * const kDBSyncDeletedTArrayKey = @"DBSyncDeletedTwitterArray";

@@ -8,21 +8,6 @@
 
 #import "AppDelegate.h"
 
-NSString * const kOAuthConsumerKey = @"ZII6ta1CbVKy8TnBNaasAQ";
-NSString * const kOAuthConsumerSecret = @"b6cqaoefVkKZsWFVxiD32o6AUjaf0oAcsJHxHz1E";
-
-NSString * const usernamesListKey = @"usernames_twitter";
-NSString * const addedUsernamesListKey = @"addedUsernames_twitter";
-
-NSString * const kSelectedFriendsDictionaryKey = @"FBSelectedFriendsDict";
-
-NSString * const kDBSyncDeletedTArrayKey = @"DBSyncDeletedTwitterArray";
-NSString * const kDBSyncDeletedFBDictKey = @"DBSyncDeletedFBDict";
-
-NSString * const kEnteringForegroundNotif = @"enterForeground";
-
-NSString * const kFacebookAppID = @"314352998657355";
-
 
 @implementation AppDelegate
 
@@ -77,11 +62,6 @@ NSString * const kFacebookAppID = @"314352998657355";
     }
 }
 
-//
-// Caching
-//
-
-
 - (void)makeSureUsernameListArraysAreNotNil {
     
     NSMutableArray *blankArray = [NSMutableArray array];
@@ -100,13 +80,14 @@ NSString * const kFacebookAppID = @"314352998657355";
     }
     
     if ([Settings addedTwitterUsernames].count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:addedUsernamesListKey];
+        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kAddedUsernamesListKey];
     }
 
     if ([Settings selectedTwitterUsernames].count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:usernamesListKey];
+        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kSelectedUsernamesListKey];
     }
 }
+
 
 //
 // HUD management Methods
@@ -151,13 +132,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 
 //
-//
-// FACEBOOK
-//
-//
-
-//
-// Facebook Login Methods
+// Facebook
 //
 
 - (void)clearSavedToken {
@@ -218,19 +193,9 @@ NSString * const kFacebookAppID = @"314352998657355";
     [self tryLoginFromSavedCreds];
 }
 
-
-//
-// Facebook Friends Methods 
-//
-
 - (void)clearFriends {
     [[[Cache sharedCache]facebookFriends]removeAllObjects];
 }
-
-
-//
-// Get logged in username
-//
 
 - (NSString *)getFacebookUsernameSync {
     
@@ -311,11 +276,6 @@ NSString * const kFacebookAppID = @"314352998657355";
     return params;
 }
 
-//
-//
-// TWITTER
-//
-//
 
 //
 // FHSTwitterEngine access token delegate methods
@@ -331,9 +291,7 @@ NSString * const kFacebookAppID = @"314352998657355";
 
 
 //
-//
 // Dropbox
-//
 //
 
 - (void)restClient:(DBRestClient*)client loadedAccountInfo:(DBAccountInfo *)info {
@@ -375,14 +333,14 @@ NSString * const kFacebookAppID = @"314352998657355";
     }
     
     id fdc = [cloudData objectForKey:kSelectedFriendsDictionaryKey];
-    id autc = [cloudData objectForKey:addedUsernamesListKey];
-    id utc = [cloudData objectForKey:usernamesListKey];
+    id autc = [cloudData objectForKey:kAddedUsernamesListKey];
+    id utc = [cloudData objectForKey:kSelectedUsernamesListKey];
     id ddc = [cloudData objectForKey:@"deleted_dict_facebook"];
     id dac = [cloudData objectForKey:@"deleted_array_twitter"];
     
     id fdl = [defaults objectForKey:kSelectedFriendsDictionaryKey];
-    id autl = [defaults objectForKey:addedUsernamesListKey];
-    id utl = [defaults objectForKey:usernamesListKey];
+    id autl = [defaults objectForKey:kAddedUsernamesListKey];
+    id utl = [defaults objectForKey:kSelectedUsernamesListKey];
     
     
     //
@@ -614,6 +572,8 @@ NSString * const kFacebookAppID = @"314352998657355";
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
+    
+    [self makeSureUsernameListArraysAreNotNil];
     
     [[Cache sharedCache]loadCaches];
     

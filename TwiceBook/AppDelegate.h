@@ -30,12 +30,7 @@
 // Twitter
 //
 
-- (void)makeSureUsernameListArraysAreNotNil; // Probs gonna be replaced by something in the cache
 - (void)reloadMainTableView;
-
-//
-// Facebook
-//
 
 // HUD View methods
 - (void)showHUDWithTitle:(NSString *)title;
@@ -44,13 +39,15 @@
 - (void)showSelfHidingHudWithTitle:(NSString *)title;
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
 
-// Login methods
+//
+// Facebook
+//
+
 - (void)loginFacebook;
 - (void)logoutFacebook;
 - (void)startFacebook;
 - (void)tryLoginFromSavedCreds;
 - (NSString *)getFacebookUsernameSync;
-
 
 @property (strong, nonatomic) Facebook *facebook;
 

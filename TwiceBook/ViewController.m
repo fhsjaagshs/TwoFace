@@ -107,8 +107,8 @@
                 
                 [[[Cache sharedCache]invalidUsers]removeAllObjects];
 
-               // [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
-                //[[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
+                [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
+                [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
             }
         } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Remove", nil];
         [av show];
