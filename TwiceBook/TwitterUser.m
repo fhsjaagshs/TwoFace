@@ -15,7 +15,7 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_name, _userDescription, _identifier, _profileImageURL, _profileBackgroundImageURL, _location, _screename, _url, _isFollowing?@"true":@"false", _isProtected?@"true":@"false", nil] forKeys:[NSArray arrayWithObjects:@"name", @"description", @"id_str", @"profile_image_url", @"profile_background_image_url", @"location", @"screen_name", @"url", @"following", @"protected", nil]];
+    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_name?_name:@"", _userDescription?_userDescription:@"", _identifier?_identifier:@"", _profileImageURL?_profileImageURL:@"", _profileBackgroundImageURL?_profileBackgroundImageURL:@"", _location?_location:@"", _screename?_screename:@"", _url?_url:@"", _isFollowing?@"true":@"false", _isProtected?@"true":@"false", nil] forKeys:[NSArray arrayWithObjects:@"name", @"description", @"id_str", @"profile_image_url", @"profile_background_image_url", @"location", @"screen_name", @"url", @"following", @"protected", nil]];
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {

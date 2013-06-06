@@ -15,7 +15,7 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_identifier, _name, _profileURL, _username, _bio, _profilePictureURL, _website, nil] forKeys:[NSArray arrayWithObjects:@"id", @"name", @"link", @"username", @"bio", @"picture", @"website", nil]];
+    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_identifier?_identifier:@"", _name?_name:@"", _profileURL?_profileURL:@"", _username?_username:@"", _bio?_bio:@"", _profilePictureURL?_profilePictureURL:@"", _website?_website:@"", nil] forKeys:[NSArray arrayWithObjects:@"id", @"name", @"link", @"username", @"bio", @"picture", @"website", nil]];
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {

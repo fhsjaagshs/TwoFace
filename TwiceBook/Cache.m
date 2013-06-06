@@ -21,6 +21,7 @@
 
 - (void)loadCaches {
     
+    NSLog(@"Start loading cache");
     NSString *cd = [Settings cachesDirectory];
     self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];;
     self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
@@ -45,6 +46,8 @@
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
         [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
     }
+    
+    NSLog(@"Finished loading caches");
 }
 
 - (void)cache {

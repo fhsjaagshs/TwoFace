@@ -25,7 +25,25 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_identifier, _createdAt, _text, _source, _inReplyToScreenName, _inReplyToUserIdentifier, _inReplyToTweetIdentifier, [_user dictionaryValue], _isFavorited?@"true":@"false", _isRetweeted?@"true":@"false", [self dictionizeReplies], _retweetedBy, nil] forKeys:[NSArray arrayWithObjects:@"id_str", @"created_at", @"text", @"source", @"in_reply_to_screen_name", @"in_reply_to_user_id_str", @"in_reply_to_status_id_str", @"favorited", @"retweeted", @"replies", @"retweeted_by", nil]];
+    NSArray *objects = [NSArray arrayWithObjects:_identifier?_identifier:@"",
+                        _createdAt?_createdAt:[NSDate date],
+                        _text?_text:@"",
+                        _source?_source:@"",
+                        _inReplyToScreenName?_inReplyToScreenName:@"",
+                        _inReplyToUserIdentifier?_inReplyToUserIdentifier:@"",
+                        _inReplyToTweetIdentifier?_inReplyToTweetIdentifier:@"",
+                        [_user dictionaryValue],
+                        _isFavorited?@"true":@"false",
+                        _isRetweeted?@"true":@"false",
+                        [self dictionizeReplies],
+                        _retweetedBy?_retweetedBy:@""
+                        , nil];
+    
+    NSArray *keys = [NSArray arrayWithObjects:@"id_str", @"created_at", @"text", @"source", @"in_reply_to_screen_name", @"in_reply_to_user_id_str", @"in_reply_to_status_id_str", @"user", @"favorited", @"retweeted", @"replies", @"retweeted_by", nil];
+    
+    NSLog(@"Objects: %d  keys: %d",objects.count, keys.count);
+    
+    return [NSDictionary dictionaryWithObjects:objects forKeys:keys];
 }
 
 - (void)addReply:(Tweet *)reply {
