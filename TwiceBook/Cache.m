@@ -31,13 +31,18 @@
     NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
     
     for (NSDictionary *dict in timelineTemp) {
+        
+        NSLog(@"Dictionary: %@",dict);
+        
         if ([dict objectForKey:@"id_str"]) {
             [_timeline addObject:[Tweet tweetWithDictionary:dict]];
         } else {
             [_timeline addObject:[Status statusWithDictionary:dict]];
         }
     }
-
+    
+    NSLog(@"%@",_timeline);
+    
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
     self.nonTimelineTweets = [NSMutableArray array];
     
@@ -57,7 +62,8 @@
     NSMutableArray *timelineTemp = [NSMutableArray array];
     
     for (id obj in _timeline) {
-        [timelineTemp addObject:[obj dictionaryValue]]; // dictionaryValue is crash prone
+        [timelineTemp addObject:[obj dictionaryValue]];
+        NSLog(@"%@",obj);
     }
     
     [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timeline.plist"] atomically:YES];

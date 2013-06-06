@@ -10,10 +10,6 @@
 
 @implementation Tweet
 
-- (NSString *)description {
-    return [[self dictionaryValue]description];
-}
-
 - (NSDictionary *)dictionizeReplies {
     NSMutableDictionary *replyDicts = [NSMutableDictionary dictionary];
     
@@ -25,8 +21,9 @@
 }
 
 - (NSDictionary *)dictionaryValue {
+    NSString *dateString = [[FHSTwitterEngine sharedEngine]stringFromDate:_createdAt?_createdAt:[NSDate date]];
     NSArray *objects = [NSArray arrayWithObjects:_identifier?_identifier:@"",
-                        _createdAt?_createdAt:[NSDate date],
+                        dateString?dateString:@"",
                         _text?_text:@"",
                         _source?_source:@"",
                         _inReplyToScreenName?_inReplyToScreenName:@"",

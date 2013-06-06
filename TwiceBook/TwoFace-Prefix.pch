@@ -33,6 +33,7 @@
     #import "NSArray+RemoveDuplicates.h"
     #import "UIImage+NSCoder.h"
     #import "NSArray+FirstObject.h"
+    #import "FHSTwitterEngine+Date2String.h"
 
     #import "Settings.h"
     #import "Cache.h"

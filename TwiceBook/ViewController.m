@@ -647,6 +647,10 @@
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
+    NSLog(@"Timeline Class: %@",NSStringFromClass([timeline class]));
+    
+  //  NSLog(@"asdf %@",timeline);
+    
     if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;

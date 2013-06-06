@@ -53,6 +53,7 @@
 		9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */; };
 		F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */; };
 		F128A1EC157FE5C4001BC156 /* TweetDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */; };
+		F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */ = {isa = PBXBuildFile; fileRef = F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */; };
 		F129B65F157B8237005353EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F129B65E157B8237005353EB /* UIKit.framework */; };
 		F129B661157B8237005353EB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F129B660157B8237005353EB /* Foundation.framework */; };
 		F129B663157B8237005353EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F129B662157B8237005353EB /* CoreGraphics.framework */; };
@@ -163,6 +164,8 @@
 		F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitPicEngine.m; sourceTree = "<group>"; };
 		F128A1E9157FE5C3001BC156 /* TweetDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetDetailViewController.h; sourceTree = "<group>"; };
 		F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetDetailViewController.m; sourceTree = "<group>"; };
+		F12968941760AE2A0044E9AE /* FHSTwitterEngine+Date2String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FHSTwitterEngine+Date2String.h"; sourceTree = "<group>"; };
+		F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "FHSTwitterEngine+Date2String.m"; sourceTree = "<group>"; };
 		F129B65A157B8237005353EB /* TwoFace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TwoFace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F129B65E157B8237005353EB /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F129B660157B8237005353EB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -268,6 +271,8 @@
 		9B857FA415F5AAD500DE25E8 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				F12968941760AE2A0044E9AE /* FHSTwitterEngine+Date2String.h */,
+				F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */,
 				9BA753B915BF1A2000717D94 /* NSDate+Helper.h */,
 				9BA753BA15BF1A2000717D94 /* NSDate+Helper.m */,
 				9BAFCD6915971B200087EF45 /* NSString+mods.h */,
@@ -633,6 +638,7 @@
 				F13964F5175EB9710073EE5E /* Settings.m in Sources */,
 				F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */,
 				F1397B2A175FE09E00CC9EDA /* Keychain.m in Sources */,
+				F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

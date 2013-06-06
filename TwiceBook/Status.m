@@ -10,10 +10,6 @@
 
 @implementation Status
 
-- (NSString *)description {
-    return [[self dictionaryValue]description];
-}
-
 - (NSDictionary *)dictionaryValue {
     return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[_from dictionaryValue], [_to dictionaryValue], _identifier?_identifier:@"", _message?_message:@"", [NSString stringWithFormat:@"%f",_createdAt?[_createdAt timeIntervalSince1970]-1800:0], _type?_type:@"", _url?_url:@"", _subject?_subject:@"", _name?_name:@"", _thumbnailURL?_thumbnailURL:@"", _link?_link:@"", _pictureURL?_pictureURL:@"", _comments?_comments:@"", _actionsAvailable?_actionsAvailable:@"", _objectIdentifier?_objectIdentifier:@"", nil] forKeys:[NSArray arrayWithObjects:@"from", @"to", @"id", @"message", @"updated_time", @"type", @"url", @"subject", @"name", @"picture", @"link", @"embed_html_parsed", @"comments", @"actions_are_available", @"object_id", nil]];
 }
