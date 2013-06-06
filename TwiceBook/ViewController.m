@@ -73,53 +73,45 @@
 
     [self sortedTimeline];
 
-    [self.pull finishedLoading];
+    [_pull finishedLoading];
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+
     
-    __block NSMutableArray *invalidUsers = [[Cache sharedCache]invalidUsers];
     
-    if (invalidUsers.count > 0) {
-        NSString *protectedUserString = [@"@" stringByAppendingString:[invalidUsers componentsJoinedByString:@", @"]];
-        protectedUserString = [protectedUserString substringToIndex:protectedUserString.length-3];
+    if ([[Cache sharedCache]invalidUsers].count > 0) {
+        NSString *protectedUserString = [@"@" stringByAppendingString:[[[Cache sharedCache]invalidUsers]componentsJoinedByString:@", @"]];
         NSString *message = [NSString stringWithFormat:@"The following users are invalid or have their tweets protected:\n\n%@\n\n Would you like to remove them from your watched list?",protectedUserString];
         
         UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Protected Users" message:message completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
             
             if (buttonIndex == 0) {
-                NSMutableDictionary *cachedUsers = [NSMutableDictionary dictionaryWithContentsOfFile:[Settings invalidUsersCachePath]];
-                
-                if (cachedUsers.count > 0) {
-                    [cachedUsers removeObjectsForKeys:invalidUsers];
-                    [cachedUsers writeToFile:[Settings invalidUsersCachePath] atomically:YES];
-                }
+                [[[Cache sharedCache]invalidUsers]removeAllObjects];
             }
             
             if (buttonIndex == 1) {
+                
                 NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
                 NSMutableArray *selectedUsers = [Settings selectedTwitterUsernames];
                 
-                for (NSString *obj in invalidUsers) {
+                for (NSString *obj in [[Cache sharedCache]invalidUsers]) {
                     if ([addedUsers containsObject:obj]) {
                         [addedUsers removeObject:obj];
-                        
-                        if ([[[Cache sharedCache]twitterFriends]containsObject:obj]) {
-                            [[[Cache sharedCache]twitterFriends]removeObject:obj];
-                        }
                     }
                     
                     if ([selectedUsers containsObject:obj]) {
                         [selectedUsers removeObject:obj];
                     }
                 }
+                
+                [[[Cache sharedCache]invalidUsers]removeAllObjects];
 
-                [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
-                [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
+               // [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
+                //[[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
             }
         } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Remove", nil];
         [av show];
-        [[[Cache sharedCache]invalidUsers]removeAllObjects];
     }
     
     if (errorEncounteredWhileLoading) {
