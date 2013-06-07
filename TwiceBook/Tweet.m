@@ -33,12 +33,10 @@
                         _isFavorited?@"true":@"false",
                         _isRetweeted?@"true":@"false",
                         [self dictionizeReplies],
-                        _retweetedBy?_retweetedBy:@""
-                        , nil];
+                        [_retweetedBy dictionaryValue]
+                        , @"twitter", nil];
     
-    NSArray *keys = [NSArray arrayWithObjects:@"id_str", @"created_at", @"text", @"source", @"in_reply_to_screen_name", @"in_reply_to_user_id_str", @"in_reply_to_status_id_str", @"user", @"favorited", @"retweeted", @"replies", @"retweeted_by", nil];
-    
-    NSLog(@"Objects: %d  keys: %d",objects.count, keys.count);
+    NSArray *keys = [NSArray arrayWithObjects:@"id_str", @"created_at", @"text", @"source", @"in_reply_to_screen_name", @"in_reply_to_user_id_str", @"in_reply_to_status_id_str", @"user", @"favorited", @"retweeted", @"replies", @"retweeted_by", @"snn", nil];
     
     return [NSDictionary dictionaryWithObjects:objects forKeys:keys];
 }
@@ -65,7 +63,7 @@
     }
     
     if (_inReplyToTweetIdentifier.length == 0) {
-        self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id"];
+        self.inReplyToTweetIdentifier = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"in_reply_to_status_id"]];
     }
     
     self.isFavorited = [[dictionary objectForKey:@"favorited"]boolValue];
@@ -79,7 +77,7 @@
         self.replies = [NSMutableDictionary dictionary];
     }
     
-    self.retweetedBy = [dictionary objectForKey:@"retweeted_by"];
+    self.retweetedBy = [TwitterUser twitterUserWithDictionary:[dictionary objectForKey:@"retweeted_by"]];
     
     NSMutableDictionary *entities = [dictionary objectForKey:@"entities"];
     
@@ -96,7 +94,7 @@
                     [rt_status removeObjectForKey:@"in_reply_to_screen_name"];
                     [rt_status removeObjectForKey:@"in_reply_to_user_id_str"];
                     [rt_status removeObjectForKey:@"in_reply_to_status_id_str"];
-                    [rt_status setObject:_user forKey:@"retweeted_by"];
+                    [rt_status setObject:[_user dictionaryValue] forKey:@"retweeted_by"];
                     [self parseDictionary:rt_status];
                     return;
                 }

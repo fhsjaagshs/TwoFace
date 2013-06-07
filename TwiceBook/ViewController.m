@@ -283,8 +283,7 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
-    
-    [[[Cache sharedCache]timeline]removeAllObjects];
+
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
@@ -647,9 +646,7 @@
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
-    NSLog(@"Timeline Class: %@",NSStringFromClass([timeline class]));
-    
-  //  NSLog(@"asdf %@",timeline);
+    NSLog(@"timeline: %@",timeline);
     
     if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;

@@ -48,17 +48,18 @@
     }
     
     self.timeline = [NSMutableArray array];
-    NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
+    
+    NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timelinecache.plist"]];
     
     for (NSDictionary *dict in timelineTemp) {
-        if ([dict objectForKey:@"id_str"]) {
+        if ([[dict objectForKey:@"snn"] isEqualToString:@"twitter"]) {
             [_timeline addObject:[Tweet tweetWithDictionary:dict]];
         } else {
             [_timeline addObject:[Status statusWithDictionary:dict]];
         }
     }
     
-    NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
+    NSArray *nonTimelineTweetsTemp = [NSArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
     self.nonTimelineTweets = [NSMutableArray array];
     
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
@@ -78,10 +79,9 @@
     
     for (id obj in _timeline) {
         [timelineTemp addObject:[obj dictionaryValue]];
-        NSLog(@"%@",obj);
     }
-    
-    [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timeline.plist"] atomically:YES];
+
+    [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timelinecache.plist"] atomically:YES];
     
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray array];
     
@@ -90,7 +90,6 @@
     }
     
     [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
-    NSLog(@"Stop caching");
 }
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {

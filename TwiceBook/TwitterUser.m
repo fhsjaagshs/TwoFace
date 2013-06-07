@@ -19,6 +19,11 @@
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {
+    
+    if (dict.allKeys.count == 0) {
+        return;
+    }
+    
     self.name = [dict objectForKey:@"name"];
     self.userDescription = [dict objectForKey:@"description"];
     self.identifier = [dict objectForKey:@"id_str"];

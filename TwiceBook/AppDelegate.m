@@ -381,8 +381,8 @@
         }
     }
     
-    [cloudData setObject:finalArray forKey:@"addedUsernames_twitter"];
-    [defaults setObject:finalArray forKey:@"addedUsernames_twitter"];
+    [cloudData setObject:finalArray forKey:kAddedUsernamesListKey];
+    [defaults setObject:finalArray forKey:kAddedUsernamesListKey];
     
     //
     // Twitter Selected Users
@@ -531,14 +531,14 @@
 //
 	
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    [self makeSureUsernameListArraysAreNotNil];
+    [[Cache sharedCache]loadCaches];
+    
     self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
-    
-    [self makeSureUsernameListArraysAreNotNil];
-    
-    [[Cache sharedCache]loadCaches];
     
     [[Keychain sharedKeychain]setIdentifier:@"TwoFaceID"];
     
