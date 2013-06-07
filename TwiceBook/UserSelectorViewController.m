@@ -213,6 +213,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                                     qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
                                 }
                             });
+                            succeeded = NO;
                             break;
                         } else if ([usersRet isKindOfClass:[NSArray class]]) {
                             NSArray *userDicts = (NSArray *)usersRet;
@@ -224,11 +225,9 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                             }
                         }
                     }
-                } else {
-                    succeeded = NO;
                 }
                 
-                if (succeeded) {
+                if (succeeded && usernames.count > 0) {
                     [[[Cache sharedCache]twitterFriends]removeAllObjects];
                     [[[Cache sharedCache]twitterFriends]addObjectsFromArray:usernames];
                     [[[Cache sharedCache]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];

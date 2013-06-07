@@ -27,21 +27,36 @@
     self.twitterIdToUsername = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]];
     self.pictwitterURLs = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"]];
     
+    if (!_twitterFriends) {
+        self.twitterFriends = [NSMutableArray array];
+    }
+    
+    if (!_facebookFriends) {
+        self.facebookFriends = [NSMutableDictionary dictionary];
+    }
+    
+    if (!_invalidUsers) {
+        self.invalidUsers = [NSMutableArray array];
+    }
+    
+    if (!_twitterIdToUsername) {
+        self.twitterIdToUsername = [NSMutableDictionary dictionary];
+    }
+    
+    if (!_pictwitterURLs) {
+        self.pictwitterURLs = [NSMutableDictionary dictionary];
+    }
+    
     self.timeline = [NSMutableArray array];
     NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timeline.plist"]];
     
     for (NSDictionary *dict in timelineTemp) {
-        
-        NSLog(@"Dictionary: %@",dict);
-        
         if ([dict objectForKey:@"id_str"]) {
             [_timeline addObject:[Tweet tweetWithDictionary:dict]];
         } else {
             [_timeline addObject:[Status statusWithDictionary:dict]];
         }
     }
-    
-    NSLog(@"%@",_timeline);
     
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"]];
     self.nonTimelineTweets = [NSMutableArray array];
