@@ -28,21 +28,26 @@
     self.link = [dict objectForKey:@"link"];
     self.pictureURL = [dict objectForKey:@"source"];
     
-    NSString *tempURL = nil;
     NSString *htmlString = [dict objectForKey:@"embed_html"];
-    NSScanner *theScanner = [NSScanner scannerWithString:htmlString];
-    [theScanner scanUpToString:@"<iframe" intoString:nil];
-    if (![theScanner isAtEnd]) {
-        [theScanner scanUpToString:@"src" intoString:nil];
-        NSCharacterSet *charset = [NSCharacterSet characterSetWithCharactersInString:@"\"'"];
-        [theScanner scanUpToCharactersFromSet:charset intoString:nil];
-        [theScanner scanCharactersFromSet:charset intoString:nil];
-        [theScanner scanUpToCharactersFromSet:charset intoString:&tempURL];
-        
-        if (tempURL.length > 0) {
-            self.link = tempURL;
+    
+    if (htmlString.length > 0) {
+        NSString *tempURL = nil;
+        NSScanner *theScanner = [NSScanner scannerWithString:htmlString];
+        [theScanner scanUpToString:@"<iframe" intoString:nil];
+        if (![theScanner isAtEnd]) {
+            [theScanner scanUpToString:@"src" intoString:nil];
+            NSCharacterSet *charset = [NSCharacterSet characterSetWithCharactersInString:@"\"'"];
+            [theScanner scanUpToCharactersFromSet:charset intoString:nil];
+            [theScanner scanCharactersFromSet:charset intoString:nil];
+            [theScanner scanUpToCharactersFromSet:charset intoString:&tempURL];
+            
+            if (tempURL.length > 0) {
+                self.link = tempURL;
+            }
         }
-    } else {
+    }
+    
+    if (_link.length == 0) {
         self.link = [dict objectForKey:@"embed_html_parsed"];
     }
     

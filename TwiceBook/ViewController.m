@@ -284,7 +284,7 @@
         return;
     }
 
-    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    //[_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)reloadCommonFetching {
@@ -305,6 +305,9 @@
         [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     } else {
+        
+        [[[Cache sharedCache]timeline]removeAllObjects];
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         
         if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [self getTweetsForUsernames:usernameArrayTwitter];
@@ -645,8 +648,6 @@
     cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
-    
-    NSLog(@"timeline: %@",timeline);
     
     if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
