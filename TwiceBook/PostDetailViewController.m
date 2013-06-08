@@ -306,8 +306,6 @@
             [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
             NSLocale *usLocale = [[NSLocale alloc]initWithLocaleIdentifier:@"en_US"];
             [df setLocale:usLocale];
-            [df setDateStyle:NSDateFormatterLongStyle];
-            [df setFormatterBehavior:NSDateFormatterBehavior10_4];
             
             for (NSDictionary *rawComment in comments) {
                 
@@ -317,7 +315,7 @@
                 NSString *posterName = [[rawComment objectForKey:@"from"]objectForKey:@"name"];
                 NSString *posterID = [[rawComment objectForKey:@"from"]objectForKey:@"id"];
                 NSString *message = [rawComment objectForKey:@"message"];
-                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"updated_time"]];
+                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"created_time"]];
                 
                 [comment setObject:created_time forKey:@"created_time"];
                 [comment setObject:postID forKey:@"post_id"];
