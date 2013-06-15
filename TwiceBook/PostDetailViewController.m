@@ -457,6 +457,7 @@
 - (id)initWithPost:(Status *)posty {
     self = [super init];
     if (self) {
+        NSLog(@"%@",posty);
         [self setPost:posty];
         [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     }

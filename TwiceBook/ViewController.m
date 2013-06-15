@@ -214,6 +214,8 @@
             
             Status *status = [Status statusWithDictionary:minusComments];
 
+            NSLog(@"%@",status);
+            
             if (!([(NSString *)[post objectForKey:@"story"]length] > 0 && [status.type isEqualToString:@"status"])) {
                 BOOL shouldAddPost = YES;
                 
@@ -635,9 +637,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString * const CellIdentifier = @"Cell";
 
-    AdditionalLabelCell *cell = (AdditionalLabelCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    TwoFaceCell *cell = (TwoFaceCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[AdditionalLabelCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        cell = [[TwoFaceCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
  
     cell.textLabel.highlightedTextColor = [UIColor blackColor];  
@@ -652,7 +654,7 @@
     if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
-        cell.additionalLabel.text = nil;
+     //   cell.additionalLabel.text = nil;
         
         AppDelegate *ad = [Settings appDelegate];
         
@@ -663,6 +665,8 @@
         if (![ad.facebook isSessionValid]) {
             [ad tryLoginFromSavedCreds];
         }
+        
+        [cell clear];
         
         if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
             cell.textLabel.text = @"Not Logged in.";
@@ -690,19 +694,25 @@
         
         if ([tweetOrStatus isKindOfClass:[Status class]]) {
             Status *status = (Status *)tweetOrStatus;
-            cell.additionalLabel.text = @"Facebook    ";
-            cell.additionalLabel.textColor = [UIColor colorWithRed:59.0/255.0 green:89.0/255.0 blue:152.0/255.0 alpha:1.0];
-            cell.textLabel.text = status.from.name;
-            cell.detailTextLabel.text = status.message;
+            cell.isFacebook = YES;
             
-            if (cell.detailTextLabel.text.length == 0) {
-                cell.detailTextLabel.text = [status.type stringByCapitalizingFirstLetter];
+            NSString *text = status.message;
+            
+            if (text.length > 140) {
+                text = [[text substringToIndex:140]stringByAppendingString:@"..."];
+            } else if (text.length == 0) {
+                text = [status.type stringByCapitalizingFirstLetter];
             }
+            
+            cell.detailTextLabel.text = text;
+
+            cell.textLabel.text = status.from.name;
             
         } else if ([tweetOrStatus isKindOfClass:[Tweet class]]) {
             Tweet *tweet = (Tweet *)tweetOrStatus;
-            cell.additionalLabel.text = @"Twitter    ";
-            cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
+            cell.isFacebook = NO;
+       //     cell.additionalLabel.text = @"Twitter    ";
+       //     cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
             cell.textLabel.text = tweet.user.name;
             cell.detailTextLabel.text = tweet.text;
         }

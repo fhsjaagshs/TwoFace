@@ -15,12 +15,14 @@
     #import <DropboxSDK/DropboxSDK.h>
     #import "FHSTwitterEngine.h"
 
+    #import "CCoreTextLabel.h"
     #import "AdditionalLabelCell.h"
     #import "FHSGradientView.h"
     #import "ZoomingImageView.h"
     #import "MBProgressHUD.h"
     #import "PullToRefreshView.h"
-
+    #import "TwoFaceCell.h"
+    
     #import "NSString+mods.h"
     #import "NSDate+Helper.h"
     #import "HelperFunctions.h"

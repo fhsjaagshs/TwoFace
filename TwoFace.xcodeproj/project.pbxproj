@@ -51,6 +51,19 @@
 		9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */; };
 		9BE3E7E21601738D00F64709 /* inner-shadow.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BE3E7E11601738D00F64709 /* inner-shadow.png */; };
 		9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */; };
+		F120C8E31768E7C700350A6B /* CCoreTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */; };
+		F120C8E41768E7C700350A6B /* CCoreTextLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */; };
+		F120C8E51768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */; };
+		F120C8E61768E7C700350A6B /* CCoreTextRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */; };
+		F120C8E71768E7C700350A6B /* CLinkingCoreTextLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */; };
+		F120C8E81768E7C700350A6B /* CMarkupValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */; };
+		F120C8E91768E7C700350A6B /* CSimpleHTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */; };
+		F120C8EB1768E7C700350A6B /* NSAttributedString_Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */; };
+		F120C8EC1768E7C700350A6B /* NSScanner_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */; };
+		F120C8ED1768E7C700350A6B /* NSString_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */; };
+		F120C8EE1768E7C700350A6B /* UIColor+Hex.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DE1768E7C700350A6B /* UIColor+Hex.m */; };
+		F120C8EF1768E7C700350A6B /* UIFont_CoreTextExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */; };
+		F120C8F41768EBE100350A6B /* ColorBandView.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8F31768EBE100350A6B /* ColorBandView.m */; };
 		F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */; };
 		F128A1EC157FE5C4001BC156 /* TweetDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */; };
 		F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */ = {isa = PBXBuildFile; fileRef = F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */; };
@@ -64,6 +77,8 @@
 		F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B26175FDC3E00CC9EDA /* Cache.m */; };
 		F1397B2A175FE09E00CC9EDA /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B29175FE09E00CC9EDA /* Keychain.m */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
+		F15A011D1763BE82001C668C /* TwoFaceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F15A011C1763BE81001C668C /* TwoFaceCell.m */; };
+		F15A011F1763CAFE001C668C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F15A011E1763CAFE001C668C /* CoreText.framework */; };
 		F18042C4175A8802008D191D /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C3175A8802008D191D /* Tweet.m */; };
 		F18042C7175A880C008D191D /* Status.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C6175A880C008D191D /* Status.m */; };
 		F18042CA175A893C008D191D /* TwitterUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C9175A893C008D191D /* TwitterUser.m */; };
@@ -160,6 +175,32 @@
 		9BE3E7E11601738D00F64709 /* inner-shadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "inner-shadow.png"; sourceTree = "<group>"; };
 		9BE8001E1634C77C006D91B8 /* PullToRefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshView.h; sourceTree = "<group>"; };
 		9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshView.m; sourceTree = "<group>"; };
+		F120C8C81768E7C700350A6B /* CCoreTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextAttachment.h; sourceTree = "<group>"; };
+		F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextAttachment.m; sourceTree = "<group>"; };
+		F120C8CA1768E7C700350A6B /* CCoreTextLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextLabel.h; sourceTree = "<group>"; };
+		F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextLabel.m; sourceTree = "<group>"; };
+		F120C8CC1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextLabel_HTMLExtensions.h; sourceTree = "<group>"; };
+		F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextLabel_HTMLExtensions.m; sourceTree = "<group>"; };
+		F120C8CE1768E7C700350A6B /* CCoreTextRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextRenderer.h; sourceTree = "<group>"; };
+		F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextRenderer.m; sourceTree = "<group>"; };
+		F120C8D01768E7C700350A6B /* CLinkingCoreTextLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLinkingCoreTextLabel.h; sourceTree = "<group>"; };
+		F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLinkingCoreTextLabel.m; sourceTree = "<group>"; };
+		F120C8D21768E7C700350A6B /* CMarkupValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMarkupValueTransformer.h; sourceTree = "<group>"; };
+		F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMarkupValueTransformer.m; sourceTree = "<group>"; };
+		F120C8D41768E7C700350A6B /* CSimpleHTMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSimpleHTMLParser.h; sourceTree = "<group>"; };
+		F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSimpleHTMLParser.m; sourceTree = "<group>"; };
+		F120C8D71768E7C700350A6B /* NSAttributedString_Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSAttributedString_Extensions.h; sourceTree = "<group>"; };
+		F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSAttributedString_Extensions.m; sourceTree = "<group>"; };
+		F120C8D91768E7C700350A6B /* NSScanner_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSScanner_HTMLExtensions.h; sourceTree = "<group>"; };
+		F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSScanner_HTMLExtensions.m; sourceTree = "<group>"; };
+		F120C8DB1768E7C700350A6B /* NSString_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSString_HTMLExtensions.h; sourceTree = "<group>"; };
+		F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSString_HTMLExtensions.m; sourceTree = "<group>"; };
+		F120C8DD1768E7C700350A6B /* UIColor+Hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Hex.h"; sourceTree = "<group>"; };
+		F120C8DE1768E7C700350A6B /* UIColor+Hex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Hex.m"; sourceTree = "<group>"; };
+		F120C8DF1768E7C700350A6B /* UIFont_CoreTextExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIFont_CoreTextExtensions.h; sourceTree = "<group>"; };
+		F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIFont_CoreTextExtensions.m; sourceTree = "<group>"; };
+		F120C8F21768EBE100350A6B /* ColorBandView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorBandView.h; sourceTree = "<group>"; };
+		F120C8F31768EBE100350A6B /* ColorBandView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorBandView.m; sourceTree = "<group>"; };
 		F1231D6F16961D3100C60FD4 /* FHSTwitPicEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitPicEngine.h; sourceTree = "<group>"; };
 		F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitPicEngine.m; sourceTree = "<group>"; };
 		F128A1E9157FE5C3001BC156 /* TweetDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetDetailViewController.h; sourceTree = "<group>"; };
@@ -185,6 +226,9 @@
 		F1397B29175FE09E00CC9EDA /* Keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keychain.m; sourceTree = "<group>"; };
 		F158D72A15800C1D0061E5A6 /* ReplyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplyViewController.h; sourceTree = "<group>"; };
 		F158D72B15800C1D0061E5A6 /* ReplyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplyViewController.m; sourceTree = "<group>"; };
+		F15A011B1763BE81001C668C /* TwoFaceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoFaceCell.h; sourceTree = "<group>"; };
+		F15A011C1763BE81001C668C /* TwoFaceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoFaceCell.m; sourceTree = "<group>"; };
+		F15A011E1763CAFE001C668C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		F18042C2175A8802008D191D /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		F18042C3175A8802008D191D /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		F18042C5175A880C008D191D /* Status.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Status.h; sourceTree = "<group>"; };
@@ -223,6 +267,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F15A011F1763CAFE001C668C /* CoreText.framework in Frameworks */,
 				9BBD602115D48F940078838C /* libz.1.2.5.dylib in Frameworks */,
 				F1937FA3169F137400C66668 /* DropboxSDK.framework in Frameworks */,
 				9BB6B24815CDED5300FA2836 /* SystemConfiguration.framework in Frameworks */,
@@ -300,6 +345,7 @@
 		9B857FA515F5AB5000DE25E8 /* Subclasses */ = {
 			isa = PBXGroup;
 			children = (
+				F120C8C71768E7C700350A6B /* CoreTextToy */,
 				9B4D79D615D1AB3D004B9B87 /* FHSGradientView.h */,
 				9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */,
 				9B76B60015D20EB100D2DD50 /* MBProgressHUD.h */,
@@ -314,6 +360,38 @@
 				9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */,
 			);
 			name = Subclasses;
+			sourceTree = "<group>";
+		};
+		F120C8C71768E7C700350A6B /* CoreTextToy */ = {
+			isa = PBXGroup;
+			children = (
+				F120C8C81768E7C700350A6B /* CCoreTextAttachment.h */,
+				F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */,
+				F120C8CA1768E7C700350A6B /* CCoreTextLabel.h */,
+				F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */,
+				F120C8CC1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.h */,
+				F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */,
+				F120C8CE1768E7C700350A6B /* CCoreTextRenderer.h */,
+				F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */,
+				F120C8D01768E7C700350A6B /* CLinkingCoreTextLabel.h */,
+				F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */,
+				F120C8D21768E7C700350A6B /* CMarkupValueTransformer.h */,
+				F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */,
+				F120C8D41768E7C700350A6B /* CSimpleHTMLParser.h */,
+				F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */,
+				F120C8D71768E7C700350A6B /* NSAttributedString_Extensions.h */,
+				F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */,
+				F120C8D91768E7C700350A6B /* NSScanner_HTMLExtensions.h */,
+				F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */,
+				F120C8DB1768E7C700350A6B /* NSString_HTMLExtensions.h */,
+				F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */,
+				F120C8DD1768E7C700350A6B /* UIColor+Hex.h */,
+				F120C8DE1768E7C700350A6B /* UIColor+Hex.m */,
+				F120C8DF1768E7C700350A6B /* UIFont_CoreTextExtensions.h */,
+				F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */,
+			);
+			name = CoreTextToy;
+			path = "../../../../Downloads/CoreTextToy-master/Source";
 			sourceTree = "<group>";
 		};
 		F129B64F157B8237005353EB = {
@@ -336,6 +414,7 @@
 		F129B65D157B8237005353EB /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F15A011E1763CAFE001C668C /* CoreText.framework */,
 				9BBD602015D48F940078838C /* libz.1.2.5.dylib */,
 				F1937FA2169F137400C66668 /* DropboxSDK.framework */,
 				9BBD602215D48FA80078838C /* MobileCoreServices.framework */,
@@ -381,6 +460,7 @@
 				9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */,
 				9B60402F163C9E9C003C5262 /* AboutViewController.h */,
 				9B604030163C9E9C003C5262 /* AboutViewController.m */,
+				F15A010D1763B24E001C668C /* Cells */,
 				F18042C1175A87E3008D191D /* Containers */,
 				F188BD71169500EB00BF01E4 /* Twitpic */,
 				F188BD4E1694FF2400BF01E4 /* FHSTwitterEngine */,
@@ -443,6 +523,17 @@
 				F1397B29175FE09E00CC9EDA /* Keychain.m */,
 			);
 			name = General;
+			sourceTree = "<group>";
+		};
+		F15A010D1763B24E001C668C /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				F15A011B1763BE81001C668C /* TwoFaceCell.h */,
+				F15A011C1763BE81001C668C /* TwoFaceCell.m */,
+				F120C8F21768EBE100350A6B /* ColorBandView.h */,
+				F120C8F31768EBE100350A6B /* ColorBandView.m */,
+			);
+			name = Cells;
 			sourceTree = "<group>";
 		};
 		F18042C1175A87E3008D191D /* Containers */ = {
@@ -639,6 +730,20 @@
 				F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */,
 				F1397B2A175FE09E00CC9EDA /* Keychain.m in Sources */,
 				F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */,
+				F15A011D1763BE82001C668C /* TwoFaceCell.m in Sources */,
+				F120C8E31768E7C700350A6B /* CCoreTextAttachment.m in Sources */,
+				F120C8E41768E7C700350A6B /* CCoreTextLabel.m in Sources */,
+				F120C8E51768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m in Sources */,
+				F120C8E61768E7C700350A6B /* CCoreTextRenderer.m in Sources */,
+				F120C8E71768E7C700350A6B /* CLinkingCoreTextLabel.m in Sources */,
+				F120C8E81768E7C700350A6B /* CMarkupValueTransformer.m in Sources */,
+				F120C8E91768E7C700350A6B /* CSimpleHTMLParser.m in Sources */,
+				F120C8EB1768E7C700350A6B /* NSAttributedString_Extensions.m in Sources */,
+				F120C8EC1768E7C700350A6B /* NSScanner_HTMLExtensions.m in Sources */,
+				F120C8ED1768E7C700350A6B /* NSString_HTMLExtensions.m in Sources */,
+				F120C8EE1768E7C700350A6B /* UIColor+Hex.m in Sources */,
+				F120C8EF1768E7C700350A6B /* UIFont_CoreTextExtensions.m in Sources */,
+				F120C8F41768EBE100350A6B /* ColorBandView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
