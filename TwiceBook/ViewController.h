@@ -14,7 +14,6 @@
     BOOL facebookDone;
 }
 
-@property (strong, nonatomic) PullToRefreshView *pull;
 @property (strong, nonatomic) UITableView *theTableView;
 
 - (void)getTweetsForUsernames:(NSArray *)usernames;

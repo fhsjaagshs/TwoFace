@@ -15,13 +15,19 @@
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     self.theTableView = [[UITableView alloc]initWithFrame:screenBounds style:UITableViewStylePlain];
+    _theTableView.backgroundColor = [UIColor clearColor];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
     _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
     _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
+    
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(refreshTimeline:) forControlEvents:UIControlEventValueChanged];
+    [_theTableView addSubview:refreshControl];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"TwoFace"];
@@ -36,23 +42,98 @@
     [self.view addSubview:button];
     [self.view bringSubviewToFront:button];
     
-    [self loadTimelineViewDidLoadThreaded];
+    [self initialTimelineCacheHit];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadTableView) name:@"reloadTableView" object:nil];
-    
-    self.pull = [[PullToRefreshView alloc]initWithScrollView:_theTableView];
-    [_pull setDelegate:self];
-    [_theTableView addSubview:_pull];
 }
 
-//
-// Finished fetching posts and statuses
-//
+- (void)initialTimelineCacheHit {
+
+    AppDelegate *ad = [Settings appDelegate];
+    
+    if (!ad.facebook) {
+        [ad startFacebook];
+    } else {
+        if (![ad.facebook isSessionValid]) {
+            [ad tryLoginFromSavedCreds];
+        }
+    }
+    
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        [[FHSTwitterEngine sharedEngine]loadAccessToken];
+    }
+    
+    if ([[Cache sharedCache]timeline].count > 0) {
+        if (![ad.facebook isSessionValid]) {
+            [ad removeFacebookFromTimeline];
+        }
+        
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+            [ad removeTwitterFromTimeline];
+        }
+    }
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+}
+
+- (void)refreshTimeline:(UIRefreshControl *)control {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    errorEncounteredWhileLoading = NO;
+    
+    AppDelegate *ad = [Settings appDelegate];
+    
+    if (!ad.facebook) {
+        [ad startFacebook];
+    } else {
+        if (![ad.facebook isSessionValid]) {
+            [ad tryLoginFromSavedCreds];
+        }
+    }
+    
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        [[FHSTwitterEngine sharedEngine]loadAccessToken];
+    }
+    
+    if (![FHSTwitterEngine isConnectedToInternet]) {
+        [control endRefreshing];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        return;
+    }
+    
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
+        [control endRefreshing];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        return;
+    }
+    
+    NSMutableArray *usernameArrayTwitter = [Settings selectedTwitterUsernames];
+    NSArray *usernameArrayFacebook = [[Settings selectedFacebookFriends]allKeys];
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    
+    if (usernameArrayTwitter.count == 0 && usernameArrayFacebook.count == 0) {
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [control endRefreshing];
+    } else {
+        [[[Cache sharedCache]timeline]removeAllObjects];
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+        
+        if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
+            [self getTweetsForUsernames:usernameArrayTwitter];
+        }
+        
+        if ([ad.facebook isSessionValid]) {
+            [self fetchPostsForIDs:usernameArrayFacebook];
+        }
+    }
+}
 
 - (void)clearImageCachesIfNecessary {
     double time = [[NSDate date]timeIntervalSince1970];
     double previousTime = [[NSUserDefaults standardUserDefaults]doubleForKey:@"previousClearTime"];
-    double remainder = time-previousTime; 
+    double remainder = time-previousTime;
     if (remainder > 172800) { // 2 days (172800 seconds)
         [[NSUserDefaults standardUserDefaults]setDouble:time forKey:@"previousClearTime"];
         [Cache clearImageCache];
@@ -73,13 +154,9 @@
 
     [self sortedTimeline];
 
-    [_pull finishedLoading];
-    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 
-    
-    
     if ([[Cache sharedCache]invalidUsers].count > 0) {
         NSString *protectedUserString = [@"@" stringByAppendingString:[[[Cache sharedCache]invalidUsers]componentsJoinedByString:@", @"]];
         NSString *message = [NSString stringWithFormat:@"The following users are invalid or have their tweets protected:\n\n%@\n\n Would you like to remove them from your watched list?",protectedUserString];
@@ -193,7 +270,6 @@
 }
 
 - (void)parseResult:(id)result {
-    
     for (NSDictionary *dictionary in result) {
         id parsedJSONResponse = removeNull([NSJSONSerialization JSONObjectWithData:[[dictionary objectForKey:@"body"] dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil]);
         
@@ -254,7 +330,7 @@
 // Timeline Loading methods
 //
 
-- (void)reloadCommon {
+/*- (void)reloadCommon {
     
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
@@ -275,13 +351,13 @@
     }
     
     if (![FHSTwitterEngine isConnectedToInternet]) {
-        [_pull finishedLoading];
+     //   [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
 
     if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
-        [_pull finishedLoading];
+     //   [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
@@ -297,14 +373,14 @@
 
     if (![FHSTwitterEngine isConnectedToInternet]) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        [_pull finishedLoading];
+       // [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         return;
     }
     
     if (usernameArrayTwitter.count == 0 && usernameArrayFacebook.count == 0) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        [_pull finishedLoading];
+       // [_pull finishedLoading];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     } else {
         
@@ -319,13 +395,13 @@
             [self fetchPostsForIDs:usernameArrayFacebook];
         }
     }
-}
+}*/
 
 // 
 // PullToRefreshView Delegate
 //
 
-- (void)pullToRefreshViewWasShown:(PullToRefreshView *)view {
+/*- (void)pullToRefreshViewWasShown:(PullToRefreshView *)view {
     NSString *subtitle = @"";
     AppDelegate *ad = [Settings appDelegate];
     
@@ -368,7 +444,7 @@
     }
     
     [self reloadCommonFetching];
-}
+}*/
 
 //
 // Threaded Timeline Loading Methods
@@ -393,7 +469,7 @@
                             [ad removeTwitterFromTimeline];
                         }
                         
-                        [_pull finishedLoading];
+                     //   [_pull finishedLoading];
                     }
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
@@ -651,7 +727,8 @@
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
-    if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
+    if (YES) {
+   // if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
      //   cell.additionalLabel.text = nil;
@@ -671,7 +748,7 @@
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
             if (oneIsCorrect([[[Settings selectedFacebookFriends]allKeys]count] > 0, [[Settings selectedTwitterUsernames]count] > 0)) {
-                if (_pull.state == kPullToRefreshViewStateNormal) {
+                if (YES) {//if (_pull.state == kPullToRefreshViewStateNormal) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";
                 } else {
