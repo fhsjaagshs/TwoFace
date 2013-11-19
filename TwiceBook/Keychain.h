@@ -1,19 +1,19 @@
 //
-//  Keychain.h
-//  TwoFace
+//  SimpleKeychain.h
+//  SwiftLoad
 //
-//  Created by Nathaniel Symer on 6/5/13.
+//  Created by Nathaniel Symer on 7/6/13.
 //  Copyright (c) 2013 Nathaniel Symer. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const kKeychainAccessTokenKey;
+
 @interface Keychain : NSObject
 
-+ (Keychain *)sharedKeychain;
-- (void)setIdentifier:(NSString *)identifier;
-- (void)setObject:(id)inObject forKey:(id)key;
-- (id)objectForKey:(id)key;
-- (void)reset;
++ (void)setObject:(id)object forKey:(NSString *)key;
++ (id)objectForKey:(NSString *)service;
++ (void)deleteObjectForKey:(NSString *)key;
 
 @end

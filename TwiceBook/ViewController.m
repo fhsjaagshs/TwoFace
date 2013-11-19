@@ -13,25 +13,25 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44)];
+    
+    self.theTableView = [[UITableView alloc]initWithFrame:screenBounds style:UITableViewStylePlain];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
+    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
-    [self.view bringSubviewToFront:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"TwoFace"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(showCompose)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Prefs" style:UIBarButtonItemStyleBordered target:self action:@selector(showPrefs)];
     [bar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
-    
+
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(90, 0, 160, 44);
+    button.frame = CGRectMake(90, 20, 160, 44);
     [button addTarget:self action:@selector(showVersion) forControlEvents:UIControlEventTouchUpInside];
     [self.view addSubview:button];
     [self.view bringSubviewToFront:button];
@@ -637,9 +637,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     static NSString * const CellIdentifier = @"Cell";
 
-    TwoFaceCell *cell = (TwoFaceCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[TwoFaceCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
     }
  
     cell.textLabel.highlightedTextColor = [UIColor blackColor];  
@@ -647,7 +647,7 @@
     
     cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
     cell.detailTextLabel.numberOfLines = 0;
-    cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
+ //   cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
@@ -665,8 +665,6 @@
         if (![ad.facebook isSessionValid]) {
             [ad tryLoginFromSavedCreds];
         }
-        
-        [cell clear];
         
         if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
             cell.textLabel.text = @"Not Logged in.";
@@ -694,8 +692,6 @@
         
         if ([tweetOrStatus isKindOfClass:[Status class]]) {
             Status *status = (Status *)tweetOrStatus;
-            cell.isFacebook = YES;
-            
             NSString *text = status.message;
             
             if (text.length > 140) {
@@ -710,7 +706,6 @@
             
         } else if ([tweetOrStatus isKindOfClass:[Tweet class]]) {
             Tweet *tweet = (Tweet *)tweetOrStatus;
-            cell.isFacebook = NO;
        //     cell.additionalLabel.text = @"Twitter    ";
        //     cell.additionalLabel.textColor = [UIColor colorWithRed:64.0/255.0 green:153.0/255.0 blue:1 alpha:1.0];
             cell.textLabel.text = tweet.user.name;

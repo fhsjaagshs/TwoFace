@@ -13,10 +13,12 @@ extern NSString * const kOAuthConsumerKey;
 extern NSString * const kOAuthConsumerSecret;
 extern NSString * const kSelectedUsernamesListKey;
 extern NSString * const kAddedUsernamesListKey;
+extern NSString * const kTwitterAccessTokenKey;
 
 // Facebook
 extern NSString * const kSelectedFriendsDictionaryKey;
 extern NSString * const kFacebookAppID;
+extern NSString * const kFacebookAccessTokenKey;
 
 // Dropbox
 extern NSString * const kDBSyncDeletedTArrayKey;

@@ -110,37 +110,21 @@
 //
 
 - (void)clearSavedToken {
-    [[Keychain sharedKeychain]setObject:@"" forKey:(__bridge id)kSecValueData];
+    [Keychain setObject:nil forKey:kFacebookAccessTokenKey];
 }
 
 - (void)tryLoginFromSavedCreds {
     if ([self.facebook isSessionValid]) {
         return;
     }
-
-    NSString *keychainData = (NSString *)[[Keychain sharedKeychain]objectForKey:(__bridge id)kSecValueData];
-    NSArray *components = [keychainData componentsSeparatedByString:@" "];
     
-    if (components.count < 2) {
-        return;
-    }
-    
-    NSTimeInterval sinceUNIXEpoch = [(NSString *)[components objectAtIndex:1]doubleValue];
-    
-    NSString *accessToken = (NSString *)[components objectAtIndex:0];
-    NSDate *expirationDate = [NSDate dateWithTimeIntervalSince1970:sinceUNIXEpoch];
-
-    if (accessToken && expirationDate) {
-        _facebook.accessToken = accessToken;
-        _facebook.expirationDate = expirationDate;
-    }
+    NSDictionary *creds = [Keychain objectForKey:kFacebookAccessTokenKey];
+    _facebook.accessToken = creds[@"access_token"];
+    _facebook.expirationDate = creds[@"expiration_date"];
 }
 
 - (void)saveAccessToken:(NSString *)accessToken andExpirationDate:(NSDate *)date {
-    NSTimeInterval sinceUNIXEpoch = [date timeIntervalSince1970];
-    NSString *dateString = [NSString stringWithFormat:@"%f",sinceUNIXEpoch];
-    NSString *finalString = [NSString stringWithFormat:@"%@ %@",accessToken,dateString];
-    [[Keychain sharedKeychain]setObject:finalString forKey:(__bridge id)kSecValueData];
+    [Keychain setObject:@{@"access_token": accessToken, @"expiration-date": date } forKey:kFacebookAccessTokenKey];
 }
 
 - (void)logoutFacebook {
@@ -245,11 +229,11 @@
 //
 
 - (NSString *)loadAccessToken {
-    return (NSString *)[[Keychain sharedKeychain]objectForKey:(__bridge id)kSecAttrAccount];
+    return [Keychain objectForKey:kTwitterAccessTokenKey];
 }
 
 - (void)storeAccessToken:(NSString *)accessToken {
-    [[Keychain sharedKeychain]setObject:accessToken forKey:(__bridge id)kSecAttrAccount];
+    [Keychain setObject:accessToken forKey:kTwitterAccessTokenKey];
 }
 
 
@@ -539,8 +523,6 @@
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
-    
-    [[Keychain sharedKeychain]setIdentifier:@"TwoFaceID"];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
     [[FHSTwitterEngine sharedEngine]setDelegate:self];

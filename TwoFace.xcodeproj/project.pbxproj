@@ -35,7 +35,6 @@
 		9B5EE1F81624EA9000BFC265 /* DraftsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */; };
 		9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B604030163C9E9C003C5262 /* AboutViewController.m */; };
 		9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */; };
-		9B76B60215D20EB100D2DD50 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B76B60115D20EB100D2DD50 /* MBProgressHUD.m */; };
 		9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D860F15D74DC70085E640 /* UIImage+Scale.m */; };
 		9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7F43F1158E4D4300462D0D /* IntermediateUserSelectorViewController.m */; };
 		9B9F328115DC03A2000B0C72 /* Facebook+Facebook_cancel.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B9F328015DC03A2000B0C72 /* Facebook+Facebook_cancel.m */; };
@@ -51,19 +50,6 @@
 		9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */; };
 		9BE3E7E21601738D00F64709 /* inner-shadow.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BE3E7E11601738D00F64709 /* inner-shadow.png */; };
 		9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */; };
-		F120C8E31768E7C700350A6B /* CCoreTextAttachment.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */; };
-		F120C8E41768E7C700350A6B /* CCoreTextLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */; };
-		F120C8E51768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */; };
-		F120C8E61768E7C700350A6B /* CCoreTextRenderer.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */; };
-		F120C8E71768E7C700350A6B /* CLinkingCoreTextLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */; };
-		F120C8E81768E7C700350A6B /* CMarkupValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */; };
-		F120C8E91768E7C700350A6B /* CSimpleHTMLParser.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */; };
-		F120C8EB1768E7C700350A6B /* NSAttributedString_Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */; };
-		F120C8EC1768E7C700350A6B /* NSScanner_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */; };
-		F120C8ED1768E7C700350A6B /* NSString_HTMLExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */; };
-		F120C8EE1768E7C700350A6B /* UIColor+Hex.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8DE1768E7C700350A6B /* UIColor+Hex.m */; };
-		F120C8EF1768E7C700350A6B /* UIFont_CoreTextExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */; };
-		F120C8F41768EBE100350A6B /* ColorBandView.m in Sources */ = {isa = PBXBuildFile; fileRef = F120C8F31768EBE100350A6B /* ColorBandView.m */; };
 		F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */; };
 		F128A1EC157FE5C4001BC156 /* TweetDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */; };
 		F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */ = {isa = PBXBuildFile; fileRef = F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */; };
@@ -75,9 +61,7 @@
 		F129B672157B8237005353EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B671157B8237005353EB /* ViewController.m */; };
 		F13964F5175EB9710073EE5E /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = F13964F4175EB9710073EE5E /* Settings.m */; };
 		F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B26175FDC3E00CC9EDA /* Cache.m */; };
-		F1397B2A175FE09E00CC9EDA /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B29175FE09E00CC9EDA /* Keychain.m */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
-		F15A011D1763BE82001C668C /* TwoFaceCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F15A011C1763BE81001C668C /* TwoFaceCell.m */; };
 		F15A011F1763CAFE001C668C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F15A011E1763CAFE001C668C /* CoreText.framework */; };
 		F18042C4175A8802008D191D /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C3175A8802008D191D /* Tweet.m */; };
 		F18042C7175A880C008D191D /* Status.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C6175A880C008D191D /* Status.m */; };
@@ -93,6 +77,8 @@
 		F188BD6F1694FF2400BF01E4 /* OAServiceTicket.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD631694FF2400BF01E4 /* OAServiceTicket.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F188BD701694FF2400BF01E4 /* OAToken.m in Sources */ = {isa = PBXBuildFile; fileRef = F188BD651694FF2400BF01E4 /* OAToken.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		F1937FA3169F137400C66668 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1937FA2169F137400C66668 /* DropboxSDK.framework */; };
+		F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE60183BF54100DD2544 /* Keychain.m */; };
+		F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */; };
 		F1CBA30E1699323C003D53C7 /* iTunesArtwork_512.png in Resources */ = {isa = PBXBuildFile; fileRef = F1CBA30D1699323C003D53C7 /* iTunesArtwork_512.png */; };
 		F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */; };
 /* End PBXBuildFile section */
@@ -147,8 +133,6 @@
 		9B604030163C9E9C003C5262 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		9B6DC063161D1073006C2B2F /* InterceptTwitPicLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterceptTwitPicLink.h; sourceTree = "<group>"; };
 		9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterceptTwitPicLink.m; sourceTree = "<group>"; };
-		9B76B60015D20EB100D2DD50 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
-		9B76B60115D20EB100D2DD50 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		9B7D860E15D74DC70085E640 /* UIImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Scale.h"; sourceTree = "<group>"; };
 		9B7D860F15D74DC70085E640 /* UIImage+Scale.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Scale.m"; sourceTree = "<group>"; };
 		9B7F43F0158E4D4300462D0D /* IntermediateUserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntermediateUserSelectorViewController.h; sourceTree = "<group>"; };
@@ -175,32 +159,6 @@
 		9BE3E7E11601738D00F64709 /* inner-shadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "inner-shadow.png"; sourceTree = "<group>"; };
 		9BE8001E1634C77C006D91B8 /* PullToRefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshView.h; sourceTree = "<group>"; };
 		9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshView.m; sourceTree = "<group>"; };
-		F120C8C81768E7C700350A6B /* CCoreTextAttachment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextAttachment.h; sourceTree = "<group>"; };
-		F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextAttachment.m; sourceTree = "<group>"; };
-		F120C8CA1768E7C700350A6B /* CCoreTextLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextLabel.h; sourceTree = "<group>"; };
-		F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextLabel.m; sourceTree = "<group>"; };
-		F120C8CC1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextLabel_HTMLExtensions.h; sourceTree = "<group>"; };
-		F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextLabel_HTMLExtensions.m; sourceTree = "<group>"; };
-		F120C8CE1768E7C700350A6B /* CCoreTextRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCoreTextRenderer.h; sourceTree = "<group>"; };
-		F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CCoreTextRenderer.m; sourceTree = "<group>"; };
-		F120C8D01768E7C700350A6B /* CLinkingCoreTextLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CLinkingCoreTextLabel.h; sourceTree = "<group>"; };
-		F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CLinkingCoreTextLabel.m; sourceTree = "<group>"; };
-		F120C8D21768E7C700350A6B /* CMarkupValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMarkupValueTransformer.h; sourceTree = "<group>"; };
-		F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CMarkupValueTransformer.m; sourceTree = "<group>"; };
-		F120C8D41768E7C700350A6B /* CSimpleHTMLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CSimpleHTMLParser.h; sourceTree = "<group>"; };
-		F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CSimpleHTMLParser.m; sourceTree = "<group>"; };
-		F120C8D71768E7C700350A6B /* NSAttributedString_Extensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSAttributedString_Extensions.h; sourceTree = "<group>"; };
-		F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSAttributedString_Extensions.m; sourceTree = "<group>"; };
-		F120C8D91768E7C700350A6B /* NSScanner_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSScanner_HTMLExtensions.h; sourceTree = "<group>"; };
-		F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSScanner_HTMLExtensions.m; sourceTree = "<group>"; };
-		F120C8DB1768E7C700350A6B /* NSString_HTMLExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSString_HTMLExtensions.h; sourceTree = "<group>"; };
-		F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSString_HTMLExtensions.m; sourceTree = "<group>"; };
-		F120C8DD1768E7C700350A6B /* UIColor+Hex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Hex.h"; sourceTree = "<group>"; };
-		F120C8DE1768E7C700350A6B /* UIColor+Hex.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Hex.m"; sourceTree = "<group>"; };
-		F120C8DF1768E7C700350A6B /* UIFont_CoreTextExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIFont_CoreTextExtensions.h; sourceTree = "<group>"; };
-		F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIFont_CoreTextExtensions.m; sourceTree = "<group>"; };
-		F120C8F21768EBE100350A6B /* ColorBandView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorBandView.h; sourceTree = "<group>"; };
-		F120C8F31768EBE100350A6B /* ColorBandView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorBandView.m; sourceTree = "<group>"; };
 		F1231D6F16961D3100C60FD4 /* FHSTwitPicEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitPicEngine.h; sourceTree = "<group>"; };
 		F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitPicEngine.m; sourceTree = "<group>"; };
 		F128A1E9157FE5C3001BC156 /* TweetDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetDetailViewController.h; sourceTree = "<group>"; };
@@ -222,12 +180,8 @@
 		F13964F4175EB9710073EE5E /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		F1397B25175FDC3E00CC9EDA /* Cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cache.h; sourceTree = "<group>"; };
 		F1397B26175FDC3E00CC9EDA /* Cache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Cache.m; sourceTree = "<group>"; };
-		F1397B28175FE09E00CC9EDA /* Keychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keychain.h; sourceTree = "<group>"; };
-		F1397B29175FE09E00CC9EDA /* Keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keychain.m; sourceTree = "<group>"; };
 		F158D72A15800C1D0061E5A6 /* ReplyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplyViewController.h; sourceTree = "<group>"; };
 		F158D72B15800C1D0061E5A6 /* ReplyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplyViewController.m; sourceTree = "<group>"; };
-		F15A011B1763BE81001C668C /* TwoFaceCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TwoFaceCell.h; sourceTree = "<group>"; };
-		F15A011C1763BE81001C668C /* TwoFaceCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwoFaceCell.m; sourceTree = "<group>"; };
 		F15A011E1763CAFE001C668C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		F18042C2175A8802008D191D /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
 		F18042C3175A8802008D191D /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
@@ -257,6 +211,10 @@
 		F188BD651694FF2400BF01E4 /* OAToken.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAToken.m; sourceTree = "<group>"; };
 		F188BD661694FF2400BF01E4 /* OAuthConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAuthConsumer.h; sourceTree = "<group>"; };
 		F1937FA2169F137400C66668 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxSDK.framework; path = Frameworks/DropboxSDK.framework; sourceTree = "<group>"; };
+		F1C8CE5F183BF54100DD2544 /* Keychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keychain.h; sourceTree = "<group>"; };
+		F1C8CE60183BF54100DD2544 /* Keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keychain.m; sourceTree = "<group>"; };
+		F1C8CE62183BFF7700DD2544 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
+		F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		F1CBA30D1699323C003D53C7 /* iTunesArtwork_512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesArtwork_512.png; sourceTree = SOURCE_ROOT; };
 		F1E0A87F1699D8B8000054F3 /* UserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSelectorViewController.h; sourceTree = "<group>"; };
 		F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSelectorViewController.m; sourceTree = "<group>"; };
@@ -345,11 +303,10 @@
 		9B857FA515F5AB5000DE25E8 /* Subclasses */ = {
 			isa = PBXGroup;
 			children = (
-				F120C8C71768E7C700350A6B /* CoreTextToy */,
 				9B4D79D615D1AB3D004B9B87 /* FHSGradientView.h */,
 				9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */,
-				9B76B60015D20EB100D2DD50 /* MBProgressHUD.h */,
-				9B76B60115D20EB100D2DD50 /* MBProgressHUD.m */,
+				F1C8CE62183BFF7700DD2544 /* MBProgressHUD.h */,
+				F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */,
 				9B2A621215AF8CEB00C4A426 /* ZoomingImageView.h */,
 				9B2A621315AF8CEB00C4A426 /* ZoomingImageView.m */,
 				9BD5621115BE67E40017E542 /* AdditionalLabelCell.h */,
@@ -360,38 +317,6 @@
 				9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */,
 			);
 			name = Subclasses;
-			sourceTree = "<group>";
-		};
-		F120C8C71768E7C700350A6B /* CoreTextToy */ = {
-			isa = PBXGroup;
-			children = (
-				F120C8C81768E7C700350A6B /* CCoreTextAttachment.h */,
-				F120C8C91768E7C700350A6B /* CCoreTextAttachment.m */,
-				F120C8CA1768E7C700350A6B /* CCoreTextLabel.h */,
-				F120C8CB1768E7C700350A6B /* CCoreTextLabel.m */,
-				F120C8CC1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.h */,
-				F120C8CD1768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m */,
-				F120C8CE1768E7C700350A6B /* CCoreTextRenderer.h */,
-				F120C8CF1768E7C700350A6B /* CCoreTextRenderer.m */,
-				F120C8D01768E7C700350A6B /* CLinkingCoreTextLabel.h */,
-				F120C8D11768E7C700350A6B /* CLinkingCoreTextLabel.m */,
-				F120C8D21768E7C700350A6B /* CMarkupValueTransformer.h */,
-				F120C8D31768E7C700350A6B /* CMarkupValueTransformer.m */,
-				F120C8D41768E7C700350A6B /* CSimpleHTMLParser.h */,
-				F120C8D51768E7C700350A6B /* CSimpleHTMLParser.m */,
-				F120C8D71768E7C700350A6B /* NSAttributedString_Extensions.h */,
-				F120C8D81768E7C700350A6B /* NSAttributedString_Extensions.m */,
-				F120C8D91768E7C700350A6B /* NSScanner_HTMLExtensions.h */,
-				F120C8DA1768E7C700350A6B /* NSScanner_HTMLExtensions.m */,
-				F120C8DB1768E7C700350A6B /* NSString_HTMLExtensions.h */,
-				F120C8DC1768E7C700350A6B /* NSString_HTMLExtensions.m */,
-				F120C8DD1768E7C700350A6B /* UIColor+Hex.h */,
-				F120C8DE1768E7C700350A6B /* UIColor+Hex.m */,
-				F120C8DF1768E7C700350A6B /* UIFont_CoreTextExtensions.h */,
-				F120C8E01768E7C700350A6B /* UIFont_CoreTextExtensions.m */,
-			);
-			name = CoreTextToy;
-			path = "../../../../Downloads/CoreTextToy-master/Source";
 			sourceTree = "<group>";
 		};
 		F129B64F157B8237005353EB = {
@@ -460,7 +385,6 @@
 				9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */,
 				9B60402F163C9E9C003C5262 /* AboutViewController.h */,
 				9B604030163C9E9C003C5262 /* AboutViewController.m */,
-				F15A010D1763B24E001C668C /* Cells */,
 				F18042C1175A87E3008D191D /* Containers */,
 				F188BD71169500EB00BF01E4 /* Twitpic */,
 				F188BD4E1694FF2400BF01E4 /* FHSTwitterEngine */,
@@ -519,21 +443,10 @@
 				F1397B26175FDC3E00CC9EDA /* Cache.m */,
 				F13964F3175EB9710073EE5E /* Settings.h */,
 				F13964F4175EB9710073EE5E /* Settings.m */,
-				F1397B28175FE09E00CC9EDA /* Keychain.h */,
-				F1397B29175FE09E00CC9EDA /* Keychain.m */,
+				F1C8CE5F183BF54100DD2544 /* Keychain.h */,
+				F1C8CE60183BF54100DD2544 /* Keychain.m */,
 			);
 			name = General;
-			sourceTree = "<group>";
-		};
-		F15A010D1763B24E001C668C /* Cells */ = {
-			isa = PBXGroup;
-			children = (
-				F15A011B1763BE81001C668C /* TwoFaceCell.h */,
-				F15A011C1763BE81001C668C /* TwoFaceCell.m */,
-				F120C8F21768EBE100350A6B /* ColorBandView.h */,
-				F120C8F31768EBE100350A6B /* ColorBandView.m */,
-			);
-			name = Cells;
 			sourceTree = "<group>";
 		};
 		F18042C1175A87E3008D191D /* Containers */ = {
@@ -692,7 +605,6 @@
 				9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */,
 				9B0B127E15CF2DCF00217981 /* UIAlertView+BlockExtensions.m in Sources */,
 				9B4D79D815D1AB3D004B9B87 /* FHSGradientView.m in Sources */,
-				9B76B60215D20EB100D2DD50 /* MBProgressHUD.m in Sources */,
 				9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */,
 				9B9F328115DC03A2000B0C72 /* Facebook+Facebook_cancel.m in Sources */,
 				9B2378DE15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m in Sources */,
@@ -713,6 +625,7 @@
 				9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */,
 				F188BD671694FF2400BF01E4 /* FHSTwitterEngine.m in Sources */,
 				F188BD681694FF2400BF01E4 /* NSString+URLEncoding.m in Sources */,
+				F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */,
 				F188BD691694FF2400BF01E4 /* Base64TranscoderFHS.c in Sources */,
 				F188BD6B1694FF2400BF01E4 /* OAConsumer.m in Sources */,
 				F188BD6C1694FF2400BF01E4 /* OAHMAC_SHA1SignatureProvider.m in Sources */,
@@ -728,22 +641,8 @@
 				F18042CD175A896C008D191D /* FacebookUser.m in Sources */,
 				F13964F5175EB9710073EE5E /* Settings.m in Sources */,
 				F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */,
-				F1397B2A175FE09E00CC9EDA /* Keychain.m in Sources */,
 				F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */,
-				F15A011D1763BE82001C668C /* TwoFaceCell.m in Sources */,
-				F120C8E31768E7C700350A6B /* CCoreTextAttachment.m in Sources */,
-				F120C8E41768E7C700350A6B /* CCoreTextLabel.m in Sources */,
-				F120C8E51768E7C700350A6B /* CCoreTextLabel_HTMLExtensions.m in Sources */,
-				F120C8E61768E7C700350A6B /* CCoreTextRenderer.m in Sources */,
-				F120C8E71768E7C700350A6B /* CLinkingCoreTextLabel.m in Sources */,
-				F120C8E81768E7C700350A6B /* CMarkupValueTransformer.m in Sources */,
-				F120C8E91768E7C700350A6B /* CSimpleHTMLParser.m in Sources */,
-				F120C8EB1768E7C700350A6B /* NSAttributedString_Extensions.m in Sources */,
-				F120C8EC1768E7C700350A6B /* NSScanner_HTMLExtensions.m in Sources */,
-				F120C8ED1768E7C700350A6B /* NSString_HTMLExtensions.m in Sources */,
-				F120C8EE1768E7C700350A6B /* UIColor+Hex.m in Sources */,
-				F120C8EF1768E7C700350A6B /* UIFont_CoreTextExtensions.m in Sources */,
-				F120C8F41768EBE100350A6B /* ColorBandView.m in Sources */,
+				F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -18,6 +18,8 @@ NSString * const kDBSyncDeletedTArrayKey = @"DBSyncDeletedTwitterArray";
 NSString * const kDBSyncDeletedFBDictKey = @"DBSyncDeletedFBDict";
 NSString * const kEnteringForegroundNotif = @"enterForeground";
 NSString * const kFacebookAppID = @"314352998657355";
+NSString * const kFacebookAccessTokenKey = @"kFacebookAccessTokenKey";
+NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
 
 @implementation Settings
 
@@ -68,7 +70,5 @@ NSString * const kFacebookAppID = @"314352998657355";
 + (NSMutableDictionary *)dropboxDeletedFacebookDictionary {
     return [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults]objectForKey:kDBSyncDeletedFBDictKey]];
 }
-
-
 
 @end

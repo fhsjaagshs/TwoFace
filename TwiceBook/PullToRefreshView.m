@@ -133,20 +133,17 @@
 		    statusLabel.text = @"Release to refresh…";
             [self showActivity:NO animated:NO];
             [self setImageFlipped:YES];
-            scrollView.contentInset = UIEdgeInsetsZero;
 		    break;
 		case kPullToRefreshViewStateNormal:
 		    statusLabel.text = @"Pull down to refresh...";
             [self showActivity:NO animated:NO];
             [self setImageFlipped:NO];
-            scrollView.contentInset = UIEdgeInsetsZero;
 		    break;
 		case kPullToRefreshViewStateLoading:
         case kPullToRefreshViewStateProgrammaticRefresh:
 		    statusLabel.text = @"Loading…";
             [self showActivity:YES animated:YES];
             [self setImageFlipped:NO];
-		    scrollView.contentInset = UIEdgeInsetsMake(fminf(-scrollView.contentOffset.y, -kPullToRefreshViewTriggerOffset), 0, 0, 0);
             if ([delegate respondsToSelector:@selector(pullToRefreshViewShouldRefresh:)]) {
                 [delegate pullToRefreshViewShouldRefresh:self];
             }
