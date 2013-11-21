@@ -30,7 +30,7 @@
 		9B400FE31603EA430050774F /* SyncingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B400FE21603EA430050774F /* SyncingViewController.m */; };
 		9B400FE81603EB0D0050774F /* UIViewController+InitWithAutoNib.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B400FE71603EB0D0050774F /* UIViewController+InitWithAutoNib.m */; };
 		9B4D79D815D1AB3D004B9B87 /* FHSGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */; };
-		9B4FF41F160FF1FF00563A31 /* NewPrefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FF41D160FF1FF00563A31 /* NewPrefs.m */; };
+		9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */; };
 		9B5DA1C9162CF6410034ABDC /* Checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */; };
 		9B5EE1F81624EA9000BFC265 /* DraftsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */; };
 		9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B604030163C9E9C003C5262 /* AboutViewController.m */; };
@@ -124,8 +124,8 @@
 		9B400FE71603EB0D0050774F /* UIViewController+InitWithAutoNib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+InitWithAutoNib.m"; sourceTree = "<group>"; };
 		9B4D79D615D1AB3D004B9B87 /* FHSGradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSGradientView.h; sourceTree = "<group>"; };
 		9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSGradientView.m; sourceTree = "<group>"; };
-		9B4FF41C160FF1FF00563A31 /* NewPrefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewPrefs.h; sourceTree = "<group>"; };
-		9B4FF41D160FF1FF00563A31 /* NewPrefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewPrefs.m; sourceTree = "<group>"; };
+		9B4FF41C160FF1FF00563A31 /* PrefsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsViewController.h; sourceTree = "<group>"; };
+		9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrefsViewController.m; sourceTree = "<group>"; };
 		9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Checkmark@2x.png"; sourceTree = "<group>"; };
 		9B5EE1F51624EA9000BFC265 /* DraftsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DraftsViewController.h; sourceTree = "<group>"; };
 		9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DraftsViewController.m; sourceTree = "<group>"; };
@@ -361,8 +361,8 @@
 				F129B66E157B8237005353EB /* AppDelegate.m */,
 				F129B670157B8237005353EB /* ViewController.h */,
 				F129B671157B8237005353EB /* ViewController.m */,
-				9B4FF41C160FF1FF00563A31 /* NewPrefs.h */,
-				9B4FF41D160FF1FF00563A31 /* NewPrefs.m */,
+				9B4FF41C160FF1FF00563A31 /* PrefsViewController.h */,
+				9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */,
 				9BCEB74B16222AF90048CC43 /* CachesViewController.h */,
 				9BCEB74C16222AF90048CC43 /* CachesViewController.m */,
 				9B400FE11603EA420050774F /* SyncingViewController.h */,
@@ -615,7 +615,7 @@
 				9B32A333160C110600BA44FB /* FBFrictionlessRequestSettings.m in Sources */,
 				9B32A334160C110600BA44FB /* FBLoginDialog.m in Sources */,
 				9B32A335160C110600BA44FB /* FBRequest.m in Sources */,
-				9B4FF41F160FF1FF00563A31 /* NewPrefs.m in Sources */,
+				9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */,
 				9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */,
 				9BCEB749162220550048CC43 /* NSArray+RemoveDuplicates.m in Sources */,
 				9BCEB74D16222AF90048CC43 /* CachesViewController.m in Sources */,

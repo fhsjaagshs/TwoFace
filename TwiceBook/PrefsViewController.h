@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NewPrefs : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface PrefsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (strong, nonatomic) UITableView *theTableView;
 

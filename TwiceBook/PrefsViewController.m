@@ -6,28 +6,26 @@
 //  Copyright (c) 2012 Nathaniel Symer. All rights reserved.
 //
 
-#import "NewPrefs.h"
+#import "PrefsViewController.h"
 
-@implementation NewPrefs
+@implementation PrefsViewController
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
     [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
-    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-4) style:UITableViewStyleGrouped];
-    self.theTableView.delegate = self;
-    self.theTableView.dataSource = self;
-    self.theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:self.theTableView.frame];
-    bgView.backgroundColor = [UIColor clearColor];
-    [self.theTableView setBackgroundView:bgView];
-    [self.view addSubview:self.theTableView];
-    [self.view bringSubviewToFront:self.theTableView];
+    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, screenBounds.size.height) style:UITableViewStyleGrouped];
+    _theTableView.delegate = self;
+    _theTableView.dataSource = self;
+    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
+    [self.view addSubview:_theTableView];
+    [self.view bringSubviewToFront:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
-    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Preferences"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
+    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Settings"];
+    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Sync" style:UIBarButtonItemStyleBordered target:self action:@selector(showSyncMenu)];
     [bar pushNavigationItem:topItem animated:NO];
     
@@ -132,14 +130,13 @@
     UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
     int section = indexPath.section;
     int row = indexPath.row;
     
     AppDelegate *ad = [Settings appDelegate];
-    
-    cell.textLabel.textAlignment = UITextAlignmentCenter;
     
     if (section == 0) {
         if (row == 0) {
@@ -201,7 +198,7 @@
                 [ad loginFacebook];
             }
         }
-        [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
+        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
     } else if (section == 1) {
         IntermediateUserSelectorViewController *iusvc = [[IntermediateUserSelectorViewController alloc]init];
         [self presentModalViewController:iusvc animated:YES];
@@ -217,7 +214,6 @@
 }
 
 - (void)close {
-    
     AppDelegate *ad = [Settings appDelegate];
     
     BOOL shouldReload = NO;
@@ -237,6 +233,9 @@
     }
     
     [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)dealloc {
     [[NSNotificationCenter defaultCenter]removeObserver:self name:@"FBButtonNotif" object:nil];
 }
 

@@ -29,6 +29,7 @@
 @property (assign, nonatomic) BOOL isLoadedDraft;
 @property (assign, nonatomic) CGRect originalTextViewFrame;
 
+- (instancetype)initWithToID:(NSString *)toId;
 - (id)initWithTweet:(Tweet *)tweets;
 - (void)refreshCounter;
 

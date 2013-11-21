@@ -55,7 +55,7 @@
     #import "CommentViewController.h"
     #import "ImageDetailViewController.h"
     #import "SyncingViewController.h"
-    #import "NewPrefs.h"
+    #import "PrefsViewController.h"
     #import "CachesViewController.h"
     #import "DraftsViewController.h"
     #import "AboutViewController.h"

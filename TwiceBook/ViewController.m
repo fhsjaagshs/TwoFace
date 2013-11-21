@@ -32,7 +32,10 @@
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"TwoFace"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(showCompose)];
-    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Prefs" style:UIBarButtonItemStyleBordered target:self action:@selector(showPrefs)];
+    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"\u2699" style:UIBarButtonItemStyleBordered target:self action:@selector(showPrefs)];
+    [topItem.rightBarButtonItem setTitlePositionAdjustment:UIOffsetMake(0, 15.0f) forBarMetrics:UIBarMetricsDefault];
+    [topItem.rightBarButtonItem setTitleTextAttributes:@{ UITextAttributeFont: [UIFont systemFontOfSize:24.0f] } forState:UIControlStateNormal];
+    
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
 
@@ -72,7 +75,7 @@
             [ad removeTwitterFromTimeline];
         }
     }
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
@@ -444,7 +447,7 @@
     }
     
     [self reloadCommonFetching];
-}*/
+}
 
 //
 // Threaded Timeline Loading Methods
@@ -477,7 +480,7 @@
             });
         }
     });
-}
+}*/
 
 - (void)reloadTableView {
     [_theTableView reloadData];
@@ -499,23 +502,19 @@
 }
 
 - (void)showPrefs {
-    NewPrefs *p = [[NewPrefs alloc]init];
+    PrefsViewController *p = [[PrefsViewController alloc]init];
     [self presentModalViewController:p animated:YES];
 }
 
 - (void)showCompose {
-    
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"Compose" completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
-
         if ([[actionSheet buttonTitleAtIndex:buttonIndex]isEqualToString:@"Tweet"]) {
             ReplyViewController *composer = [[ReplyViewController alloc]initWithTweet:nil];
             [self presentModalViewController:composer animated:YES];
         } else if ([[actionSheet buttonTitleAtIndex:buttonIndex]isEqualToString:@"Status"]) {
-            ReplyViewController *composer = [[ReplyViewController alloc]initWithTweet:nil];
-            composer.isFacebook = YES;
+            ReplyViewController *composer = [[ReplyViewController alloc]initWithToID:nil];
             [self presentModalViewController:composer animated:YES];
         }
-        
     } cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
     
@@ -535,31 +534,29 @@
     if (!facebook && !twitter) {
         as.title = @"Please log in";
         [as addButtonWithTitle:@"OK"];
-        as.cancelButtonIndex = 1;
     } else {
         [as addButtonWithTitle:@"Cancel"];
-        as.cancelButtonIndex = as.numberOfButtons-1;
     }
+    as.cancelButtonIndex = as.numberOfButtons-1;
     
     [as showInView:ad.window];
 }
 
 //
-// Timeline Methods
+// TODO: turn this into an NSPredicate
 //
-
 - (void)sortedTimeline {
-    NSMutableArray *array = [[Cache sharedCache]timeline];
+    NSMutableArray *timeline = [[Cache sharedCache]timeline];
     NSMutableDictionary *the = [NSMutableDictionary dictionary];
     
-    for (id item in array) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[array indexOfObject:item]];
+    for (id item in timeline) {
+        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[timeline indexOfObject:item]];
         NSString *time = [NSString stringWithFormat:@"%f",[[item createdAt]timeIntervalSince1970]];
         [the setObject:numberInArray forKey:time];
     }
     
-    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:[the allKeys]]; // contains sorted dates, use to fetch number in arrays
-    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:NO]]];
+    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:the.allKeys]; // contains sorted dates, use to fetch number in arrays
+    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:YES]]];
     NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
 
     for (NSString *number in arrayZ) {
@@ -569,7 +566,7 @@
     NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
     
     for (NSString *string in penultimateArray) {
-        [final addObject:[array objectAtIndex:[string intValue]]]; // array obj.. was timeline obj...
+        [final addObject:[timeline objectAtIndex:[string intValue]]]; // array obj.. was timeline obj...
     }
     
     [[[Cache sharedCache]timeline]removeAllObjects];

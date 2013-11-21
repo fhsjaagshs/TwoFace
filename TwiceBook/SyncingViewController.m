@@ -12,20 +12,18 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
     [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
-    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
-    self.theTableView.delegate = self;
-    self.theTableView.dataSource = self;
-    self.theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:self.theTableView.frame];
-    bgView.backgroundColor = [UIColor clearColor];
-    [self.theTableView setBackgroundView:bgView];
-    [self.view addSubview:self.theTableView];
-    [self.view bringSubviewToFront:self.theTableView];
+    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, screenBounds.size.height) style:UITableViewStyleGrouped];
+    _theTableView.delegate = self;
+    _theTableView.dataSource = self;
+    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
+    [self.view addSubview:_theTableView];
+    [self.view bringSubviewToFront:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Sync"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
@@ -78,13 +76,6 @@
     return 0;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 0) {
-        return @"Dropbox";
-    }
-    return nil;
-}
-
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
 
     if (section == 0) {
@@ -133,24 +124,16 @@
     UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
     int section = indexPath.section;
     int row = indexPath.row;
     
     if (section == 0) {
-        cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        cell.textLabel.textAlignment = UITextAlignmentCenter;
-        BOOL isLinked = [[DBSession sharedSession]isLinked];
-        cell.textLabel.text = isLinked?@"Log out of Dropbox":@"Log into Dropbox";
+        cell.textLabel.text = [[DBSession sharedSession]isLinked]?@"Log out of Dropbox":@"Log into Dropbox";
     } else if (section == 1) {
-        cell.selectionStyle = UITableViewCellSelectionStyleBlue;
-        cell.textLabel.textAlignment = UITextAlignmentCenter;
-        if (row == 0) {
-            cell.textLabel.text = @"Sync";
-        } else if (row == 1) {
-            cell.textLabel.text = @"Reset Dropbox Sync";
-        }
+        cell.textLabel.text = (row == 0)?@"Sync":@"Reset Sync";
     }
     
     return cell;

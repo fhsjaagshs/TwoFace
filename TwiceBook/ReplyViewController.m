@@ -236,9 +236,19 @@
     [self.replyZone becomeFirstResponder];
 }
 
+- (instancetype)initWithToID:(NSString *)toId {
+    self = [super init];
+    if (self) {
+        self.toID = toId;
+        self.isFacebook = YES;
+    }
+    return self;
+}
+
 - (id)initWithTweet:(Tweet *)aTweet {
     self = [super init];
     if (self) {
+        self.isFacebook = NO;
         self.tweet = aTweet;
     }
     return self;
