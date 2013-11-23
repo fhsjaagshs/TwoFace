@@ -532,7 +532,7 @@
     }
     
     if (!facebook && !twitter) {
-        as.title = @"Please log in";
+        as.title = @"Please log in.";
         [as addButtonWithTitle:@"OK"];
     } else {
         [as addButtonWithTitle:@"Cancel"];
@@ -542,35 +542,19 @@
     [as showInView:ad.window];
 }
 
-//
-// TODO: turn this into an NSPredicate
-//
 - (void)sortedTimeline {
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
-    NSMutableDictionary *the = [NSMutableDictionary dictionary];
-    
-    for (id item in timeline) {
-        NSString *numberInArray = [NSString stringWithFormat:@"%d",(int)[timeline indexOfObject:item]];
-        NSString *time = [NSString stringWithFormat:@"%f",[[item createdAt]timeIntervalSince1970]];
-        [the setObject:numberInArray forKey:time];
-    }
-    
-    NSMutableArray *arrayZ = [NSMutableArray arrayWithArray:the.allKeys]; // contains sorted dates, use to fetch number in arrays
-    [arrayZ sortUsingDescriptors:[NSArray arrayWithObject:[[NSSortDescriptor alloc] initWithKey:@"doubleValue" ascending:YES]]];
-    NSMutableArray *penultimateArray = [NSMutableArray array]; // the other half of the NSMutableDictiony *the (the objects). Use this to finish off the sorting
-
-    for (NSString *number in arrayZ) {
-        [penultimateArray addObject:[the objectForKey:number]];
-    }
-    
-    NSMutableArray *final = [NSMutableArray array]; // date sorted timeline!!! (backwards)
-    
-    for (NSString *string in penultimateArray) {
-        [final addObject:[timeline objectAtIndex:[string intValue]]]; // array obj.. was timeline obj...
-    }
-    
-    [[[Cache sharedCache]timeline]removeAllObjects];
-    [[[Cache sharedCache]timeline]addObjectsFromArray:final];
+    [[[Cache sharedCache]timeline]sortUsingComparator:^NSComparisonResult(id one, id two) {
+        float oneTime = [[one createdAt]timeIntervalSince1970];
+        float twoTime = [[two createdAt]timeIntervalSince1970];
+        
+        if (oneTime < twoTime) {
+            return (NSComparisonResult)NSOrderedDescending;
+        } else if (oneTime > twoTime) {
+            return (NSComparisonResult)NSOrderedAscending;
+        } else {
+            return (NSComparisonResult)NSOrderedSame;
+        }
+    }];
 }
 
 // 

@@ -10,6 +10,10 @@
 
 @implementation Tweet
 
+- (NSString *)description {
+    return [self dictionaryValue];
+}
+
 - (NSDictionary *)dictionizeReplies {
     NSMutableDictionary *replyDicts = [NSMutableDictionary dictionary];
     
