@@ -7,6 +7,7 @@
 //
 
 #import "UserSelectorViewController.h"
+#import "FHSTwitterEngine.h"
 
 static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1 = me()) order by last_name";
 
@@ -171,12 +172,12 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)fetchFriends {
     
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             id retIDs = [[FHSTwitterEngine sharedEngine]getFriendsIDs];
             if ([retIDs isKindOfClass:[NSError class]]) {
                 NSError *theError = (NSError *)retIDs;
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
                     }
@@ -208,7 +209,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                         
                         if ([usersRet isKindOfClass:[NSError class]]) {
                             NSError *theError = (NSError *)usersRet;
-                            dispatch_sync(GCDMainThread, ^{
+                            dispatch_sync(dispatch_get_main_queue(), ^{
                                 @autoreleasepool {
                                     qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.domain);
                                 }
@@ -234,7 +235,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 }
             }
             
-            dispatch_sync(GCDMainThread, ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 @autoreleasepool {
                     [self enableButtons];
                 }

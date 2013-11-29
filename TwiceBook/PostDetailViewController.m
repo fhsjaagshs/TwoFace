@@ -8,6 +8,7 @@
 
 #import "PostDetailViewController.h"
 #import "InterceptTwitPicLink.h"
+#import "FHSTwitterEngine.h"
 
 #define bgViewPadding 33
 #define messageViewYval 124
@@ -466,7 +467,7 @@
 
 - (void)openURL:(NSNotification *)notif {
     
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             
             AppDelegate *ad = [Settings appDelegate];
@@ -475,7 +476,7 @@
             NSData *imageDataD = [NSData dataWithContentsOfFile:cachePath];
             
             if (imageDataD.length == 0) {
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         [[Settings appDelegate]showHUDWithTitle:@"Loading Image..."];
                     }
@@ -484,7 +485,7 @@
             }
             
             if (imageDataD.length == 0) {
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         [ad hideHUD];
                         [ad showSelfHidingHudWithTitle:@"Error Loading Image"];
@@ -492,7 +493,7 @@
                 });
             } else {
                 [imageDataD writeToFile:cachePath atomically:YES];
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         [ad hideHUD];
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageDataD];

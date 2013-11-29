@@ -67,7 +67,7 @@
 - (id)initWithImagePath:(NSString *)path {
     if (self = [self init]) {
         if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
-            dispatch_async(GCDBackgroundThread, ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
                     self.image = [UIImage imageWithContentsOfFile:path];
                 }
@@ -79,7 +79,7 @@
 
 - (id)initWithData:(NSData *)data {
     if (self = [self init]) {
-        dispatch_async(GCDBackgroundThread, ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             @autoreleasepool {
                 if (data.length > 0) {
                     self.image = [UIImage imageWithData:data];
@@ -121,10 +121,10 @@
             hud.mode = MBProgressHUDModeIndeterminate;
             hud.labelText = @"Saving...";
             
-            dispatch_async(GCDBackgroundThread, ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
                     UIImageWriteToSavedPhotosAlbum(self.image, nil, nil, nil);
-                    dispatch_sync(GCDMainThread, ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             [MBProgressHUD hideHUDForView:window animated:YES];
                         }

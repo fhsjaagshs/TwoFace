@@ -110,7 +110,7 @@
         [self.view bringSubviewToFront:aiv];
         [aiv startAnimating];
         
-        dispatch_async(GCDBackgroundThread, ^{
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             @autoreleasepool {
                 id image = nil;
 
@@ -133,7 +133,7 @@
                 }
 
                 if (image == nil) {
-                    dispatch_sync(GCDMainThread, ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             for (UIView *view in self.view.subviews) {
                                 if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
@@ -145,7 +145,7 @@
                         }
                     });
                 } else {
-                    dispatch_sync(GCDMainThread, ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             for (UIView *view in self.view.subviews) {
                                 if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
@@ -181,7 +181,7 @@
 
     __block BOOL isFavorite = _tweet.isFavorited;
     
-    if ([_tweet.user.screename isEqualToString:[[FHSTwitterEngine sharedEngine]loggedInUsername]]) {
+    if ([_tweet.user.screename isEqualToString:[[FHSTwitterEngine sharedEngine]authenticatedUsername]]) {
         ReplyViewController *d = [[ReplyViewController alloc]initWithTweet:_tweet];
         [self presentModalViewController:d animated:YES];
     } else {
@@ -193,12 +193,12 @@
             } else if (buttonIndex == 1) {
                 [ad showHUDWithTitle:@"Retweeting..."];
                 
-                dispatch_async(GCDBackgroundThread, ^{
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     @autoreleasepool {
                         
                         NSError *error = [[FHSTwitterEngine sharedEngine]retweet:_tweet.identifier];
                         
-                        dispatch_sync(GCDMainThread, ^{
+                        dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
                                 [ad hideHUD];
                                 if (error) {
@@ -216,12 +216,12 @@
                     [ad showHUDWithTitle:@"Unfavoriting..."];
                 }
                 
-                dispatch_async(GCDBackgroundThread, ^{
+                dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     @autoreleasepool {
                         
                         NSError *error = [[FHSTwitterEngine sharedEngine]markTweet:_tweet.identifier asFavorite:!isFavorite];
                         
-                        dispatch_sync(GCDMainThread, ^{
+                        dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
                                 [ad hideHUD];
                                 
@@ -247,17 +247,16 @@
 }
 
 - (void)openURL:(NSNotification *)notif {
-    
     AppDelegate *ad = [Settings appDelegate];
     
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             
             NSString *cachePath = [[Settings cachesDirectory]stringByAppendingPathComponent:[notif.object lastPathComponent]];
             NSData *imageData = [NSData dataWithContentsOfFile:cachePath];
             
             if (imageData.length == 0) {
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         [ad showHUDWithTitle:@"Loading Image..."];
                     }
@@ -268,14 +267,14 @@
             [ad hideHUD];
             
             if (imageData.length == 0) {
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         [ad showSelfHidingHudWithTitle:@"Error Loading Image"];
                     }
                 });
             } else {
                 [imageData writeToFile:cachePath atomically:YES];
-                dispatch_sync(GCDMainThread, ^{
+                dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageData];
                         [self presentModalViewController:vc animated:YES];

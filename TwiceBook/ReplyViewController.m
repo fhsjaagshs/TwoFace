@@ -7,8 +7,7 @@
 //
 
 #import "ReplyViewController.h"
-#import "FHSTwitPicEngine.h"
-#import "OAConsumer.h"
+#import "FHSTwitterEngine.h"
 
 @implementation ReplyViewController
 
@@ -99,7 +98,7 @@
 - (void)kickoffTweetPost {
     NSString *messageBody = [_replyZone.text stringByTrimmingWhitespace];
     [[Settings appDelegate] showHUDWithTitle:@"Tweeting..."];
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             NSError *error = nil;
             
@@ -109,7 +108,7 @@
                 error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody];
             }
             
-            dispatch_sync(GCDMainThread, ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 [self dismissModalViewControllerAnimated:YES];
                 
@@ -493,11 +492,11 @@
             [ad showHUDWithTitle:@"Uploading..."];
             NSString *message = [self.replyZone.text stringByTrimmingWhitespace];
             
-            dispatch_async(GCDBackgroundThread, ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
-                    id returnValue = [FHSTwitPicEngine uploadPictureToTwitPic:UIImageJPEGRepresentation(self.imageFromCameraRoll, 0.8) withMessage:message withConsumer:[[OAConsumer alloc]initWithKey:kOAuthConsumerKey secret:kOAuthConsumerSecret] accessToken:[[FHSTwitterEngine sharedEngine]accessToken] andTwitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
+                    id returnValue = [[FHSTwitterEngine sharedEngine]uploadImageToTwitPic:UIImageJPEGRepresentation(self.imageFromCameraRoll, 0.8) withMessage:message twitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
                     
-                    dispatch_sync(GCDMainThread, ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             if ([returnValue isKindOfClass:[NSError class]]) {
                                 [ad hideHUD];

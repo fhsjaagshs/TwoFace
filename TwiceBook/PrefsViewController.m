@@ -7,6 +7,7 @@
 //
 
 #import "PrefsViewController.h"
+#import "FHSTwitterEngine.h"
 
 @implementation PrefsViewController
 
@@ -79,15 +80,15 @@
     
     if (section == 0) {
         
-        NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]loggedInUsername];
+        NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]authenticatedUsername];
         NSString *fbUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"fbName"];
         
         if (fbUsername.length == 0 && [ad.facebook isSessionValid]) {
-            dispatch_async(GCDBackgroundThread, ^{
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
                     NSString *theName = [ad getFacebookUsernameSync];
                     [[NSUserDefaults standardUserDefaults]setObject:theName forKey:@"fbName"];
-                    dispatch_sync(GCDMainThread, ^{
+                    dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
                         }
@@ -184,7 +185,11 @@
                     return;
                 }
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
-                [[FHSTwitterEngine sharedEngine]showOAuthLoginControllerFromViewController:self];
+                
+                UIViewController *loginController = [[FHSTwitterEngine sharedEngine]loginControllerWithCompletionHandler:^(BOOL success) {
+                    NSLog(success?@"L0L success":@"O noes!!! Loggen faylur!!!");
+                }];
+                [self presentViewController:loginController animated:YES completion:nil];
             }
         } else if (row == 1) {
             if ([ad.facebook isSessionValid]) {

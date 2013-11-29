@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9B0229BA158D64AB005CCCAA /* arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B0229B6158D64AB005CCCAA /* arrow.png */; };
 		9B0229BE158D6587005CCCAA /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9B0229BD158D6587005CCCAA /* QuartzCore.framework */; };
 		9B0B127715CF2A0400217981 /* HelperFunctions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B127615CF2A0400217981 /* HelperFunctions.m */; };
 		9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B0B127A15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m */; };
@@ -50,7 +49,6 @@
 		9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */; };
 		9BE3E7E21601738D00F64709 /* inner-shadow.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BE3E7E11601738D00F64709 /* inner-shadow.png */; };
 		9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */; };
-		F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */; };
 		F128A1EC157FE5C4001BC156 /* TweetDetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */; };
 		F12968961760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m in Sources */ = {isa = PBXBuildFile; fileRef = F12968951760AE2A0044E9AE /* FHSTwitterEngine+Date2String.m */; };
 		F129B65F157B8237005353EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F129B65E157B8237005353EB /* UIKit.framework */; };
@@ -68,14 +66,13 @@
 		F18042CA175A893C008D191D /* TwitterUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C9175A893C008D191D /* TwitterUser.m */; };
 		F18042CD175A896C008D191D /* FacebookUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042CC175A896C008D191D /* FacebookUser.m */; };
 		F1937FA3169F137400C66668 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1937FA2169F137400C66668 /* DropboxSDK.framework */; };
+		F19D0A45184919A700891122 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F19D0A44184919A700891122 /* FHSTwitterEngine.m */; };
 		F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE60183BF54100DD2544 /* Keychain.m */; };
 		F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */; };
-		F1CBA30E1699323C003D53C7 /* iTunesArtwork_512.png in Resources */ = {isa = PBXBuildFile; fileRef = F1CBA30D1699323C003D53C7 /* iTunesArtwork_512.png */; };
 		F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9B0229B6158D64AB005CCCAA /* arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = arrow.png; sourceTree = "<group>"; };
 		9B0229BD158D6587005CCCAA /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		9B0B127515CF2A0400217981 /* HelperFunctions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HelperFunctions.h; sourceTree = "<group>"; };
 		9B0B127615CF2A0400217981 /* HelperFunctions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HelperFunctions.m; sourceTree = "<group>"; };
@@ -150,8 +147,6 @@
 		9BE3E7E11601738D00F64709 /* inner-shadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "inner-shadow.png"; sourceTree = "<group>"; };
 		9BE8001E1634C77C006D91B8 /* PullToRefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshView.h; sourceTree = "<group>"; };
 		9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshView.m; sourceTree = "<group>"; };
-		F1231D6F16961D3100C60FD4 /* FHSTwitPicEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitPicEngine.h; sourceTree = "<group>"; };
-		F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitPicEngine.m; sourceTree = "<group>"; };
 		F128A1E9157FE5C3001BC156 /* TweetDetailViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetDetailViewController.h; sourceTree = "<group>"; };
 		F128A1EA157FE5C3001BC156 /* TweetDetailViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetDetailViewController.m; sourceTree = "<group>"; };
 		F12968941760AE2A0044E9AE /* FHSTwitterEngine+Date2String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "FHSTwitterEngine+Date2String.h"; sourceTree = "<group>"; };
@@ -183,11 +178,12 @@
 		F18042CB175A896C008D191D /* FacebookUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookUser.h; sourceTree = "<group>"; };
 		F18042CC175A896C008D191D /* FacebookUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookUser.m; sourceTree = "<group>"; };
 		F1937FA2169F137400C66668 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxSDK.framework; path = Frameworks/DropboxSDK.framework; sourceTree = "<group>"; };
+		F19D0A43184919A700891122 /* FHSTwitterEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitterEngine.h; sourceTree = "<group>"; };
+		F19D0A44184919A700891122 /* FHSTwitterEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitterEngine.m; sourceTree = "<group>"; };
 		F1C8CE5F183BF54100DD2544 /* Keychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Keychain.h; sourceTree = "<group>"; };
 		F1C8CE60183BF54100DD2544 /* Keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keychain.m; sourceTree = "<group>"; };
 		F1C8CE62183BFF7700DD2544 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
-		F1CBA30D1699323C003D53C7 /* iTunesArtwork_512.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iTunesArtwork_512.png; sourceTree = SOURCE_ROOT; };
 		F1E0A87F1699D8B8000054F3 /* UserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSelectorViewController.h; sourceTree = "<group>"; };
 		F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSelectorViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -369,13 +365,11 @@
 		F129B665157B8237005353EB /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				F1CBA30D1699323C003D53C7 /* iTunesArtwork_512.png */,
 				9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */,
 				9B3C672815F68B7B0019F346 /* icon@2x.png */,
 				9B3C672515F68B690019F346 /* icon.png */,
 				9B2EA635160BD0320029F276 /* Default-568h@2x.png */,
 				9BBC4CAD15DBED01006FA7DE /* Caution.png */,
-				9B0229B6158D64AB005CCCAA /* arrow.png */,
 				9BE3E7E11601738D00F64709 /* inner-shadow.png */,
 				F129B666157B8237005353EB /* TwoFace-Info.plist */,
 				F129B66A157B8237005353EB /* main.m */,
@@ -429,19 +423,19 @@
 			name = Containers;
 			sourceTree = "<group>";
 		};
-		F188BD71169500EB00BF01E4 /* Twitpic */ = {
+		F19D0A42184919A700891122 /* FHSTwitterEngine */ = {
 			isa = PBXGroup;
 			children = (
-				F1231D6F16961D3100C60FD4 /* FHSTwitPicEngine.h */,
-				F1231D7016961D3100C60FD4 /* FHSTwitPicEngine.m */,
+				F19D0A43184919A700891122 /* FHSTwitterEngine.h */,
+				F19D0A44184919A700891122 /* FHSTwitterEngine.m */,
 			);
-			path = Twitpic;
+			path = FHSTwitterEngine;
 			sourceTree = "<group>";
 		};
 		F1D1FE21183EBB3800DED9D3 /* SDKs */ = {
 			isa = PBXGroup;
 			children = (
-				F188BD71169500EB00BF01E4 /* Twitpic */,
+				F19D0A42184919A700891122 /* FHSTwitterEngine */,
 				9B32A33C160C110D00BA44FB /* Facebook iOS SDK */,
 			);
 			name = SDKs;
@@ -475,6 +469,11 @@
 			attributes = {
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Nathaniel Symer";
+				TargetAttributes = {
+					F129B659157B8237005353EB = {
+						DevelopmentTeam = GWB3VGVLKR;
+					};
+				};
 			};
 			buildConfigurationList = F129B654157B8237005353EB /* Build configuration list for PBXProject "TwoFace" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -498,7 +497,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9B0229BA158D64AB005CCCAA /* arrow.png in Resources */,
 				9BBC4CAE15DBED01006FA7DE /* Caution.png in Resources */,
 				9B3C672615F68B690019F346 /* icon.png in Resources */,
 				9B3C672915F68B7B0019F346 /* icon@2x.png in Resources */,
@@ -506,7 +504,6 @@
 				9B2EA636160BD0320029F276 /* Default-568h@2x.png in Resources */,
 				9B32A331160C110600BA44FB /* FBDialog.bundle in Resources */,
 				9B5DA1C9162CF6410034ABDC /* Checkmark@2x.png in Resources */,
-				F1CBA30E1699323C003D53C7 /* iTunesArtwork_512.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -545,6 +542,7 @@
 				9B32A334160C110600BA44FB /* FBLoginDialog.m in Sources */,
 				9B32A335160C110600BA44FB /* FBRequest.m in Sources */,
 				9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */,
+				F19D0A45184919A700891122 /* FHSTwitterEngine.m in Sources */,
 				9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */,
 				9BCEB749162220550048CC43 /* NSArray+RemoveDuplicates.m in Sources */,
 				9BCEB74D16222AF90048CC43 /* CachesViewController.m in Sources */,
@@ -553,7 +551,6 @@
 				9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */,
 				9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */,
 				F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */,
-				F1231D7116961D3100C60FD4 /* FHSTwitPicEngine.m in Sources */,
 				F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */,
 				F18042C4175A8802008D191D /* Tweet.m in Sources */,
 				F18042C7175A880C008D191D /* Status.m in Sources */,
@@ -642,7 +639,8 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Corinna Wiedmer-Symer (RT2G2Q9WRP)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
@@ -656,7 +654,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_NAME = TwoFace;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "AE6F5E5F-49C4-4F24-9AAA-A27F67E569EB";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "89C6FCC5-1F46-4855-9F68-611BBA263564";
 				TARGETED_DEVICE_FAMILY = 1;
 				VALIDATE_PRODUCT = NO;
 				WRAPPER_EXTENSION = app;
@@ -668,7 +667,8 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Corinna Wiedmer-Symer";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/Frameworks\"",
@@ -682,7 +682,8 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
 				LIBRARY_SEARCH_PATHS = "";
 				PRODUCT_NAME = TwoFace;
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "D4CE8496-B32F-4D7E-B9CE-715F0C5E6BFF";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "03C8377E-FD2B-4172-997E-CD9EB0BF3908";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

@@ -21,7 +21,7 @@
 
 - (void)loadCaches {
     NSString *cd = [Settings cachesDirectory];
-    self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];;
+    self.twitterFriends = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"]];
     self.facebookFriends = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"]];
     self.invalidUsers = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"invalidUsers.plist"]];
     self.twitterIdToUsername = [NSMutableDictionary dictionaryWithContentsOfFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"]];
@@ -109,7 +109,6 @@
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
     return [dict objectForKey:linkURL];
 }
-
 
 + (void)setImage:(UIImage *)image forName:(NSString *)name {
     

@@ -7,7 +7,17 @@
 //
 
 #import "ViewController.h"
-#import "NSString+URLEncoding.h"
+#import "FHSTwitterEngine.h"
+
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, PullToRefreshViewDelegate> {
+    BOOL errorEncounteredWhileLoading;
+    BOOL finishedLoadingTwitter;
+    BOOL facebookDone;
+}
+
+@property (nonatomic, strong) UIRefreshControl *refreshControl;
+
+@end
 
 @implementation ViewController
 
@@ -25,9 +35,9 @@
     _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
     
-    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
-    [refreshControl addTarget:self action:@selector(refreshTimeline:) forControlEvents:UIControlEventValueChanged];
-    [_theTableView addSubview:refreshControl];
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [_refreshControl addTarget:self action:@selector(refreshTimeline:) forControlEvents:UIControlEventValueChanged];
+    [_theTableView addSubview:_refreshControl];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"TwoFace"];
@@ -149,7 +159,7 @@
     finishedLoadingTwitter = YES;
     facebookDone = YES;
     
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             [self clearImageCachesIfNecessary];
         }
@@ -254,7 +264,7 @@
     
     reqString = [reqString stringByAppendingString:@"]"];
     
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/?batch=%@&access_token=%@",[reqString URLEncodedString],ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/?batch=%@&access_token=%@",reqString.fhs_URLEncode,ad.facebook.accessToken];
     
     NSURL *url = [NSURL URLWithString:string];
     
@@ -329,159 +339,6 @@
     [self reflectCompletedFetchingIfDoneFetching];
 }
 
-//
-// Timeline Loading methods
-//
-
-/*- (void)reloadCommon {
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    
-    errorEncounteredWhileLoading = NO;
-    
-    AppDelegate *ad = [Settings appDelegate];
-        
-    if (!ad.facebook) {
-        [ad startFacebook];
-    } else {
-        if (![ad.facebook isSessionValid]) {
-            [ad tryLoginFromSavedCreds];
-        }
-    }
-    
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [[FHSTwitterEngine sharedEngine]loadAccessToken];
-    }
-    
-    if (![FHSTwitterEngine isConnectedToInternet]) {
-     //   [_pull finishedLoading];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
-     //   [_pull finishedLoading];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-
-    //[_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-}
-
-- (void)reloadCommonFetching {
-    NSMutableArray *usernameArrayTwitter = [Settings selectedTwitterUsernames];
-    NSArray *usernameArrayFacebook = [[Settings selectedFacebookFriends]allKeys];
-    
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-
-    if (![FHSTwitterEngine isConnectedToInternet]) {
-        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-       // [_pull finishedLoading];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-    
-    if (usernameArrayTwitter.count == 0 && usernameArrayFacebook.count == 0) {
-        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-       // [_pull finishedLoading];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    } else {
-        
-        [[[Cache sharedCache]timeline]removeAllObjects];
-        [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-        
-        if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-            [self getTweetsForUsernames:usernameArrayTwitter];
-        }
-        
-        if ([[[Settings appDelegate]facebook]isSessionValid]) {
-            [self fetchPostsForIDs:usernameArrayFacebook];
-        }
-    }
-}*/
-
-// 
-// PullToRefreshView Delegate
-//
-
-/*- (void)pullToRefreshViewWasShown:(PullToRefreshView *)view {
-    NSString *subtitle = @"";
-    AppDelegate *ad = [Settings appDelegate];
-    
-    NSMutableArray *usernameArrayTwitter = [Settings selectedTwitterUsernames];
-    NSArray *usernameArrayFacebook = [[Settings selectedFacebookFriends]allKeys];
-    
-    BOOL twitterIsAuthorized = [[FHSTwitterEngine sharedEngine]isAuthorized] && (usernameArrayTwitter.count > 0);
-    BOOL facebookIsSessionValid = [ad.facebook isSessionValid] && (usernameArrayFacebook.count > 0);
-    
-    if (twitterIsAuthorized && !facebookIsSessionValid) {
-        subtitle = @"Twitter";
-    }
-    
-    if (!twitterIsAuthorized && facebookIsSessionValid) {
-        subtitle = @"Facebook";
-    }
-    
-    if (twitterIsAuthorized && facebookIsSessionValid) {
-        subtitle = @"Twitter and Facebook";
-    }
-    
-    if (!twitterIsAuthorized && !facebookIsSessionValid) {
-        subtitle = @"Nothing to Load";
-    }
-
-    [_pull setSubtitleText:subtitle];
-}
-
-- (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view {
-    [self reloadCommon];
-    
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![[[Settings appDelegate]facebook]isSessionValid]) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-    
-    if (![FHSTwitterEngine isConnectedToInternet]) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        return;
-    }
-    
-    [self reloadCommonFetching];
-}
-
-//
-// Threaded Timeline Loading Methods
-//
-
-- (void)loadTimelineViewDidLoadThreaded {
-    dispatch_async(GCDBackgroundThread, ^{
-        @autoreleasepool {
-            dispatch_sync(GCDMainThread, ^{
-                @autoreleasepool {
-                    [self reloadCommon];
-                    
-                    if ([[Cache sharedCache]timeline].count > 0) {
-
-                        AppDelegate *ad = [Settings appDelegate];
-                        
-                        if (![ad.facebook isSessionValid]) {
-                            [ad removeFacebookFromTimeline];
-                        }
-                        
-                        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                            [ad removeTwitterFromTimeline];
-                        }
-                        
-                     //   [_pull finishedLoading];
-                    }
-                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-                }
-            });
-        }
-    });
-}*/
-
 - (void)reloadTableView {
     [_theTableView reloadData];
 }
@@ -491,10 +348,6 @@
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
 }
-
-//
-// Former IBActions
-//
 
 - (void)showVersion {
     AboutViewController *vc = [[AboutViewController alloc]init];
@@ -566,7 +419,7 @@
     finishedLoadingTwitter = NO;
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     
-    dispatch_async(GCDBackgroundThread, ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             
             NSMutableArray *tweets = [NSMutableArray array];
@@ -642,7 +495,7 @@
 
             finishedLoadingTwitter = YES;
             
-            dispatch_sync(GCDMainThread, ^{
+            dispatch_sync(dispatch_get_main_queue(), ^{
                 @autoreleasepool {
                     [self reflectCompletedFetchingIfDoneFetching];
                 };
@@ -704,12 +557,10 @@
     
     cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
     cell.detailTextLabel.numberOfLines = 0;
- //   cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
     
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
-    if (YES) {
-   // if (oneIsCorrect(_pull.state == kPullToRefreshViewStateLoading, timeline.count == 0)) {
+    if (oneIsCorrect(_refreshControl.isRefreshing, timeline.count == 0)) {
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
      //   cell.additionalLabel.text = nil;
@@ -717,7 +568,7 @@
         AppDelegate *ad = [Settings appDelegate];
         
         if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-            [ad loadAccessToken];
+            [[FHSTwitterEngine sharedEngine]loadAccessToken];
         }
             
         if (![ad.facebook isSessionValid]) {
@@ -729,7 +580,7 @@
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
             if (oneIsCorrect([[[Settings selectedFacebookFriends]allKeys]count] > 0, [[Settings selectedTwitterUsernames]count] > 0)) {
-                if (YES) {//if (_pull.state == kPullToRefreshViewStateNormal) {
+                if (!_refreshControl.isRefreshing) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";
                 } else {

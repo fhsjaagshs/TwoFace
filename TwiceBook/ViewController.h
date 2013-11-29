@@ -8,11 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ViewController : UIViewController <UITableViewDelegate, UITableViewDataSource, PullToRefreshViewDelegate> {
-    BOOL errorEncounteredWhileLoading;
-    BOOL finishedLoadingTwitter;
-    BOOL facebookDone;
-}
+@interface ViewController : UIViewController
 
 @property (strong, nonatomic) UITableView *theTableView;
 

@@ -7,11 +7,12 @@
 //
 
 #import "Tweet.h"
+#import "FHSTwitterEngine.h"
 
 @implementation Tweet
 
 - (NSString *)description {
-    return [self dictionaryValue];
+    return [self dictionaryValue].description;
 }
 
 - (NSDictionary *)dictionizeReplies {
@@ -25,7 +26,7 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    NSString *dateString = [[FHSTwitterEngine sharedEngine]stringFromDate:_createdAt?_createdAt:[NSDate date]];
+    NSString *dateString = [[[FHSTwitterEngine sharedEngine]dateFormatter]stringFromDate:_createdAt?_createdAt:[NSDate date]];
     NSArray *objects = [NSArray arrayWithObjects:_identifier?_identifier:@"",
                         dateString?dateString:@"",
                         _text?_text:@"",
@@ -61,7 +62,7 @@
     id created_at = [dictionary objectForKey:@"created_at"];
     
     if ([created_at isKindOfClass:[NSString class]]) {
-        self.createdAt = [[FHSTwitterEngine sharedEngine]getDateFromTwitterCreatedAt:created_at];
+        self.createdAt = [[[FHSTwitterEngine sharedEngine]dateFormatter]dateFromString:created_at];
     } else if ([created_at isKindOfClass:[NSDate class]]) {
         self.createdAt = (NSDate *)created_at;
     }

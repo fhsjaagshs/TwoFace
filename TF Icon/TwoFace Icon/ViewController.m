@@ -247,12 +247,11 @@ void drawF(CGContextRef context) {
     UIImage *iPhoneRetina = [image scaleToSize:CGSizeMake(114, 114)];
     UIImage *iPhone = [image scaleToSize:CGSizeMake(57, 57)];
     
-    [UIImagePNGRepresentation(image) writeToFile:@"/Users/wiedmersymer/Desktop/SwiftloadIconry/iTunesArtwork.png" atomically:YES];
-    [UIImagePNGRepresentation(iPadRetina) writeToFile:@"/Users/wiedmersymer/Desktop/SwiftloadIconry/icon~iPad@2x.png" atomically:YES];
-    [UIImagePNGRepresentation(iPad) writeToFile:@"/Users/wiedmersymer/Desktop/SwiftloadIconry/icon~iPad.png" atomically:YES];
-    [UIImagePNGRepresentation(iPhoneRetina) writeToFile:@"/Users/wiedmersymer/Desktop/SwiftloadIconry/icon@2x.png" atomically:YES];
-    [UIImagePNGRepresentation(iPhone) writeToFile:@"/Users/wiedmersymer/Desktop/SwiftloadIconry/icon.png" atomically:YES];
-	// Do any additional setup after loading the view, typically from a nib.
+    [UIImagePNGRepresentation(image) writeToFile:@"/Users/nathaniel/Desktop/TF_Icon/iTunesArtwork.png" atomically:YES];
+    [UIImagePNGRepresentation(iPadRetina) writeToFile:@"/Users/nathaniel/Desktop/TF_Icon/icon~iPad@2x.png" atomically:YES];
+    [UIImagePNGRepresentation(iPad) writeToFile:@"/Users/nathaniel/Desktop/TF_Icon/icon~iPad.png" atomically:YES];
+    [UIImagePNGRepresentation(iPhoneRetina) writeToFile:@"/Users/nathaniel/Desktop/TF_Icon/icon@2x.png" atomically:YES];
+    [UIImagePNGRepresentation(iPhone) writeToFile:@"/Users/nathaniel/Desktop/TF_Icon/icon.png" atomically:YES];
 }
 
 - (void)viewDidUnload
