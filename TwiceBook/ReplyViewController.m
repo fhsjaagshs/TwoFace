@@ -13,7 +13,7 @@
 
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[[Cache sharedCache]facebookFriends]objectForKey:_toID]componentsSeparatedByString:@" "]firstObjectA]];
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[Cache sharedCache]facebookFriends][_toID]componentsSeparatedByString:@" "]firstObjectA]];
 }
 
 - (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
@@ -60,7 +60,7 @@
     UIBarButtonItem *space = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     space.width = 5;
     
-    self.bar.items = [NSArray arrayWithObjects:[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showImageSelector)], space, [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(showDraftsBrowser)], nil];
+    self.bar.items = @[[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showImageSelector)], space, [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(showDraftsBrowser)]];
     
     if (!self.isFacebook) {
         self.charactersLeft = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 310, 44)];
@@ -158,7 +158,7 @@
     
     [self dismissModalViewControllerAnimated:YES];
     
-    self.imageFromCameraRoll = [info objectForKey:UIImagePickerControllerOriginalImage];
+    self.imageFromCameraRoll = info[UIImagePickerControllerOriginalImage];
     [self scaleImageFromCameraRoll];
     
     NSMutableArray *toolbarItems = [self.bar.items mutableCopy];
@@ -285,9 +285,9 @@
 - (void)moveTextViewForKeyboard:(NSNotification *)notification up:(BOOL)up {
     UIViewAnimationCurve animationCurve;
 
-    [[[notification userInfo]objectForKey:UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
-    NSTimeInterval animationDuration = [[[notification userInfo]objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    CGRect keyboardRect = [self.view convertRect:[[[notification userInfo]objectForKey:UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
+    [[notification userInfo][UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
+    NSTimeInterval animationDuration = [[notification userInfo][UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    CGRect keyboardRect = [self.view convertRect:[[notification userInfo][UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
     
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
@@ -326,8 +326,8 @@
     NSMutableArray *drafts = [Settings drafts];
     
     if ([drafts containsObject:_loadedDraft]) {
-        [[NSFileManager defaultManager]removeItemAtPath:[_loadedDraft objectForKey:@"thumbnailImagePath"] error:nil];
-        [[NSFileManager defaultManager]removeItemAtPath:[_loadedDraft objectForKey:@"imagePath"] error:nil];
+        [[NSFileManager defaultManager]removeItemAtPath:_loadedDraft[@"thumbnailImagePath"] error:nil];
+        [[NSFileManager defaultManager]removeItemAtPath:_loadedDraft[@"imagePath"] error:nil];
         [drafts removeObject:_loadedDraft];
         [drafts writeToFile:[Settings draftsPath] atomically:YES];
     }
@@ -342,8 +342,8 @@
     
     for (NSDictionary *dict in drafts) {
         
-        NSString *imageName = [[dict objectForKey:@"imagePath"]lastPathComponent];
-        NSString *thumbnailImageName = [[dict objectForKey:@"thumbnailImagePath"]lastPathComponent];
+        NSString *imageName = [dict[@"imagePath"]lastPathComponent];
+        NSString *thumbnailImageName = [dict[@"thumbnailImagePath"]lastPathComponent];
 
         if (imageName.length > 0) {
             [imagesToKeep addObject:imageName];
@@ -371,14 +371,14 @@
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     
-    NSString *thetoID = _isFacebook?_toID:[_loadedDraft objectForKey:@"toID"];
+    NSString *thetoID = _isFacebook?_toID:_loadedDraft[@"toID"];
     
     if (thetoID.length > 0) {
-        [dict setObject:thetoID forKey:@"toID"];
+        dict[@"toID"] = thetoID;
     }
     
     if (_replyZone.text.length > 0) {
-        [dict setObject:_replyZone.text forKey:@"text"];
+        dict[@"text"] = _replyZone.text;
     }
     
     if (self.imageFromCameraRoll) {
@@ -395,21 +395,21 @@
         } while ([[NSFileManager defaultManager]fileExistsAtPath:path]);
         
         [UIImageJPEGRepresentation(self.imageFromCameraRoll, 1.0) writeToFile:path atomically:YES];
-        [dict setObject:path forKey:@"imagePath"];
+        dict[@"imagePath"] = path;
         
         // Thumbnail
         NSString *thumbnailFilename = [path stringByReplacingOccurrencesOfString:@".jpg" withString:@"-thumbnail.jpg"];
         UIImage *thumbnail = [self.imageFromCameraRoll thumbnailImageWithSideOfLength:35];
         
         [UIImageJPEGRepresentation(thumbnail, 1.0) writeToFile:thumbnailFilename atomically:YES];
-        [dict setObject:thumbnailFilename forKey:@"thumbnailImagePath"];
+        dict[@"thumbnailImagePath"] = thumbnailFilename;
     }
     
     if (self.tweet) {
-        [dict setObject:self.tweet forKey:@"tweet"];
+        dict[@"tweet"] = self.tweet;
     }
     
-    [dict setObject:[NSDate date] forKey:@"time"];
+    dict[@"time"] = [NSDate date];
     
     [drafts addObject:dict];
     [drafts writeToFile:[Settings draftsPath] atomically:YES];
@@ -431,11 +431,11 @@
     self.bar.items = newItems;
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithDictionary:(NSDictionary *)notif.object];
-    self.replyZone.text = [dict objectForKey:@"text"];
+    self.replyZone.text = dict[@"text"];
     
-    self.imageFromCameraRoll = [UIImage imageWithContentsOfFile:[dict objectForKey:@"imagePath"]];
-    self.tweet = [dict objectForKey:@"tweet"];
-    self.toID = self.isFacebook?[dict objectForKey:@"toID"]:nil;
+    self.imageFromCameraRoll = [UIImage imageWithContentsOfFile:dict[@"imagePath"]];
+    self.tweet = dict[@"tweet"];
+    self.toID = self.isFacebook?dict[@"toID"]:nil;
     
     if (self.imageFromCameraRoll) {
         [self addImageToolbarItems];
@@ -466,10 +466,10 @@
         [ad showHUDWithTitle:@"Posting..."];
         
         NSMutableDictionary *params = [NSMutableDictionary dictionary];
-        [params setObject:self.replyZone.text forKey:@"message"];
+        params[@"message"] = self.replyZone.text;
         
         if (self.imageFromCameraRoll) {
-            [params setObject:UIImagePNGRepresentation(self.imageFromCameraRoll) forKey:@"source"];
+            params[@"source"] = UIImagePNGRepresentation(self.imageFromCameraRoll);
             
             if (self.toID.length == 0) {
                 [ad.facebook requestWithGraphPath:@"me/photos" andParams:params andHttpMethod:@"POST" andDelegate:self];
@@ -503,7 +503,7 @@
                                 [self.replyZone becomeFirstResponder];
                                 qAlert(@"Image Upload Failed", [NSString stringWithFormat:@"%@",[(NSError *)returnValue localizedDescription]]);
                             } else if ([returnValue isKindOfClass:[NSDictionary class]]) {
-                                NSString *link = [(NSDictionary *)returnValue objectForKey:@"url"];
+                                NSString *link = ((NSDictionary *)returnValue)[@"url"];
                                 self.replyZone.text = [[self.replyZone.text stringByTrimmingWhitespace]stringByAppendingFormat:@" %@",link];
                                 [self kickoffTweetPost];
                             }

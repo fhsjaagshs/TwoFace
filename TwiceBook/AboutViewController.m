@@ -48,7 +48,7 @@
     
     UILabel *version = [[UILabel alloc]initWithFrame:CGRectMake(0, 247, 320, 51)];
     version.font = [UIFont boldSystemFontOfSize:19];
-    version.text = [@"v" stringByAppendingString:[[[NSBundle mainBundle]infoDictionary]objectForKey:@"CFBundleVersion"]];
+    version.text = [@"v" stringByAppendingString:[[NSBundle mainBundle]infoDictionary][@"CFBundleVersion"]];
     version.textAlignment = UITextAlignmentCenter;
     version.backgroundColor = [UIColor clearColor];
     [self.view addSubview:version];

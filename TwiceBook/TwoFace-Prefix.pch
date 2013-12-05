@@ -38,6 +38,7 @@
     #import "Settings.h"
     #import "Cache.h"
     #import "Keychain.h"
+    #import "PostsClient.h"
 
     #import "TwitterUser.h"
     #import "Tweet.h"

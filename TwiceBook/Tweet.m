@@ -19,47 +19,43 @@
     NSMutableDictionary *replyDicts = [NSMutableDictionary dictionary];
     
     for (NSString *identifierKey in _replies.allKeys) {
-        [replyDicts setObject:[[_replies objectForKey:identifierKey]dictionaryValue] forKey:identifierKey];
+        replyDicts[identifierKey] = [_replies[identifierKey] dictionaryValue];
     }
     
     return replyDicts;
 }
 
 - (NSDictionary *)dictionaryValue {
-    NSString *dateString = [[[FHSTwitterEngine sharedEngine]dateFormatter]stringFromDate:_createdAt?_createdAt:[NSDate date]];
-    NSArray *objects = [NSArray arrayWithObjects:_identifier?_identifier:@"",
-                        dateString?dateString:@"",
-                        _text?_text:@"",
-                        _source?_source:@"",
-                        _inReplyToScreenName?_inReplyToScreenName:@"",
-                        _inReplyToUserIdentifier?_inReplyToUserIdentifier:@"",
-                        _inReplyToTweetIdentifier?_inReplyToTweetIdentifier:@"",
-                        [_user dictionaryValue],
-                        _isFavorited?@"true":@"false",
-                        _isRetweeted?@"true":@"false",
-                        [self dictionizeReplies],
-                        [_retweetedBy dictionaryValue]
-                        , @"twitter", nil];
-    
-    NSArray *keys = [NSArray arrayWithObjects:@"id_str", @"created_at", @"text", @"source", @"in_reply_to_screen_name", @"in_reply_to_user_id_str", @"in_reply_to_status_id_str", @"user", @"favorited", @"retweeted", @"replies", @"retweeted_by", @"snn", nil];
-    
-    return [NSDictionary dictionaryWithObjects:objects forKeys:keys];
+    return @{
+             @"id_str": _identifier?_identifier:@"",
+             @"created_at": [[[FHSTwitterEngine sharedEngine]dateFormatter]stringFromDate:_createdAt?_createdAt:[NSDate date]],
+             @"text": _text?_text:@"",
+             @"source": _source?_source:@"",
+             @"in_reply_to_screen_name": _inReplyToScreenName?_inReplyToScreenName:@"",
+             @"in_reply_to_user_id_str": _inReplyToUserIdentifier?_inReplyToUserIdentifier:@"",
+             @"in_reply_to_status_id_str": _inReplyToTweetIdentifier?_inReplyToTweetIdentifier:@"",
+             @"user": [_user dictionaryValue],
+             @"favorited": _isFavorited?@"true":@"false",
+             @"retweeted": _isRetweeted?@"true":@"false",
+             @"replies": [self dictionizeReplies],
+             @"retweeted_by": [_retweetedBy dictionaryValue],
+             @"snn": @"twitter"
+             };
 }
 
 - (void)addReply:(Tweet *)reply {
-    [_replies setObject:reply forKey:reply.identifier];
+    _replies[reply.identifier] = reply;
 }
 
 - (void)parseDictionary:(NSDictionary *)dictionary {
-    self.identifier = [dictionary objectForKey:@"id_str"];
+    self.identifier = dictionary[@"id_str"];
+    self.text = dictionary[@"text"];
+    self.source = dictionary[@"source"];
+    self.inReplyToScreenName = dictionary[@"in_reply_to_screen_name"];
+    self.inReplyToUserIdentifier = dictionary[@"in_reply_to_user_id_str"];
+    self.inReplyToTweetIdentifier = dictionary[@"in_reply_to_status_id_str"];
     
-    self.text = [dictionary objectForKey:@"text"];
-    self.source = [dictionary objectForKey:@"source"];
-    self.inReplyToScreenName = [dictionary objectForKey:@"in_reply_to_screen_name"];
-    self.inReplyToUserIdentifier = [dictionary objectForKey:@"in_reply_to_user_id_str"];
-    self.inReplyToTweetIdentifier = [dictionary objectForKey:@"in_reply_to_status_id_str"];
-    
-    id created_at = [dictionary objectForKey:@"created_at"];
+    id created_at = dictionary[@"created_at"];
     
     if ([created_at isKindOfClass:[NSString class]]) {
         self.createdAt = [[[FHSTwitterEngine sharedEngine]dateFormatter]dateFromString:created_at];
@@ -68,38 +64,37 @@
     }
     
     if (_inReplyToTweetIdentifier.length == 0) {
-        self.inReplyToTweetIdentifier = [NSString stringWithFormat:@"%@",[dictionary objectForKey:@"in_reply_to_status_id"]];
+        self.inReplyToTweetIdentifier = [NSString stringWithFormat:@"%@",dictionary[@"in_reply_to_status_id"]];
     }
     
-    self.isFavorited = [[dictionary objectForKey:@"favorited"]boolValue];
-    self.isRetweeted = [[dictionary objectForKey:@"retweeted"]boolValue];
+    self.isFavorited = [dictionary[@"favorited"] boolValue];
+    self.isRetweeted = [dictionary[@"retweeted"] boolValue];
     
-    self.user = [TwitterUser twitterUserWithDictionary:[dictionary objectForKey:@"user"]];
+    self.user = [TwitterUser twitterUserWithDictionary:dictionary[@"user"]];
     
-    self.replies = [dictionary objectForKey:@"replies"];
+    self.replies = dictionary[@"replies"];
     
     if (_replies == nil) {
         self.replies = [NSMutableDictionary dictionary];
     }
     
-    self.retweetedBy = [TwitterUser twitterUserWithDictionary:[dictionary objectForKey:@"retweeted_by"]];
+    self.retweetedBy = [TwitterUser twitterUserWithDictionary:dictionary[@"retweeted_by"]];
     
-    NSMutableDictionary *entities = [dictionary objectForKey:@"entities"];
-    
-    NSMutableDictionary *rt_status = [dictionary objectForKey:@"retweeted_status"];
+    NSMutableDictionary *entities = dictionary[@"entities"];
+    NSMutableDictionary *rt_status = dictionary[@"retweeted_status"];
     
     if (rt_status.allKeys.count > 0) {
-        NSString *retweetedUsername = [[rt_status objectForKey:@"user"]objectForKey:@"screen_name"];
-        NSString *retweetedText = [rt_status objectForKey:@"text"];
+        NSString *retweetedUsername = rt_status[@"user"][@"screen_name"];
+        NSString *retweetedText = rt_status[@"text"];
         
         if ([[_text substringToIndex:2]isEqualToString:@"RT"]) {
             if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
-                NSMutableDictionary *newEntities = [[dictionary objectForKey:@"retweeted_status"]objectForKey:@"entities"];
+                NSMutableDictionary *newEntities = dictionary[@"retweeted_status"][@"entities"];
                 if (newEntities.allKeys.count > 0) {
                     [rt_status removeObjectForKey:@"in_reply_to_screen_name"];
                     [rt_status removeObjectForKey:@"in_reply_to_user_id_str"];
                     [rt_status removeObjectForKey:@"in_reply_to_status_id_str"];
-                    [rt_status setObject:[_user dictionaryValue] forKey:@"retweeted_by"];
+                    rt_status[@"retweeted_by"] = [_user dictionaryValue];
                     [self parseDictionary:rt_status];
                     return;
                 }
@@ -108,31 +103,31 @@
     }
     
     if (entities.allKeys.count > 0) {
-        for (NSMutableDictionary *mediadict in [entities objectForKey:@"media"]) {
+        for (NSMutableDictionary *mediadict in entities[@"media"]) {
             
-            NSString *picTwitterComLink = [mediadict objectForKey:@"display_url"];
-            NSString *picTwitterURLtoReplace = [mediadict objectForKey:@"url"];
-            NSString *picTwitterComImageLink = [mediadict objectForKey:@"media_url"];
+            NSString *picTwitterComLink = mediadict[@"display_url"];
+            NSString *picTwitterURLtoReplace = mediadict[@"url"];
+            NSString *picTwitterComImageLink = mediadict[@"media_url"];
             
             BOOL hasTwitPicLink = (picTwitterComImageLink.length > 0);
             
             if (hasTwitPicLink) {
                 picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
                 self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-                [[[Cache sharedCache]pictwitterURLs]setObject:picTwitterComImageLink forKey:picTwitterComLink];
+                Cache.sharedCache.pictwitterURLs[picTwitterComLink] = picTwitterComImageLink;
             }
         }
         
-        NSArray *urlEntities = [entities objectForKey:@"urls"];
+        NSArray *urlEntities = entities[@"urls"];
         
         if (urlEntities.count > 0) {
             for (NSDictionary *entity in urlEntities) {
-                NSString *shortenedURL = [entity objectForKey:@"url"];
-                NSString *fullURL = [entity objectForKey:@"expanded_url"];
+                NSString *shortenedURL = entity[@"url"];
+                NSString *fullURL = entity[@"expanded_url"];
                 
                 NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""]componentsSeparatedByString:@"/"]firstObjectA]componentsSeparatedByString:@"."]lastObject];
                 
-                if (([dotWhatever isEqualToString:@"com"] || [dotWhatever isEqualToString:@"net"] || [dotWhatever isEqualToString:@"gov"] || [dotWhatever isEqualToString:@"us"] || [dotWhatever isEqualToString:@"me"] || [dotWhatever isEqualToString:@"org"] || [dotWhatever isEqualToString:@"edu"])) {
+                if ([@[@"com",@"net",@"gov",@"us",@"me",@"org",@"edu"] containsObject:dotWhatever]) {
                     fullURL = [fullURL stringByReplacingOccurrencesOfString:@"http://" withString:@""];
                 }
                 

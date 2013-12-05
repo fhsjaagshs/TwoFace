@@ -52,7 +52,7 @@
 - (void)updateRecipientCacheWithRecipients:(NSArray *)ids {
     // if setting recipients directly, no need to complete pending request
     self.activeRequest = nil;
-    self.allowedRecipients = (ids == nil)?[NSArray array]:[NSArray arrayWithArray:ids];
+    self.allowedRecipients = (ids == nil)?@[]:[NSArray arrayWithArray:ids];
 }
 
 - (BOOL)isFrictionlessEnabledForRecipient:(NSString *)fbid {
@@ -79,7 +79,7 @@
             fbidstr = (NSString *)fbid;
         } else {
             // unexpected type found in the array of fbids
-            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"items in fbids must be NSString or NSNumber" userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[fbid class], @"invalid class", nil]];
+            @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"items in fbids must be NSString or NSNumber" userInfo:@{@"invalid class": [fbid class]}];
         }
         
         // if we miss our cache once, we fail the set
@@ -99,10 +99,10 @@
     self.activeRequest = nil;
 
     NSMutableArray *recipients = [NSMutableArray array];
-    NSArray *data = [result objectForKey:@"data"];
+    NSArray *data = result[@"data"];
     
     for (NSDictionary *dict in data) {
-        [recipients addObject:[dict objectForKey:@"recipient_id"]];
+        [recipients addObject:dict[@"recipient_id"]];
     }
         
     self.allowedRecipients = recipients;        

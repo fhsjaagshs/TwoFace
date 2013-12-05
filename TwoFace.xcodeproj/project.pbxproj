@@ -70,6 +70,7 @@
 		F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE60183BF54100DD2544 /* Keychain.m */; };
 		F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */; };
 		F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */; };
+		F1E182B9184FBC92002ABBD9 /* PostsClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E182B8184FBC92002ABBD9 /* PostsClient.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -186,6 +187,8 @@
 		F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		F1E0A87F1699D8B8000054F3 /* UserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSelectorViewController.h; sourceTree = "<group>"; };
 		F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSelectorViewController.m; sourceTree = "<group>"; };
+		F1E182B7184FBC92002ABBD9 /* PostsClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostsClient.h; sourceTree = "<group>"; };
+		F1E182B8184FBC92002ABBD9 /* PostsClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostsClient.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -405,6 +408,8 @@
 			children = (
 				F1397B25175FDC3E00CC9EDA /* Cache.h */,
 				F1397B26175FDC3E00CC9EDA /* Cache.m */,
+				F1E182B7184FBC92002ABBD9 /* PostsClient.h */,
+				F1E182B8184FBC92002ABBD9 /* PostsClient.m */,
 				F13964F3175EB9710073EE5E /* Settings.h */,
 				F13964F4175EB9710073EE5E /* Settings.m */,
 				F1C8CE5F183BF54100DD2544 /* Keychain.h */,
@@ -514,6 +519,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1E182B9184FBC92002ABBD9 /* PostsClient.m in Sources */,
 				F129B66B157B8237005353EB /* main.m in Sources */,
 				F129B66F157B8237005353EB /* AppDelegate.m in Sources */,
 				F129B672157B8237005353EB /* ViewController.m in Sources */,

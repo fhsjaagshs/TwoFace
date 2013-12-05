@@ -215,7 +215,7 @@ static BOOL FBIsDeviceIPad() {
     if (params) {
         NSMutableArray* pairs = [NSMutableArray array];
         for (NSString *key in params.keyEnumerator) {
-            NSString *value = [params objectForKey:key];
+            NSString *value = params[key];
             NSString *escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(nil, (CFStringRef)value, nil, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8);
             [pairs addObject:[NSString stringWithFormat:@"%@=%@", key, escaped_value]];
             [escaped_value release];
@@ -361,7 +361,7 @@ static BOOL FBIsDeviceIPad() {
 - (void)showWebView {	
     UIWindow* window = [UIApplication sharedApplication].keyWindow;	
     if (!window) {	
-        window = [[UIApplication sharedApplication].windows objectAtIndex:0];	
+        window = ([UIApplication sharedApplication].windows)[0];	
     }	
     _modalBackgroundView.frame = window.frame;	
     [_modalBackgroundView addSubview:self];	
@@ -403,7 +403,7 @@ static BOOL FBIsDeviceIPad() {
             NSString * errorCode = [self getStringFromUrl:[url absoluteString] needle:@"error_code="];
             NSString * errorStr = [self getStringFromUrl:[url absoluteString] needle:@"error_msg="];
             if (errorCode) {
-                NSDictionary *errorData = [NSDictionary dictionaryWithObject:errorStr forKey:@"error_msg"];
+                NSDictionary *errorData = @{@"error_msg": errorStr};
                 NSError *error = [NSError errorWithDomain:@"facebookErrDomain" code:[errorCode intValue] userInfo:errorData];
                 [self dismissWithError:error animated:YES];
             } else {

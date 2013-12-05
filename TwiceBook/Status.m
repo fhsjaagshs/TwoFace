@@ -11,24 +11,24 @@
 @implementation Status
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:[_from dictionaryValue], [_to dictionaryValue], _identifier?_identifier:@"", _message?_message:@"", [NSString stringWithFormat:@"%f",_createdAt?[_createdAt timeIntervalSince1970]-1800:0], _type?_type:@"", _url?_url:@"", _subject?_subject:@"", _name?_name:@"", _thumbnailURL?_thumbnailURL:@"", _link?_link:@"", _pictureURL?_pictureURL:@"", _comments?_comments:@"", _actionsAvailable?_actionsAvailable:@"", _objectIdentifier?_objectIdentifier:@"", @"facebook", nil] forKeys:[NSArray arrayWithObjects:@"from", @"to", @"id", @"message", @"updated_time", @"type", @"url", @"subject", @"name", @"picture", @"link", @"embed_html_parsed", @"comments", @"actions_are_available", @"object_id", @"snn", nil]];
+    return @{@"from": [_from dictionaryValue], @"to": [_to dictionaryValue], @"id": _identifier?_identifier:@"", @"message": _message?_message:@"", @"updated_time": [NSString stringWithFormat:@"%f",_createdAt?[_createdAt timeIntervalSince1970]-1800:0], @"type": _type?_type:@"", @"url": _url?_url:@"", @"subject": _subject?_subject:@"", @"name": _name?_name:@"", @"picture": _thumbnailURL?_thumbnailURL:@"", @"link": _link?_link:@"", @"embed_html_parsed": _pictureURL?_pictureURL:@"", @"comments": _comments?_comments:@"", @"actions_are_available": _actionsAvailable?_actionsAvailable:@"", @"object_id": _objectIdentifier?_objectIdentifier:@"", @"snn": @"facebook"};
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {
-    self.from = [FacebookUser facebookUserWithDictionary:[dict objectForKey:@"from"]];
-    self.to = [FacebookUser facebookUserWithDictionary:[[[dict objectForKey:@"to"]objectForKey:@"data"]firstObjectA]];
-    self.identifier = [dict objectForKey:@"id"];
-    self.message = [[dict objectForKey:@"message"]stringByTrimmingWhitespace];
-    self.createdAt = [NSDate dateWithTimeIntervalSince1970:[[dict objectForKey:@"updated_time"]floatValue]+1800];
-    self.type = [dict objectForKey:@"type"];
-    self.url = [dict objectForKey:@"url"];
-    self.subject = [[dict objectForKey:@"subject"]stringByTrimmingWhitespace];
-    self.thumbnailURL = [dict objectForKey:@"picture"];
-    self.name = [[dict objectForKey:@"name"]stringByTrimmingWhitespace];
-    self.link = [dict objectForKey:@"link"];
-    self.pictureURL = [dict objectForKey:@"source"];
+    self.from = [FacebookUser facebookUserWithDictionary:dict[@"from"]];
+    self.to = [FacebookUser facebookUserWithDictionary:[dict[@"to"][@"data"]firstObjectA]];
+    self.identifier = dict[@"id"];
+    self.message = [dict[@"message"]stringByTrimmingWhitespace];
+    self.createdAt = [NSDate dateWithTimeIntervalSince1970:[dict[@"updated_time"]floatValue]+1800];
+    self.type = dict[@"type"];
+    self.url = dict[@"url"];
+    self.subject = [dict[@"subject"]stringByTrimmingWhitespace];
+    self.thumbnailURL = dict[@"picture"];
+    self.name = [dict[@"name"]stringByTrimmingWhitespace];
+    self.link = dict[@"link"];
+    self.pictureURL = dict[@"source"];
     
-    NSString *htmlString = [dict objectForKey:@"embed_html"];
+    NSString *htmlString = dict[@"embed_html"];
     
     if (htmlString.length > 0) {
         NSString *tempURL = nil;
@@ -48,22 +48,22 @@
     }
     
     if (_link.length == 0) {
-        self.link = [dict objectForKey:@"embed_html_parsed"];
+        self.link = dict[@"embed_html_parsed"];
     }
     
-    NSArray *actions = (NSArray *)[dict objectForKey:@"actions"];
+    NSArray *actions = (NSArray *)dict[@"actions"];
     
     if (actions) {
         self.actionsAvailable = (actions.count > 0)?@"yes":@"no";
     } else {
-        self.actionsAvailable = [dict objectForKey:@"actions_are_available"];
+        self.actionsAvailable = dict[@"actions_are_available"];
     }
     
-    self.objectIdentifier = [dict objectForKey:@"object_id"];
+    self.objectIdentifier = dict[@"object_id"];
     
     if (_message.length == 0) {
-        NSString *story = [dict objectForKey:@"story"];
-        NSString *description = [dict objectForKey:@"description"];
+        NSString *story = dict[@"story"];
+        NSString *description = dict[@"description"];
         
         if (description.length > 0) {
             self.message = description;
@@ -73,12 +73,12 @@
     }
     
     if ([_type isEqualToString:@"link"]) {
-        _message = [dict objectForKey:@"story"];
+        _message = dict[@"story"];
     }
     
     self.message = [_message stringByTrimmingWhitespace];
     
-    self.comments = [NSMutableArray arrayWithArray:[dict objectForKey:@"comments"]];
+    self.comments = [NSMutableArray arrayWithArray:dict[@"comments"]];
     
     /*
      NSMutableDictionary *restructured = [[NSMutableDictionary alloc]init];

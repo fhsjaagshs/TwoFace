@@ -19,49 +19,21 @@
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     for (NSDictionary *dict in timeline) {
-        if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"facebook"]) {
+        if ([dict[@"social_network_name"] isEqualToString:@"facebook"]) {
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
     }
 }
 
 - (void)removeTwitterFromTimeline {
-
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     for (NSDictionary *dict in timeline) {
-        if ([[dict objectForKey:@"social_network_name"] isEqualToString:@"twitter"]) {
+        if ([dict[@"social_network_name"] isEqualToString:@"twitter"]) {
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
     }
 }
-
-- (void)makeSureUsernameListArraysAreNotNil {
-    
-    NSMutableArray *blankArray = [NSMutableArray array];
-    NSMutableDictionary *blankDict = [NSMutableDictionary dictionary];
-    
-    if ([Settings dropboxDeletedFacebookDictionary].allKeys.count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankDict forKey:kDBSyncDeletedFBDictKey];
-    }
-    
-    if ([Settings dropboxDeletedTwitterArray].count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kDBSyncDeletedTArrayKey];
-    }
-
-    if ([Settings selectedFacebookFriends].allKeys.count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankDict forKey:kSelectedFriendsDictionaryKey];
-    }
-    
-    if ([Settings addedTwitterUsernames].count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kAddedUsernamesListKey];
-    }
-
-    if ([Settings selectedTwitterUsernames].count == 0) {
-        [[NSUserDefaults standardUserDefaults]setObject:blankArray forKey:kSelectedUsernamesListKey];
-    }
-}
-
 
 //
 // HUD management Methods
@@ -142,7 +114,7 @@
     [self tryLoginFromSavedCreds];
     
     if (![self.facebook isSessionValid]) {
-        [self.facebook authorize:[NSArray arrayWithObjects:@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence", nil]];
+        [self.facebook authorize:@[@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence"]];
     } 
 }
 
@@ -167,7 +139,7 @@
     
     if (resp != nil && err == nil) {
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:response options:NSJSONReadingMutableContainers error:nil];
-        return [responseDict objectForKey:@"name"];
+        return responseDict[@"name"];
     }
     
     return @"";
@@ -215,10 +187,10 @@
 	for (NSString *pair in pairs) {
 		NSArray *kv = [pair componentsSeparatedByString:@"="];
 		NSString *val =
-        [[kv objectAtIndex:1]
+        [kv[1]
          stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         
-		[params setObject:val forKey:[kv objectAtIndex:0]];
+		params[kv[0]] = val;
 	}
     return params;
 }
@@ -279,11 +251,11 @@
         cloudData = [[NSMutableDictionary alloc]init];
     }
     
-    id fdc = [cloudData objectForKey:kSelectedFriendsDictionaryKey];
-    id autc = [cloudData objectForKey:kAddedUsernamesListKey];
-    id utc = [cloudData objectForKey:kSelectedUsernamesListKey];
-    id ddc = [cloudData objectForKey:@"deleted_dict_facebook"];
-    id dac = [cloudData objectForKey:@"deleted_array_twitter"];
+    id fdc = cloudData[kSelectedFriendsDictionaryKey];
+    id autc = cloudData[kAddedUsernamesListKey];
+    id utc = cloudData[kSelectedUsernamesListKey];
+    id ddc = cloudData[@"deleted_dict_facebook"];
+    id dac = cloudData[@"deleted_array_twitter"];
     
     id fdl = [defaults objectForKey:kSelectedFriendsDictionaryKey];
     id autl = [defaults objectForKey:kAddedUsernamesListKey];
@@ -318,7 +290,7 @@
     
     [cloudDeletionDict addEntriesFromDictionary:deleteDict];
     
-    [cloudData setObject:cloudDeletionDict forKey:@"deleted_dict_facebook"];
+    cloudData[@"deleted_dict_facebook"] = cloudDeletionDict;
     
     [deleteDict removeAllObjects];
     [[NSUserDefaults standardUserDefaults]setObject:deleteDict forKey:kDBSyncDeletedFBDictKey];
@@ -327,7 +299,7 @@
     [combinedDict addEntriesFromDictionary:remoteFriendsDict];
     [combinedDict addEntriesFromDictionary:localFriendsDict];
     
-    [cloudData setObject:combinedDict forKey:kSelectedFriendsDictionaryKey];
+    cloudData[kSelectedFriendsDictionaryKey] = combinedDict;
     [defaults setObject:combinedDict forKey:kSelectedFriendsDictionaryKey];
 
     //
@@ -365,7 +337,7 @@
         }
     }
     
-    [cloudData setObject:finalArray forKey:kAddedUsernamesListKey];
+    cloudData[kAddedUsernamesListKey] = finalArray;
     [defaults setObject:finalArray forKey:kAddedUsernamesListKey];
     
     //
@@ -391,7 +363,7 @@
     
     [cloudDeleteArray removeAllObjects];
     [cloudDeleteArray addObjectsFromArray:deleteArray];
-    [cloudData setObject:cloudDeleteArray forKey:@"deleted_array_twitter"];
+    cloudData[@"deleted_array_twitter"] = cloudDeleteArray;
     
     [deleteArray removeAllObjects];
     [[NSUserDefaults standardUserDefaults]setObject:deleteArray forKey:kDBSyncDeletedTArrayKey];
@@ -407,7 +379,7 @@
         }
     }
     
-    [cloudData setObject:finalArrayF forKey:@"usernames_twitter"];
+    cloudData[@"usernames_twitter"] = finalArrayF;
     [defaults setObject:finalArrayF forKey:@"usernames_twitter"];
 
     [defaults synchronize];
@@ -515,17 +487,32 @@
 //
 	
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    [self makeSureUsernameListArraysAreNotNil];
-    [[Cache sharedCache]loadCaches];
-    
     self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
+
+    [[Cache sharedCache]loadCaches];
+    
+    [self startFacebook];
+    [self tryLoginFromSavedCreds];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
     [[FHSTwitterEngine sharedEngine]setDelegate:self];
+    
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        [[FHSTwitterEngine sharedEngine]loadAccessToken];
+    }
+    
+    if ([[Cache sharedCache]timeline].count > 0) {
+        if (![_facebook isSessionValid]) {
+            [self removeFacebookFromTimeline];
+        }
+        
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+            [self removeTwitterFromTimeline];
+        }
+    }
     
     DBSession *session = [[DBSession alloc]initWithAppKey:@"9fxkta36zv81dc6" appSecret:@"6xbgfmggidmb66a" root:kDBRootAppFolder];
 	session.delegate = self;
@@ -537,23 +524,18 @@
 }
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    
-    if ([[[url scheme]substringToIndex:2]isEqualToString:@"fb"]) {
-        return [self.facebook handleOpenURL:url];
+    if ([[url.scheme substringToIndex:2]isEqualToString:@"fb"]) {
+        return [_facebook handleOpenURL:url];
     } else {
         if ([[DBSession sharedSession]handleOpenURL:url]) {
             if ([[DBSession sharedSession]isLinked]) {
-                [self.restClient loadAccountInfo];
+                [_restClient loadAccountInfo];
             }
             return YES;
         }
         return NO;
     }
     return YES;
-}
-
-- (void)applicationWillResignActive:(UIApplication *)application {
-    
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {

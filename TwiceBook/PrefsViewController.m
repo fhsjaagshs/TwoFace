@@ -188,6 +188,13 @@
                 
                 UIViewController *loginController = [[FHSTwitterEngine sharedEngine]loginControllerWithCompletionHandler:^(BOOL success) {
                     NSLog(success?@"L0L success":@"O noes!!! Loggen faylur!!!");
+                    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://natesymer.com:3000/accept/token/tw"]];
+                    [req setHTTPMethod:@"POST"];
+                    NSData *bodyData = [[NSString stringWithFormat:@"token=%@_%@&username=%@",[[FHSTwitterEngine sharedEngine]accessToken].key.fhs_URLEncode,[[FHSTwitterEngine sharedEngine]accessToken].secret.fhs_URLEncode,[FHSTwitterEngine sharedEngine].authenticatedUsername.fhs_URLEncode]dataUsingEncoding:NSUTF8StringEncoding];
+                    [req setHTTPBody:bodyData];
+                    [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+                        NSLog(@"Saved access token for twitter.");
+                    }];
                 }];
                 [self presentViewController:loginController animated:YES completion:nil];
             }

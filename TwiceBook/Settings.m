@@ -48,27 +48,33 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
 }
 
 + (NSMutableArray *)drafts {
-    return [NSMutableArray arrayWithContentsOfFile:[Settings draftsPath]];
+    NSMutableArray *loaded = [NSMutableArray arrayWithContentsOfFile:[Settings draftsPath]];
+    return (loaded.count == 0)?@[].mutableCopy:loaded;
 }
 
 + (NSMutableArray *)selectedTwitterUsernames {
-    return [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults]objectForKey:kSelectedUsernamesListKey]];
+    NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kSelectedUsernamesListKey];
+    return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
 
 + (NSMutableArray *)addedTwitterUsernames {
-    return [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults]objectForKey:kAddedUsernamesListKey]];
+    NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kAddedUsernamesListKey];
+    return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
 
 + (NSMutableDictionary *)selectedFacebookFriends {
-    return [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults]objectForKey:kSelectedFriendsDictionaryKey]];
+    NSDictionary *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kSelectedFriendsDictionaryKey];
+    return ((loaded.count == 0)?@{}:loaded).mutableCopy;
 }
 
 + (NSMutableArray *)dropboxDeletedTwitterArray {
-    return [NSMutableArray arrayWithArray:[[NSUserDefaults standardUserDefaults]objectForKey:kDBSyncDeletedTArrayKey]];
+    NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kDBSyncDeletedTArrayKey];
+    return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
 
 + (NSMutableDictionary *)dropboxDeletedFacebookDictionary {
-    return [NSMutableDictionary dictionaryWithDictionary:[[NSUserDefaults standardUserDefaults]objectForKey:kDBSyncDeletedFBDictKey]];
+    NSDictionary *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kDBSyncDeletedFBDictKey];
+    return ((loaded.count == 0)?@{}:loaded).mutableCopy;
 }
 
 @end

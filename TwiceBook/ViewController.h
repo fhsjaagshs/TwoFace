@@ -10,9 +10,4 @@
 
 @interface ViewController : UIViewController
 
-@property (strong, nonatomic) UITableView *theTableView;
-
-- (void)getTweetsForUsernames:(NSArray *)usernames;
-- (BOOL)isLoadingPosts;
-
 @end

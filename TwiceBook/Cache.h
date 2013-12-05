@@ -21,6 +21,8 @@
 - (void)cache;
 - (void)loadCaches;
 
+- (void)sortTimeline;
+
 + (Cache *)sharedCache;
 
 + (void)clearImageCache;

@@ -50,9 +50,9 @@
 - (void)moveTextViewForKeyboard:(NSNotification*)notification up:(BOOL)up {
     UIViewAnimationCurve animationCurve;
     
-    [[[notification userInfo]objectForKey:UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
-    NSTimeInterval animationDuration = [[[notification userInfo]objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    CGRect keyboardRect = [self.view convertRect:[[[notification userInfo]objectForKey:UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
+    [[notification userInfo][UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
+    NSTimeInterval animationDuration = [[notification userInfo][UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    CGRect keyboardRect = [self.view convertRect:[[notification userInfo][UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
     
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];

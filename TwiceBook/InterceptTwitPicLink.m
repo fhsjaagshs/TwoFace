@@ -32,7 +32,7 @@
     }
     
     if (([extension isEqualToString:@"png"] || [extension isEqualToString:@"jpg"] || [extension isEqualToString:@"tif"] || [extension isEqualToString:@"jpe"] || [urlString containsString:@"pic.twitter.com/"])) {
-        NSString *newURL = [[[Cache sharedCache]pictwitterURLs]objectForKey:[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
+        NSString *newURL = [[Cache sharedCache]pictwitterURLs][[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
         if (newURL.length > 0) {
             urlString = newURL;
             url = [NSURL URLWithString:urlString];

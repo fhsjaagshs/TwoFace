@@ -231,7 +231,7 @@
                                     int index = [[[Cache sharedCache]timeline]indexOfObject:_tweet];
                                     if (index != INT_MAX) {
                                         [_tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
-                                        [[[Cache sharedCache]timeline]replaceObjectAtIndex:index withObject:_tweet];
+                                        [[Cache sharedCache]timeline][index] = _tweet;
                                     }
                                 }
                             }

@@ -69,10 +69,10 @@
         cell.accessoryView = imageView;
     }
 
-    NSDictionary *draft = [[Settings drafts]objectAtIndex:indexPath.row];
-    NSString *thumbnailImagePath = (NSString *)[draft objectForKey:@"thumbnailImagePath"];
+    NSDictionary *draft = [Settings drafts][indexPath.row];
+    NSString *thumbnailImagePath = (NSString *)draft[@"thumbnailImagePath"];
     
-    UIImage *image = [UIImage imageWithContentsOfFile:thumbnailImagePath.length?thumbnailImagePath:[draft objectForKey:@"imagePath"]];
+    UIImage *image = [UIImage imageWithContentsOfFile:thumbnailImagePath.length?thumbnailImagePath:draft[@"imagePath"]];
     
     if (image) {
         cell.accessoryView.hidden = NO;
@@ -81,8 +81,8 @@
         cell.accessoryView.hidden = YES;
     }
     
-    cell.textLabel.text = [[[draft objectForKey:@"time"]timeElapsedSinceCurrentDate]stringByAppendingString:@" ago"];
-    cell.detailTextLabel.text = [draft objectForKey:@"text"];
+    cell.textLabel.text = [[draft[@"time"]timeElapsedSinceCurrentDate]stringByAppendingString:@" ago"];
+    cell.detailTextLabel.text = draft[@"text"];
     
     return cell;
 }
@@ -98,7 +98,7 @@
     [draftsArray writeToFile:[Settings draftsPath] atomically:YES];
     
     [tableView beginUpdates];
-    [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObjects:[NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section], nil] withRowAnimation:UITableViewRowAnimationLeft];
+    [tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section]] withRowAnimation:UITableViewRowAnimationLeft];
     [tableView endUpdates];
 }
 
@@ -108,7 +108,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[[Settings drafts]objectAtIndex:indexPath.row]];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[Settings drafts][indexPath.row]];
     [self dismissModalViewControllerAnimated:YES];
 }
 

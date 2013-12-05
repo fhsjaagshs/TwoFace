@@ -67,14 +67,14 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     NSMutableArray *pairs = [NSMutableArray array];
     
     for (NSString *key in [params keyEnumerator]) {
-        if ([[params objectForKey:key]isKindOfClass:[UIImage class]] || [[params objectForKey:key]isKindOfClass:[NSData class]]) {
+        if ([params[key]isKindOfClass:[UIImage class]] || [params[key]isKindOfClass:[NSData class]]) {
             if ([httpMethod isEqualToString:@"GET"]) {
                 NSLog(@"can not use GET to upload a file");
             }
             continue;
         }
         
-        NSString *escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(nil, (CFStringRef)[params objectForKey:key], nil,(CFStringRef)@"!*'();:@&=+$,/?%#[]",kCFStringEncodingUTF8);
+        NSString *escaped_value = (NSString *)CFURLCreateStringByAddingPercentEscapes(nil, (CFStringRef)params[key], nil,(CFStringRef)@"!*'();:@&=+$,/?%#[]",kCFStringEncodingUTF8);
         [pairs addObject:[NSString stringWithFormat:@"%@=%@", key, escaped_value]];
         [escaped_value release];
     }
@@ -101,19 +101,19 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     
     for (id key in _params.keyEnumerator) {
         
-        if ([[_params objectForKey:key]isKindOfClass:[UIImage class]] || [[_params objectForKey:key]isKindOfClass:[NSData class]]) {
-            [dataDictionary setObject:[_params objectForKey:key] forKey:key];
+        if ([_params[key]isKindOfClass:[UIImage class]] || [_params[key]isKindOfClass:[NSData class]]) {
+            dataDictionary[key] = _params[key];
             continue;
         }
         
         [self utfAppendBody:body data:[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n",key]];
-        [self utfAppendBody:body data:[_params objectForKey:key]];
+        [self utfAppendBody:body data:_params[key]];
         [self utfAppendBody:body data:endLine];
     }
     
     if (dataDictionary.count > 0) {
         for (id key in dataDictionary) {
-            NSObject *dataParam = [dataDictionary objectForKey:key];
+            NSObject *dataParam = dataDictionary[key];
             if ([dataParam isKindOfClass:[UIImage class]]) {
                 NSData *imageData = UIImagePNGRepresentation((UIImage*)dataParam);
                 [self utfAppendBody:body data:[NSString stringWithFormat:@"Content-Disposition: form-data; filename=\"%@\"\r\n", key]];
@@ -146,10 +146,10 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     NSString *responseString = [[[NSString alloc]initWithData:data encoding:NSUTF8StringEncoding]autorelease];
     
     if ([responseString isEqualToString:@"true"]) {
-        return [NSDictionary dictionaryWithObject:@"true" forKey:@"result"];
+        return @{@"result": @"true"};
     } else if ([responseString isEqualToString:@"false"]) {
         if (error != nil) {
-            *error = [self formError:kGeneralErrorCode userInfo:[NSDictionary dictionaryWithObject:@"This operation can not be completed" forKey:@"error_msg"]];
+            *error = [self formError:kGeneralErrorCode userInfo:@{@"error_msg": @"This operation can not be completed"}];
         }
         return nil;
     }
@@ -161,27 +161,27 @@ static const NSTimeInterval kTimeoutInterval = 180.0;
     }
 
     if ([result isKindOfClass:[NSDictionary class]]) {
-        if ([result objectForKey:@"error"] != nil) {
+        if (result[@"error"] != nil) {
             if (error != nil) {
                 *error = [self formError:kGeneralErrorCode userInfo:result];
             }
             return nil;
         }
         
-        if ([result objectForKey:@"error_code"] != nil) {
+        if (result[@"error_code"] != nil) {
             if (error != nil) {
-                *error = [self formError:[[result objectForKey:@"error_code"]intValue]userInfo:result];
+                *error = [self formError:[result[@"error_code"]intValue]userInfo:result];
             }
             return nil;
         }
         
-        if ([result objectForKey:@"error_msg"] != nil) {
+        if (result[@"error_msg"] != nil) {
             if (error != nil) {
                 *error = [self formError:kGeneralErrorCode userInfo:result];
             }
         }
         
-        if ([result objectForKey:@"error_reason"] != nil) {
+        if (result[@"error_reason"] != nil) {
             if (error != nil) {
                 *error = [self formError:kGeneralErrorCode userInfo:result];
             }

@@ -52,7 +52,7 @@
     NSMutableArray *timelineTemp = [NSMutableArray arrayWithContentsOfFile:[cd stringByAppendingPathComponent:@"timelinecache.plist"]];
     
     for (NSDictionary *dict in timelineTemp) {
-        if ([[dict objectForKey:@"snn"] isEqualToString:@"twitter"]) {
+        if ([dict[@"snn"] isEqualToString:@"twitter"]) {
             [_timeline addObject:[Tweet tweetWithDictionary:dict]];
         } else {
             [_timeline addObject:[Status statusWithDictionary:dict]];
@@ -100,14 +100,14 @@
         dict = [NSMutableDictionary dictionary];
     }
     
-    [dict setObject:imageURL forKey:linkURL];
+    dict[linkURL] = imageURL;
     [dict writeToFile:writeLocation atomically:YES];
 }
 
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
     NSString *writeLocation = [[Settings cachesDirectory]stringByAppendingPathComponent:@"picTwitter_to_image_url.plist"];
     NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithContentsOfFile:writeLocation];
-    return [dict objectForKey:linkURL];
+    return dict[linkURL];
 }
 
 + (void)setImage:(UIImage *)image forName:(NSString *)name {
@@ -120,7 +120,7 @@
         return;
     }
     
-    name = [[[name pathComponents]objectAtIndex:0]stringByAppendingPathExtension:@"png"];
+    name = [[name pathComponents][0]stringByAppendingPathExtension:@"png"];
     [UIImagePNGRepresentation(image) writeToFile:[[Settings cachesDirectory]stringByAppendingPathComponent:name] atomically:YES];
 }
 
@@ -130,7 +130,7 @@
         return nil;
     }
     
-    imageName = [[[imageName pathComponents]objectAtIndex:0]stringByAppendingPathExtension:@"png"];
+    imageName = [[imageName pathComponents][0]stringByAppendingPathExtension:@"png"];
     return [UIImage imageWithContentsOfFile:[[Settings cachesDirectory]stringByAppendingPathComponent:imageName]];
 }
 
@@ -144,6 +144,21 @@
             [[NSFileManager defaultManager]removeItemAtPath:file error:nil];
         }
     }
+}
+
+- (void)sortTimeline {
+    [_timeline sortUsingComparator:^NSComparisonResult(id one, id two) {
+        float oneTime = [[one createdAt]timeIntervalSince1970];
+        float twoTime = [[two createdAt]timeIntervalSince1970];
+        
+        if (oneTime < twoTime) {
+            return (NSComparisonResult)NSOrderedDescending;
+        } else if (oneTime > twoTime) {
+            return (NSComparisonResult)NSOrderedAscending;
+        } else {
+            return (NSComparisonResult)NSOrderedSame;
+        }
+    }];
 }
 
 @end

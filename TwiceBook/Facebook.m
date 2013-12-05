@@ -285,10 +285,10 @@ static void *finishedContext = @"finishedContext";
 	for (NSString *pair in pairs) {
 		NSArray *kv = [pair componentsSeparatedByString:@"="];
 		NSString *val =
-    [[kv objectAtIndex:1]
+    [kv[1]
      stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 
-		[params setObject:val forKey:[kv objectAtIndex:0]];
+		params[kv[0]] = val;
 	}
   return params;
 }
@@ -416,11 +416,11 @@ static void *finishedContext = @"finishedContext";
     
     NSDictionary *params = [self parseURLParams:query];
     
-    NSString *accessToken = [params objectForKey:@"access_token"];
+    NSString *accessToken = params[@"access_token"];
     
     // If the URL doesn't contain the access token, an error has occurred.
     if (!accessToken) {
-        NSString *errorReason = [params objectForKey:@"error"];
+        NSString *errorReason = params[@"error"];
         
         // If the error response indicates that we should try again using Safari, open
         // the authorization dialog in Safari.
@@ -439,7 +439,7 @@ static void *finishedContext = @"finishedContext";
         // The facebook app may return an error_code parameter in case it
         // encounters a UIWebViewDelegate error. This should not be treated
         // as a cancel.
-        NSString *errorCode = [params objectForKey:@"error_code"];
+        NSString *errorCode = params[@"error_code"];
         
         BOOL userDidCancel =
         !errorCode && (!errorReason || [errorReason isEqualToString:@"access_denied"]);
@@ -448,7 +448,7 @@ static void *finishedContext = @"finishedContext";
     }
     
     // We have an access token, so parse the expiration date.
-    NSString *expTime = [params objectForKey:@"expires_in"];
+    NSString *expTime = params[@"expires_in"];
     NSDate *expirationDate = [NSDate distantFuture];
     if (expTime != nil) {
         int expVal = [expTime intValue];
@@ -512,12 +512,12 @@ static void *finishedContext = @"finishedContext";
  */
 - (FBRequest*)requestWithParams:(NSMutableDictionary *)params
                     andDelegate:(id <FBRequestDelegate>)delegate {
-    if ([params objectForKey:@"method"] == nil) {
+    if (params[@"method"] == nil) {
         NSLog(@"API Method must be specified");
         return nil;
     }
     
-    NSString * methodName = [params objectForKey:@"method"];
+    NSString * methodName = params[@"method"];
     [params removeObjectForKey:@"method"];
     
     return [self requestWithMethodName:methodName
@@ -691,15 +691,15 @@ static void *finishedContext = @"finishedContext";
     [_fbDialog release];
     
     NSString *dialogURL = [kDialogBaseURL stringByAppendingString:action];
-    [params setObject:@"touch" forKey:@"display"];
-    [params setObject:kSDKVersion forKey:@"sdk"];
-    [params setObject:kRedirectURL forKey:@"redirect_uri"];
+    params[@"display"] = @"touch";
+    params[@"sdk"] = kSDKVersion;
+    params[@"redirect_uri"] = kRedirectURL;
     
     if ([action isEqualToString:kLogin]) {
-        [params setObject:@"user_agent" forKey:@"type"];
+        params[@"type"] = @"user_agent";
         _fbDialog = [[FBLoginDialog alloc] initWithURL:dialogURL loginParams:params delegate:self];
     } else {
-        [params setObject:_appId forKey:@"app_id"];
+        params[@"app_id"] = _appId;
         if ([self isSessionValid]) {
             [params setValue:[self.accessToken stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
                       forKey:@"access_token"];
@@ -721,7 +721,7 @@ static void *finishedContext = @"finishedContext";
             }
 
             // set invisible if all recipients are enabled for frictionless requests
-            id fbid = [params objectForKey:@"to"];
+            id fbid = params[@"to"];
             if (fbid != nil) {
                 // if value parses as a json array expression get the list that way
                // SBJsonParser *parser = [[[SBJsonParser alloc] init] autorelease];
@@ -813,8 +813,8 @@ static void *finishedContext = @"finishedContext";
 - (void)request:(FBRequest *)request didLoad:(id)result {
     _isExtendingAccessToken = NO;
     _requestExtendingAccessToken = nil;
-    NSString* accessToken = [result objectForKey:@"access_token"];
-    NSString* expTime = [result objectForKey:@"expires_at"];
+    NSString* accessToken = result[@"access_token"];
+    NSString* expTime = result[@"expires_at"];
     
     if (accessToken == nil || expTime == nil) {
         return;

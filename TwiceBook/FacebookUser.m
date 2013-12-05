@@ -15,17 +15,17 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_identifier?_identifier:@"", _name?_name:@"", _profileURL?_profileURL:@"", _username?_username:@"", _bio?_bio:@"", _profilePictureURL?_profilePictureURL:@"", _website?_website:@"", nil] forKeys:[NSArray arrayWithObjects:@"id", @"name", @"link", @"username", @"bio", @"picture", @"website", nil]];
+    return @{@"id": _identifier?_identifier:@"", @"name": _name?_name:@"", @"link": _profileURL?_profileURL:@"", @"username": _username?_username:@"", @"bio": _bio?_bio:@"", @"picture": _profilePictureURL?_profilePictureURL:@"", @"website": _website?_website:@""};
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {
-    self.identifier = [dict objectForKey:@"id"];
-    self.name = [dict objectForKey:@"name"];
-    self.profileURL = [dict objectForKey:@"link"];
-    self.username = [dict objectForKey:@"username"];
-    self.bio = [dict objectForKey:@"bio"];
-    self.profilePictureURL = [dict objectForKey:@"picture"];
-    self.website = [dict objectForKey:@"website"];
+    self.identifier = dict[@"id"];
+    self.name = dict[@"name"];
+    self.profileURL = dict[@"link"];
+    self.username = dict[@"username"];
+    self.bio = dict[@"bio"];
+    self.profilePictureURL = dict[@"picture"];
+    self.website = dict[@"website"];
 }
 
 - (id)initWithDictionary:(NSDictionary *)dictionary {

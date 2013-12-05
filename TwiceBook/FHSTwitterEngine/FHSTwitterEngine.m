@@ -139,9 +139,9 @@ id removeNull(id rootObject) {
         [rootObject enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
             id sanitized = removeNull(obj);
             if (!sanitized) {
-                [sanitizedDictionary setObject:@"" forKey:key];
+                sanitizedDictionary[key] = @"";
             } else {
-                [sanitizedDictionary setObject:sanitized forKey:key];
+                sanitizedDictionary[key] = sanitized;
             }
         }];
         return [NSMutableDictionary dictionaryWithDictionary:sanitizedDictionary];
@@ -152,9 +152,9 @@ id removeNull(id rootObject) {
         [rootObject enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             id sanitized = removeNull(obj);
             if (!sanitized) {
-                [sanitizedArray replaceObjectAtIndex:[sanitizedArray indexOfObject:obj] withObject:@""];
+                sanitizedArray[[sanitizedArray indexOfObject:obj]] = @"";
             } else {
-                [sanitizedArray replaceObjectAtIndex:[sanitizedArray indexOfObject:obj] withObject:sanitized];
+                sanitizedArray[[sanitizedArray indexOfObject:obj]] = sanitized;
             }
         }];
         return [NSMutableArray arrayWithArray:sanitizedArray];
@@ -375,7 +375,7 @@ id removeNull(id rootObject) {
                 break;
         }
     }
-    NSString *pictemp = [NSString stringWithUTF8String:outputBuffer];
+    NSString *pictemp = @(outputBuffer);
     free(outputBuffer);
     return pictemp;
 }
@@ -1375,16 +1375,16 @@ id removeNull(id rootObject) {
     }
     
     if ([parsedJSONResponse isKindOfClass:[NSDictionary class]]) {
-        NSString *errorMessage = [parsedJSONResponse objectForKey:@"error"];
-        NSArray *errorArray = [parsedJSONResponse objectForKey:@"errors"];
+        NSString *errorMessage = parsedJSONResponse[@"error"];
+        NSArray *errorArray = parsedJSONResponse[@"errors"];
         if (errorMessage.length > 0) {
-            return [NSError errorWithDomain:errorMessage code:[[parsedJSONResponse objectForKey:@"code"]intValue] userInfo:[NSDictionary dictionaryWithObject:req forKey:@"request"]];
+            return [NSError errorWithDomain:errorMessage code:[parsedJSONResponse[@"code"]intValue] userInfo:@{@"request": req}];
         } else if (errorArray.count > 0) {
             if (errorArray.count > 1) {
-                return [NSError errorWithDomain:@"Multiple Errors" code:1337 userInfo:[NSDictionary dictionaryWithObject:req forKey:@"request"]];
+                return [NSError errorWithDomain:@"Multiple Errors" code:1337 userInfo:@{@"request": req}];
             } else {
-                NSDictionary *theError = [errorArray objectAtIndex:0];
-                return [NSError errorWithDomain:[theError objectForKey:@"message"] code:[[theError objectForKey:@"code"]integerValue] userInfo:[NSDictionary dictionaryWithObject:req forKey:@"request"]];
+                NSDictionary *theError = errorArray[0];
+                return [NSError errorWithDomain:theError[@"message"] code:[theError[@"code"]integerValue] userInfo:@{@"request": req}];
             }
         }
     }
@@ -1420,7 +1420,7 @@ id removeNull(id rootObject) {
     NSString *initialString = [array componentsJoinedByString:@","];
     
     if (array.count <= 100) {
-        return [NSArray arrayWithObjects:initialString, nil];
+        return @[initialString];
     }
     
     int offset = 0;
@@ -1430,7 +1430,7 @@ id removeNull(id rootObject) {
     NSMutableArray *reqStrs = [NSMutableArray array];
     
     for (int i = 1; i <= numberOfStrings; ++i) {
-        NSString *ninetyNinththItem = (NSString *)[array objectAtIndex:(i*100)-1];
+        NSString *ninetyNinththItem = (NSString *)array[(i*100)-1];
         NSRange range = [initialString rangeOfString:ninetyNinththItem];
         int endOffset = range.location+range.length;
         NSRange rangeOfAString = NSMakeRange(offset, endOffset-offset);
@@ -1845,8 +1845,8 @@ id removeNull(id rootObject) {
 		NSArray *keyValueArray = [tuple componentsSeparatedByString:@"="];
 		
 		if (keyValueArray.count >= 2) {
-			NSString *key = [keyValueArray objectAtIndex:0];
-			NSString *value = [keyValueArray objectAtIndex:1];
+			NSString *key = keyValueArray[0];
+			NSString *value = keyValueArray[1];
 			
 			if ([key isEqualToString:target]) {
                 return value;
@@ -2029,7 +2029,7 @@ id removeNull(id rootObject) {
 
 - (void)pasteboardChanged:(NSNotification *)note {
 	
-	if (![note.userInfo objectForKey:UIPasteboardChangedTypesAddedKey]) {
+	if (!(note.userInfo)[UIPasteboardChangedTypesAddedKey]) {
         return;
     }
     

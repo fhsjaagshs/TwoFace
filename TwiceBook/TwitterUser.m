@@ -15,26 +15,36 @@
 }
 
 - (NSDictionary *)dictionaryValue {
-    return [NSDictionary dictionaryWithObjects:[NSArray arrayWithObjects:_name?_name:@"", _userDescription?_userDescription:@"", _identifier?_identifier:@"", _profileImageURL?_profileImageURL:@"", _profileBackgroundImageURL?_profileBackgroundImageURL:@"", _location?_location:@"", _screename?_screename:@"", _url?_url:@"", _isFollowing?@"true":@"false", _isProtected?@"true":@"false", nil] forKeys:[NSArray arrayWithObjects:@"name", @"description", @"id_str", @"profile_image_url", @"profile_background_image_url", @"location", @"screen_name", @"url", @"following", @"protected", nil]];
+    return @{@"name": _name?_name:@"",
+             @"description": _userDescription?_userDescription:@"",
+             @"id_str": _identifier?_identifier:@"",
+             @"profile_image_url": _profileImageURL?_profileImageURL:@"",
+             @"profile_background_image_url": _profileBackgroundImageURL?_profileBackgroundImageURL:@"",
+             @"location": _location?_location:@"",
+             @"screen_name": _screename?_screename:@"",
+             @"url": _url?_url:@"",
+             @"following": _isFollowing?@"true":@"false",
+             @"protected": _isProtected?@"true":@"false"
+             };
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {
     
-    if (dict.allKeys.count == 0) {
+    if (dict.count == 0) {
         return;
     }
     
-    self.name = [dict objectForKey:@"name"];
-    self.userDescription = [dict objectForKey:@"description"];
-    self.identifier = [dict objectForKey:@"id_str"];
-    self.profileImageURL = [dict objectForKey:@"profile_image_url"];
-    self.profileBackgroundImageURL = [dict objectForKey:@"profile_background_image_url"];
-    self.location = [dict objectForKey:@"location"];
-    self.screename = [dict objectForKey:@"screen_name"];
-    self.url = [dict objectForKey:@"url"];
+    self.name = dict[@"name"];
+    self.userDescription = dict[@"description"];
+    self.identifier = dict[@"id_str"];
+    self.profileImageURL = dict[@"profile_image_url"];
+    self.profileBackgroundImageURL = dict[@"profile_background_image_url"];
+    self.location = dict[@"location"];
+    self.screename = dict[@"screen_name"];
+    self.url = dict[@"url"];
     
-    self.isFollowing = [[dict objectForKey:@"following"]boolValue];
-    self.isProtected = [[dict objectForKey:@"protected"]boolValue];
+    self.isFollowing = [dict[@"following"] boolValue];
+    self.isProtected = [dict[@"protected"] boolValue];
 }
 
 - (id)initWithDictionary:(NSDictionary *)dict {

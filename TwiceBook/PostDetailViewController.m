@@ -252,9 +252,9 @@
         } else {
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             NSDictionary *resultDict = [NSDictionary dictionaryWithDictionary:(NSDictionary *)result];
-            NSArray *images = [resultDict objectForKey:@"images"];
-            NSDictionary *imageContents = [NSDictionary dictionaryWithDictionary:(NSDictionary *)[images objectAtIndex:(images.count > 1)?1:0]];
-            [self getImageAtURL:[imageContents objectForKey:@"source"]];
+            NSArray *images = resultDict[@"images"];
+            NSDictionary *imageContents = [NSDictionary dictionaryWithDictionary:(NSDictionary *)images[(images.count > 1)?1:0]];
+            [self getImageAtURL:imageContents[@"source"]];
         }
     }];
 }
@@ -299,7 +299,7 @@
             
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             
-            NSArray *comments = [(NSDictionary *)result objectForKey:@"data"];
+            NSArray *comments = ((NSDictionary *)result)[@"data"];
             
             NSMutableArray *parsedComments = [[NSMutableArray alloc]init];
             
@@ -312,17 +312,17 @@
                 
                 NSMutableDictionary *comment = [[NSMutableDictionary alloc]init];
                 
-                NSString *postID = [rawComment objectForKey:@"id"];
-                NSString *posterName = [[rawComment objectForKey:@"from"]objectForKey:@"name"];
-                NSString *posterID = [[rawComment objectForKey:@"from"]objectForKey:@"id"];
-                NSString *message = [rawComment objectForKey:@"message"];
-                NSDate *created_time = [df dateFromString:[rawComment objectForKey:@"created_time"]];
+                NSString *postID = rawComment[@"id"];
+                NSString *posterName = rawComment[@"from"][@"name"];
+                NSString *posterID = rawComment[@"from"][@"id"];
+                NSString *message = rawComment[@"message"];
+                NSDate *created_time = [df dateFromString:rawComment[@"created_time"]];
                 
-                [comment setObject:created_time forKey:@"created_time"];
-                [comment setObject:postID forKey:@"post_id"];
-                [comment setObject:posterName forKey:@"poster_name"];
-                [comment setObject:posterID forKey:@"poster_id"];
-                [comment setObject:message forKey:@"message"];
+                comment[@"created_time"] = created_time;
+                comment[@"post_id"] = postID;
+                comment[@"poster_name"] = posterName;
+                comment[@"poster_id"] = posterID;
+                comment[@"message"] = message;
                 
                 [parsedComments addObject:comment];
             }
@@ -338,7 +338,7 @@
                 
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;
-                    [[[Cache sharedCache]timeline]replaceObjectAtIndex:index withObject:_post];
+                    [[Cache sharedCache]timeline][index] = _post;
                 }
             }
             
@@ -409,7 +409,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *cellText = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"message"];
+    NSString *cellText = (_post.comments)[indexPath.row][@"message"];
     UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
     CGSize constraintSize = CGSizeMake(300.0f, MAXFLOAT);
     CGSize labelSize = [cellText sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:UILineBreakModeWordWrap];
@@ -435,8 +435,8 @@
     cell.detailTextLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    cell.textLabel.text = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"poster_name"];
-    cell.detailTextLabel.text = [[_post.comments objectAtIndex:indexPath.row]objectForKey:@"message"];
+    cell.textLabel.text = (_post.comments)[indexPath.row][@"poster_name"];
+    cell.detailTextLabel.text = (_post.comments)[indexPath.row][@"message"];
     return cell;
 }
 
