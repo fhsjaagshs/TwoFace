@@ -86,9 +86,10 @@
     NSString *accessToken = params[@"access_token"];
     
     if (accessToken.length == 0) {
-        NSString *errorReason = params[@"error"];
-        BOOL userDidCancel = !params[@"error_code"] && (errorReason.length == 0 || [errorReason isEqualToString:@"access_denied"]);
-        [self fbDialogNotLogin:userDidCancel];
+        if ([_delegate respondsToSelector:@selector(facebookDidNotLogin:)]) {
+            NSString *errorReason = params[@"error"];
+            [_delegate facebookDidNotLogin:!params[@"error_code"] && (errorReason.length == 0 || [errorReason isEqualToString:@"access_denied"])];
+        }
         return YES;
     }
     
@@ -101,24 +102,15 @@
         }
     }
     
-    [self fbDialogLogin:accessToken expirationDate:expirationDate];
-    return YES;
-}
-
-- (void)fbDialogLogin:(NSString *)token expirationDate:(NSDate *)expirationDate {
-    self.accessToken = token;
+    self.accessToken = accessToken;
     self.expirationDate = expirationDate;
     self.tokenDate = [NSDate date];
     
     if ([_delegate respondsToSelector:@selector(facebookDidLogin)]) {
         [_delegate facebookDidLogin];
     }
-}
-
-- (void)fbDialogNotLogin:(BOOL)cancelled {
-    if ([_delegate respondsToSelector:@selector(facebookDidNotLogin:)]) {
-        [_delegate facebookDidNotLogin:cancelled];
-    }
+    
+    return YES;
 }
 
 - (NSDictionary *)parseURLParams:(NSString *)query {

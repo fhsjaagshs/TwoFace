@@ -12,7 +12,7 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, DBRestClientDelegate, DBSessionDelegate, FHSTwitterEngineAccessTokenDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate> {
     NSString *savedRev;
 }
 
@@ -29,11 +29,9 @@
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
 
 // Facebook
-//@property (strong, nonatomic) Facebook *facebook;
 
 - (void)loginFacebook;
 - (void)logoutFacebook;
-- (void)startFacebook;
 - (void)tryLoginFromSavedCreds;
 - (NSString *)getFacebookUsernameSync;
 

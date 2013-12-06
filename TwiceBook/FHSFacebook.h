@@ -14,7 +14,12 @@
 
 + (FHSFacebook *)shared;
 
+- (void)authorizeWithPermissions:(NSArray *)permissions;
+
 - (BOOL)isSessionValid;
+- (void)invalidateSession;
+- (BOOL)handleOpenURL:(NSURL *)url;
+- (void)extendAccessTokenIfNeeded;
 
 @property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, strong) NSDate *expirationDate;

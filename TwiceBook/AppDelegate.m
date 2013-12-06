@@ -9,6 +9,10 @@
 #import "AppDelegate.h"
 #import "FHSTwitterEngine.h"
 
+@interface AppDelegate () <DBRestClientDelegate, DBSessionDelegate, FHSTwitterEngineAccessTokenDelegate, FHSFacebookDelegate>
+
+@end
+
 @implementation AppDelegate
 
 - (void)reloadMainTableView {
@@ -81,18 +85,31 @@
 // Facebook
 //
 
+- (void)facebookDidLogin {
+    
+}
+
+- (void)facebookDidNotLogin:(BOOL)cancelled {
+    
+    if (!cancelled) {
+        [self clearFriends];
+        [self clearFBAccessToken];
+        qAlert(@"Login Failed", @"Please try again.");
+    }
+}
+
 - (void)clearFBAccessToken {
     [Keychain removeObjectForKey:kFacebookAccessTokenKey];
 }
 
 - (void)tryLoginFromSavedCreds {
-    if ([self.facebook isSessionValid]) {
+    if (FHSFacebook.shared.isSessionValid) {
         return;
     }
     
     NSDictionary *creds = [Keychain objectForKey:kFacebookAccessTokenKey];
-    _facebook.accessToken = creds[@"access_token"];
-    _facebook.expirationDate = creds[@"expiration_date"];
+    FHSFacebook.shared.accessToken = creds[@"access_token"];
+    FHSFacebook.shared.expirationDate = creds[@"expiration_date"];
 }
 
 - (void)saveFBAccessToken:(NSString *)accessToken andExpirationDate:(NSDate *)date {
@@ -102,24 +119,15 @@
 - (void)logoutFacebook {
     [self clearFBAccessToken];
     [self clearFriends];
-    [_facebook logout];
+    [FHSFacebook.shared invalidateSession];
 }
 
 - (void)loginFacebook {
     [self tryLoginFromSavedCreds];
     
-    if ([self.facebook isSessionValid]) {
-        return;
-    }
-    
-    if (![self.facebook isSessionValid]) {
-        [self.facebook authorize:@[@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence"]];
+    if (!FHSFacebook.shared.isSessionValid) {
+        [FHSFacebook.shared authorizeWithPermissions:@[@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence"]];
     } 
-}
-
-- (void)startFacebook {
-    self.facebook = [[Facebook alloc]initWithAppId:@"314352998657355" andDelegate:self];
-    [self tryLoginFromSavedCreds];
 }
 
 - (void)clearFriends {
@@ -127,7 +135,7 @@
 }
 
 - (NSString *)getFacebookUsernameSync {
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",_facebook.accessToken]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",FHSFacebook.shared.accessToken]];
     
     NSError *err = nil;
     NSURLResponse *resp = nil;
@@ -150,7 +158,7 @@
 }
 
 - (void)fbDidLogin {
-    [self saveFBAccessToken:self.facebook.accessToken andExpirationDate:self.facebook.expirationDate];
+    [self saveFBAccessToken:FHSFacebook.shared.accessToken andExpirationDate:FHSFacebook.shared.expirationDate];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }
 
@@ -471,7 +479,8 @@
 
     [[Cache sharedCache]loadCaches];
     
-    [self startFacebook];
+    [FHSFacebook.shared setAppID:@"314352998657355"];
+    [FHSFacebook.shared setDelegate:self];
     [self tryLoginFromSavedCreds];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
@@ -482,7 +491,7 @@
     }
     
     if ([[Cache sharedCache]timeline].count > 0) {
-        if (![_facebook isSessionValid]) {
+        if (!FHSFacebook.shared.isSessionValid) {
             [self removeFacebookFromTimeline];
         }
         
@@ -502,7 +511,7 @@
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
     if ([[url.scheme substringToIndex:2]isEqualToString:@"fb"]) {
-        return [_facebook handleOpenURL:url];
+        return [FHSFacebook.shared handleOpenURL:url];
     } else {
         if ([[DBSession sharedSession]handleOpenURL:url]) {
             if ([[DBSession sharedSession]isLinked]) {
@@ -525,7 +534,7 @@
         [[FHSTwitterEngine sharedEngine]loadAccessToken];
     }
     
-    if (![self.facebook isSessionValid]) {
+    if (!FHSFacebook.shared.isSessionValid) {
         [self tryLoginFromSavedCreds];
     }
     [[NSNotificationCenter defaultCenter]postNotificationName:kEnteringForegroundNotif object:nil];

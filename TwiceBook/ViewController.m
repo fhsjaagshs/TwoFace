@@ -52,38 +52,7 @@
     [self.view addSubview:button];
     [self.view bringSubviewToFront:button];
     
-    [self initialTimelineCacheHit];
-    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadTableView) name:@"reloadTableView" object:nil];
-}
-
-- (void)initialTimelineCacheHit {
-
-    AppDelegate *ad = [Settings appDelegate];
-    
-    if (!ad.facebook) {
-        [ad startFacebook];
-    }
-    
-    if (![ad.facebook isSessionValid]) {
-        [ad tryLoginFromSavedCreds];
-    }
-    
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [[FHSTwitterEngine sharedEngine]loadAccessToken];
-    }
-    
-    if ([[Cache sharedCache]timeline].count > 0) {
-        if (![ad.facebook isSessionValid]) {
-            [ad removeFacebookFromTimeline];
-        }
-        
-        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-            [ad removeTwitterFromTimeline];
-        }
-    }
-
-    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
 - (void)refreshTimeline {
@@ -91,20 +60,16 @@
         [_refreshControl endRefreshing];
         return;
     }
-
-    if (!Settings.appDelegate.facebook) {
-        [Settings.appDelegate startFacebook];
-    } else {
-        if (![Settings.appDelegate.facebook isSessionValid]) {
-            [Settings.appDelegate tryLoginFromSavedCreds];
-        }
+    
+    if (!FHSFacebook.shared.isSessionValid) {
+        [Settings.appDelegate tryLoginFromSavedCreds];
     }
     
     if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
         [[FHSTwitterEngine sharedEngine]loadAccessToken];
     }
     
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![Settings.appDelegate.facebook isSessionValid]) {
+    if (![[FHSTwitterEngine sharedEngine]isAuthorized] && !FHSFacebook.shared.isSessionValid) {
         [_refreshControl endRefreshing];
         return;
     }
@@ -122,7 +87,6 @@
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             @autoreleasepool {
-                
                 [self clearImageCachesIfNecessary];
                 
                 BOOL returnValue = YES;
@@ -131,14 +95,12 @@
                     returnValue = [PostsClient loadTweetsForUsernames:usernameArrayTwitter];
                 }
                 
-                if ([Settings.appDelegate.facebook isSessionValid]) {
+                if (FHSFacebook.shared.isSessionValid) {
                     BOOL retValFB = [PostsClient loadPostsForIDs:usernameArrayFacebook];
                     if (returnValue) {
                         returnValue = retValFB;
                     }
                 }
-                
-                [[Cache sharedCache]sortTimeline];
                 
                 if ([[Cache sharedCache]invalidUsers].count > 0) {
                     NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
@@ -159,6 +121,8 @@
                     [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
                     [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
                 }
+                
+                [[Cache sharedCache]sortTimeline];
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
@@ -248,11 +212,11 @@
             [[FHSTwitterEngine sharedEngine]loadAccessToken];
         }
             
-        if (![ad.facebook isSessionValid]) {
+        if (!FHSFacebook.shared.isSessionValid) {
             [ad tryLoginFromSavedCreds];
         }
         
-        if (![[FHSTwitterEngine sharedEngine]isAuthorized] && ![ad.facebook isSessionValid]) {
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized] && !FHSFacebook.shared.isSessionValid) {
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
@@ -362,7 +326,7 @@
     AppDelegate *ad = [Settings appDelegate];
     
     BOOL twitter = [[FHSTwitterEngine sharedEngine]isAuthorized];
-    BOOL facebook = [ad.facebook isSessionValid];
+    BOOL facebook = FHSFacebook.shared.isSessionValid;
     
     if (twitter) {
         [as addButtonWithTitle:@"Tweet"];

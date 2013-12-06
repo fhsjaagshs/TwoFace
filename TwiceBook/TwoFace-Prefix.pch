@@ -11,9 +11,9 @@
 
     #import "HelperFunctions.h"
 
-    //#import "Facebook.h"
     #import <DropboxSDK/DropboxSDK.h>
     #import "FHSTwitterEngine.h"
+    #import "FHSFacebook.h"
 
     #import "AdditionalLabelCell.h"
     #import "FHSGradientView.h"

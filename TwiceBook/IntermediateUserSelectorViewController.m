@@ -62,7 +62,7 @@
         } 
     } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Facebook";
-        BOOL authorized = [[[Settings appDelegate]facebook]isSessionValid];
+        BOOL authorized = FHSFacebook.shared.isSessionValid;
         cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[[Settings selectedFacebookFriends]allKeys]count]]:@"Login Required";
         
         if (!authorized) {
@@ -79,7 +79,7 @@
             [self presentModalViewController:userSelector animated:YES];
         }
     } else if (indexPath.row == 1) {
-        if ([[[Settings appDelegate]facebook]isSessionValid]) {
+        if (FHSFacebook.shared.isSessionValid) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:YES];
             [self presentModalViewController:userSelector animated:YES];
         }
