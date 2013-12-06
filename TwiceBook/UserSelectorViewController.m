@@ -92,10 +92,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)loadFacebookFriends {
-    
-    AppDelegate *ad = [Settings appDelegate];
-
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me/fql?access_token=%@&q=%@",ad.facebook.accessToken, encodeForURL(fqlFriendsOrdered)]];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me/fql?access_token=%@&q=%@",FHSFacebook.shared.accessToken, fqlFriendsOrdered.fhs_URLEncode]];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:url];
     [req setHTTPMethod:@"GET"];
@@ -596,7 +593,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     
     if (_isFacebook) {
         
-        if (![ad.facebook isSessionValid]) {
+        if (!FHSFacebook.shared.isSessionValid) {
             [ad tryLoginFromSavedCreds];
         }
         
@@ -616,7 +613,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         }
         
         if ([[Cache sharedCache]facebookFriends].allKeys.count == 0) {
-            if ([ad.facebook isSessionValid]) {
+            if (FHSFacebook.shared.isSessionValid) {
                 [ad showHUDWithTitle:@"Loading..."];
                 [self loadFacebookFriends];
             }

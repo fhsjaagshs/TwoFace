@@ -77,7 +77,7 @@
         NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]authenticatedUsername];
         NSString *fbUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"fbName"];
         
-        if (fbUsername.length == 0 && [ad.facebook isSessionValid]) {
+        if (fbUsername.length == 0 && FHSFacebook.shared.isSessionValid) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
                     NSString *theName = [ad getFacebookUsernameSync];
@@ -130,14 +130,12 @@
     
     int section = indexPath.section;
     int row = indexPath.row;
-    
-    AppDelegate *ad = [Settings appDelegate];
-    
+ 
     if (section == 0) {
         if (row == 0) {
             cell.textLabel.text = FHSTwitterEngine.sharedEngine.isAuthorized?@"Log out of Twitter":@"Sign into Twitter";
         } else {
-            cell.textLabel.text = ad.facebook.isSessionValid?@"Log out of Facebook":@"Sign into Facebook";
+            cell.textLabel.text = FHSFacebook.shared.isSessionValid?@"Log out of Facebook":@"Sign into Facebook";
         }
     } else if (section == 1) {
         cell.textLabel.text = @"Select Users to Watch";
@@ -183,7 +181,7 @@
                 [self presentViewController:loginController animated:YES completion:nil];
             }
         } else if (row == 1) {
-            if ([ad.facebook isSessionValid]) {
+            if (FHSFacebook.shared.isSessionValid) {
                 [ad logoutFacebook];
                 [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"fbName"];
             } else {
@@ -214,7 +212,7 @@
     
     BOOL shouldReload = NO;
     
-    if (![ad.facebook isSessionValid]) {
+    if (!FHSFacebook.shared.isSessionValid) {
         [ad removeFacebookFromTimeline];
         shouldReload = YES;
     }

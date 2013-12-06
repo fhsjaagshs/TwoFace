@@ -25,7 +25,7 @@
     
     NSString *reqString = [NSString stringWithFormat:@"[%@]",[reqs componentsJoinedByString:@","]];
     
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/?batch=%@&access_token=%@",reqString.fhs_URLEncode,Settings.appDelegate.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/?batch=%@&access_token=%@",reqString.fhs_URLEncode,FHSFacebook.shared.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
     [req setHTTPMethod:@"POST"];

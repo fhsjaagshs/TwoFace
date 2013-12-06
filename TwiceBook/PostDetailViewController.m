@@ -225,9 +225,7 @@
     [self.view bringSubviewToFront:aiv];
     [aiv startAnimating];
     
-    AppDelegate *ad = [Settings appDelegate];
-    
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL(_post.objectIdentifier),ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/?&type=normal&access_token=%@", encodeForURL(_post.objectIdentifier),FHSFacebook.shared.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
     [req setHTTPMethod:@"GET"];
@@ -236,10 +234,10 @@
         
         self.isLoadingComments = NO;
         
-        if (![ad.facebook isPendingRequests]) {
-            if (!_isLoadingImage) {
-                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            }
+        // check for pending requests
+        
+        if (!_isLoadingImage) {
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         }
         
         if (error) {
@@ -277,9 +275,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     self.isLoadingComments = YES;
     
-    AppDelegate *ad = [Settings appDelegate];
-    
-    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL(_post.identifier),ad.facebook.accessToken];
+    NSString *string = [NSString stringWithFormat:@"https://graph.facebook.com/%@/comments?&access_token=%@", encodeForURL(_post.identifier),FHSFacebook.shared.accessToken];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:string]];
     [req setHTTPMethod:@"GET"];
@@ -288,10 +284,10 @@
         
         self.isLoadingComments = NO;
         
-        if (![ad.facebook isPendingRequests]) {
-            if (!self.isLoadingImage) {
-                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            }
+        // check for pending requests
+        
+        if (!self.isLoadingImage) {
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         }
         
         if (!error) {
@@ -358,10 +354,10 @@
         NSData *data = [NSData dataWithContentsOfFile:cachepath];
         [_theImageView setImage:[UIImage imageWithData:data]];
 
-        if (![[[Settings appDelegate]facebook]isPendingRequests]) {
-            if (!_isLoadingComments) {
-                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            }
+        // check for pending requests somehow
+        
+        if (!_isLoadingComments) {
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         }
         [self layoutViews];
     } else {
@@ -394,10 +390,9 @@
 
             _isLoadingImage = NO;
             
-            if (![[[Settings appDelegate]facebook]isPendingRequests]) {
-                if (!_isLoadingComments) {
-                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                }
+            // check for pending requests
+            if (!_isLoadingComments) {
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             }
             [self layoutViews];
         }];
@@ -450,7 +445,7 @@
 }
 
 - (void)close {
-    [[[Settings appDelegate]facebook]cancelAllRequests];
+    //[[[Settings appDelegate]facebook]cancelAllRequests];
     [[NSNotificationCenter defaultCenter]removeObserver:self];
     [self dismissModalViewControllerAnimated:YES];
 }

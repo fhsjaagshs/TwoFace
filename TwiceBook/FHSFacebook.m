@@ -8,6 +8,8 @@
 
 #import "FHSFacebook.h"
 
+static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
+
 @interface FHSFacebook ()
 
 @property (nonatomic, assign) BOOL isExtendingAccessToken;
@@ -39,6 +41,29 @@
     for (NSHTTPCookie *cookie in facebookCookies) {
         [cookies deleteCookie:cookie];
     }
+}
+
+- (NSMutableURLRequest *)generateRequestWithURL:(NSString *)baseURL params:(NSMutableDictionary *)params HTTPMethod:(NSString *)httpMethod {
+    NSString *url = [[self class]serializeURL:baseURL params:params httpMethod:@"GET"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:30.0f];
+    [request setHTTPMethod:httpMethod];
+    
+    if ([httpMethod isEqualToString: @"POST"]) {
+        NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",kStringBoundary];
+        [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
+        [request setHTTPBody:[self generatePostBody:params]];
+    }
+    
+    [params setValue:@"json" forKey:@"format"];
+    [params setValue:@"ios" forKey:@"sdk"];
+    [params setValue:@"2" forKey:@"sdk_version"];
+    if ([self isSessionValid]) {
+        [params setValue:_accessToken forKey:@"access_token"];
+    }
+    
+    [self extendAccessTokenIfNeeded];
+    
+    return request;
 }
 
 - (NSString *)baseURL {
@@ -181,6 +206,45 @@
     }
     
     return [NSString stringWithFormat:@"%@%@%@", baseUrl, queryPrefix, [pairs componentsJoinedByString:@"&"]];
+}
+
+- (NSMutableData *)generatePostBody:(NSMutableDictionary *)params {
+    NSMutableData *body = [NSMutableData data];
+    NSData *endLine = [[NSString stringWithFormat:@"\r\n--%@\r\n", kStringBoundary]dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableDictionary *dataDictionary = [NSMutableDictionary dictionary];
+    
+    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", kStringBoundary]dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    for (id key in params.keyEnumerator) {
+        
+        if ([params[key]isKindOfClass:[UIImage class]] || [params[key]isKindOfClass:[NSData class]]) {
+            dataDictionary[key] = params[key];
+            continue;
+        }
+        
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"%@\"\r\n\r\n",key]dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[params[key] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:endLine];
+    }
+    
+    if (dataDictionary.count > 0) {
+        for (id key in dataDictionary) {
+            NSObject *dataParam = dataDictionary[key];
+            if ([dataParam isKindOfClass:[UIImage class]]) {
+                NSData *imageData = UIImagePNGRepresentation((UIImage *)dataParam);
+                [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; filename=\"%@\"\r\n", key] dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[@"Content-Type: image/png\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:imageData];
+            } else {
+                NSAssert([dataParam isKindOfClass:[NSData class]], @"dataParam must be a UIImage or NSData");
+                [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; filename=\"%@\"\r\n", key]dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:[@"Content-Type: content/unknown\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+                [body appendData:(NSData *)dataParam];
+            }
+            [body appendData:endLine];
+        }
+    }
+    return body;
 }
 
 @end

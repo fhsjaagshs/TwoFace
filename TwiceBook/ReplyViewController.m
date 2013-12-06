@@ -16,17 +16,6 @@
     _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[Cache sharedCache]facebookFriends][_toID]componentsSeparatedByString:@" "]firstObjectA]];
 }
 
-- (void)request:(FBRequest *)request didFailWithError:(NSError *)error {
-    [self dismissModalViewControllerAnimated:YES];
-    qAlert(@"Status Update Error", (error.localizedDescription.length == 0)?@"Confirm that you are logged in correctly and try again.":error.localizedDescription);
-    [self saveDraft];
-}
-
-- (void)request:(FBRequest *)request didLoad:(id)result {
-    [self dismissModalViewControllerAnimated:YES];
-    [self deletePostedDraft];
-}
-
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
@@ -453,37 +442,37 @@
 }
 
 - (void)sendReply {
-    if (self.replyZone.text.length == 0) {
-        if (self.isFacebook) {
-            return;
-        }
+    if (_replyZone.text.length == 0 && _isFacebook) {
+        return;
     }
     
     AppDelegate *ad = [Settings appDelegate];
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     
-    if (self.isFacebook) {
+    if (_isFacebook) {
         [ad showHUDWithTitle:@"Posting..."];
         
-        NSMutableDictionary *params = [NSMutableDictionary dictionary];
-        params[@"message"] = self.replyZone.text;
+        NSMutableDictionary *params = @{ @"message":_replyZone.text }.mutableCopy;
         
-        if (self.imageFromCameraRoll) {
-            params[@"source"] = UIImagePNGRepresentation(self.imageFromCameraRoll);
-            
-            if (self.toID.length == 0) {
-                [ad.facebook requestWithGraphPath:@"me/photos" andParams:params andHttpMethod:@"POST" andDelegate:self];
-            } else {
-                [ad.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/photos",self.toID] andParams:params andHttpMethod:@"POST" andDelegate:self];
-            }
-            
-        } else {
-            if (self.toID.length == 0) {
-                [ad.facebook requestWithGraphPath:@"me/feed" andParams:params andHttpMethod:@"POST" andDelegate:self];
-            } else {
-                [ad.facebook requestWithGraphPath:[NSString stringWithFormat:@"%@/feed",self.toID] andParams:params andHttpMethod:@"POST" andDelegate:self];
-            }
+        NSString *graphURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/%@",(_toID.length == 0)?@"me":_toID, (_imageFromCameraRoll != nil)?@"photos":@"feed"];
+        
+        if (_imageFromCameraRoll) {
+            params[@"source"] = UIImagePNGRepresentation(_imageFromCameraRoll);
         }
+        
+        NSMutableURLRequest *request = [FHSFacebook.shared generateRequestWithURL:graphURL params:params HTTPMethod:@"POST"];
+        
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            [self dismissModalViewControllerAnimated:YES];
+            
+            if (error) {
+                qAlert(@"Status Update Error", (error.localizedDescription.length == 0)?@"Confirm that you are logged in correctly and try again.":error.localizedDescription);
+                [self saveDraft];
+            } else {
+                [self deletePostedDraft];
+            }
+        }];
+        
     } else {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
