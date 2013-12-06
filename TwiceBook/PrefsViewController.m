@@ -69,27 +69,9 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-
-    AppDelegate *ad = [Settings appDelegate];
-    
     if (section == 0) {
-        
         NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]authenticatedUsername];
-        NSString *fbUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"fbName"];
-        
-        if (fbUsername.length == 0 && FHSFacebook.shared.isSessionValid) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                @autoreleasepool {
-                    NSString *theName = [ad getFacebookUsernameSync];
-                    [[NSUserDefaults standardUserDefaults]setObject:theName forKey:@"fbName"];
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        @autoreleasepool {
-                            [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
-                        }
-                    });
-                }
-            });
-        }
+        NSString *fbUsername = FHSFacebook.shared.user.name;
         
         BOOL fbUsernameIsThere = fbUsername.length > 0;
         BOOL twitterUsernameIsThere = twitterUsername.length > 0;

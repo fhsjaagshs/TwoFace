@@ -61,10 +61,6 @@
         return;
     }
     
-    if (!FHSFacebook.shared.isSessionValid) {
-        [Settings.appDelegate tryLoginFromSavedCreds];
-    }
-    
     if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
         [[FHSTwitterEngine sharedEngine]loadAccessToken];
     }
@@ -206,16 +202,10 @@
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
         
-        AppDelegate *ad = [Settings appDelegate];
-        
         if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [[FHSTwitterEngine sharedEngine]loadAccessToken];
         }
-            
-        if (!FHSFacebook.shared.isSessionValid) {
-            [ad tryLoginFromSavedCreds];
-        }
-        
+
         if (![[FHSTwitterEngine sharedEngine]isAuthorized] && !FHSFacebook.shared.isSessionValid) {
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";

@@ -12,6 +12,7 @@
     #import "HelperFunctions.h"
 
     #import <DropboxSDK/DropboxSDK.h>
+    #import "DroppinBadassBlocks.h"
     #import "FHSTwitterEngine.h"
     #import "FHSFacebook.h"
 

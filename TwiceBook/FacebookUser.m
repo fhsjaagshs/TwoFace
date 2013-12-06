@@ -19,6 +19,11 @@
 }
 
 - (void)parseDictionary:(NSDictionary *)dict {
+    
+    if (dict == nil) {
+        return;
+    }
+    
     self.identifier = dict[@"id"];
     self.name = dict[@"name"];
     self.profileURL = dict[@"link"];

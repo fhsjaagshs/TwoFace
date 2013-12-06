@@ -29,11 +29,9 @@
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
 
 // Facebook
-
 - (void)loginFacebook;
 - (void)logoutFacebook;
-- (void)tryLoginFromSavedCreds;
-- (NSString *)getFacebookUsernameSync;
+//- (void)tryLoginFromSavedCreds;
 
 // Timeline management
 - (void)removeFacebookFromTimeline;

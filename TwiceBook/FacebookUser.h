@@ -19,7 +19,7 @@
 @property (nonatomic, strong) NSString *website;
 
 - (id)initWithDictionary:(NSDictionary *)dictionary;
-+ (id)facebookUserWithDictionary:(NSDictionary *)dict;
++ (FacebookUser *)facebookUserWithDictionary:(NSDictionary *)dict;
 
 - (NSDictionary *)dictionaryValue;
 

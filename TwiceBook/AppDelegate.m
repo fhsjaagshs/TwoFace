@@ -19,24 +19,30 @@
     [[NSNotificationCenter defaultCenter]postNotificationName:@"reloadTableView" object:nil];
 }
 
+// Redo with NSPredicates
 - (void)removeFacebookFromTimeline {
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
+    
+   /* NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    
+    [timeline filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != Status"]];
     
     for (NSDictionary *dict in timeline) {
         if ([dict[@"social_network_name"] isEqualToString:@"facebook"]) {
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
-    }
+    }*/
 }
 
 - (void)removeTwitterFromTimeline {
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
+    /*NSMutableArray *timeline = [[Cache sharedCache]timeline].mutableCopy;
     
     for (NSDictionary *dict in timeline) {
         if ([dict[@"social_network_name"] isEqualToString:@"twitter"]) {
             [[[Cache sharedCache]timeline]removeObject:dict];
         }
-    }
+    }*/
 }
 
 //
@@ -44,18 +50,15 @@
 //
 
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted {
-    UIImage *checkmarkImage = [UIImage imageWithContentsOfFile:[[NSBundle mainBundle]pathForResource:@"Checkmark" ofType:@"png"]];
-    UIImageView *checkmark = [[UIImageView alloc]initWithImage:checkmarkImage];
-
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
     hud.mode = MBProgressHUDModeCustomView;
     hud.labelText = shouldSayCompleted?@"Completed":@"Success";
-    hud.customView = checkmark;
+    hud.customView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"Checkmark"]];
     [hud hide:YES afterDelay:1.5];
 }
 
 - (void)showHUDWithTitle:(NSString *)title {
-    [self hideHUD];
+    [MBProgressHUD hideAllHUDsForView:self.window animated:YES];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
     hud.mode = MBProgressHUDModeIndeterminate;
@@ -73,27 +76,31 @@
 }
 
 - (void)showSelfHidingHudWithTitle:(NSString *)title {
-    [self hideHUD];
+    [MBProgressHUD hideAllHUDsForView:self.window animated:YES];
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:self.window animated:YES];
     hud.mode = MBProgressHUDModeText;
     hud.labelText = title;
     [hud hide:YES afterDelay:1.5];
 }
 
-
 //
 // Facebook
 //
 
+- (void)facebookDidExtendAccessToken {
+    [self saveFBAccessToken:FHSFacebook.shared.accessToken andExpirationDate:FHSFacebook.shared.expirationDate];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
+}
+
 - (void)facebookDidLogin {
-    
+    [self saveFBAccessToken:FHSFacebook.shared.accessToken andExpirationDate:FHSFacebook.shared.expirationDate];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }
 
 - (void)facebookDidNotLogin:(BOOL)cancelled {
-    
     if (!cancelled) {
         [self clearFriends];
-        [self clearFBAccessToken];
+     //   [self clearFBAccessToken];
         qAlert(@"Login Failed", @"Please try again.");
     }
 }
@@ -102,7 +109,7 @@
     [Keychain removeObjectForKey:kFacebookAccessTokenKey];
 }
 
-- (void)tryLoginFromSavedCreds {
+/*- (void)tryLoginFromSavedCreds {
     if (FHSFacebook.shared.isSessionValid) {
         return;
     }
@@ -110,10 +117,12 @@
     NSDictionary *creds = [Keychain objectForKey:kFacebookAccessTokenKey];
     FHSFacebook.shared.accessToken = creds[@"access_token"];
     FHSFacebook.shared.expirationDate = creds[@"expiration_date"];
-}
+    FHSFacebook.shared.tokenDate = creds[@"token_date"];
+    FHSFacebook.shared.user = [FacebookUser facebookUserWithDictionary:creds[@"user"]];
+}*/
 
 - (void)saveFBAccessToken:(NSString *)accessToken andExpirationDate:(NSDate *)date {
-    [Keychain setObject:@{@"access_token": accessToken, @"expiration-date": date } forKey:kFacebookAccessTokenKey];
+    [Keychain setObject:@{@"access_token": accessToken, @"expiration_date": date } forKey:kFacebookAccessTokenKey];
 }
 
 - (void)logoutFacebook {
@@ -123,63 +132,14 @@
 }
 
 - (void)loginFacebook {
-    [self tryLoginFromSavedCreds];
-    
     if (!FHSFacebook.shared.isSessionValid) {
         [FHSFacebook.shared authorizeWithPermissions:@[@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence"]];
-    } 
+    }
 }
 
 - (void)clearFriends {
     [[[Cache sharedCache]facebookFriends]removeAllObjects];
 }
-
-- (NSString *)getFacebookUsernameSync {
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",FHSFacebook.shared.accessToken]];
-    
-    NSError *err = nil;
-    NSURLResponse *resp = nil;
-    NSData *response = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:url] returningResponse:&resp error:&err];
-    
-    if (resp != nil && err == nil) {
-        NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:response options:NSJSONReadingMutableContainers error:nil];
-        return responseDict[@"name"];
-    }
-    
-    return @"";
-}
-
-- (void)fbDidNotLogin:(BOOL)cancelled {
-    [self clearFriends];
-    [self clearFBAccessToken];
-    if (!cancelled) {
-        qAlert(@"Login Failed", @"Please try again.");
-    }
-}
-
-- (void)fbDidLogin {
-    [self saveFBAccessToken:FHSFacebook.shared.accessToken andExpirationDate:FHSFacebook.shared.expirationDate];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
-}
-
-- (void)fbDidExtendToken:(NSString *)accessToken expiresAt:(NSDate *)expiresAt {
-    [self saveFBAccessToken:accessToken andExpirationDate:expiresAt];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
-}
-
-- (void)fbSessionInvalidated {
-    [self hideHUD];
-    [self clearFBAccessToken];
-    [self clearFriends];
-    
-    UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Facebook Login Expired" message:@"Do you wish to reauthenticate?" completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
-        if (buttonIndex == 0) {
-            [self loginFacebook];
-        }
-    } cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
-    [av show];
-}
-
 
 //
 // FHSTwitterEngine access token delegate methods
@@ -207,255 +167,7 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
-- (void)uploadSyncFile {
-    [self.restClient uploadFile:@"selectedUsernameSync.plist" toPath:@"/" withParentRev:savedRev fromPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
-}
-
-- (void)downloadSyncFile {
-    [self.restClient loadFile:@"/selectedUsernameSync.plist" intoPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
-}
-
-- (NSMutableDictionary *)getSyncDict {
-    return [NSMutableDictionary dictionaryWithContentsOfFile:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"]];
-}
-
-- (void)checkForSyncingFile {
-    NSString *path = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
-    if (![[NSFileManager defaultManager]fileExistsAtPath:path]) {
-        [[NSFileManager defaultManager]createFileAtPath:path contents:nil attributes:nil];
-    }
-}
-
-- (void)mainSyncStep {
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    NSMutableDictionary *cloudData = [self getSyncDict];
-    
-    if (cloudData.allKeys.count == 0) {
-        cloudData = [[NSMutableDictionary alloc]init];
-    }
-    
-    id fdc = cloudData[kSelectedFriendsDictionaryKey];
-    id autc = cloudData[kAddedUsernamesListKey];
-    id utc = cloudData[kSelectedUsernamesListKey];
-    id ddc = cloudData[@"deleted_dict_facebook"];
-    id dac = cloudData[@"deleted_array_twitter"];
-    
-    id fdl = [defaults objectForKey:kSelectedFriendsDictionaryKey];
-    id autl = [defaults objectForKey:kAddedUsernamesListKey];
-    id utl = [defaults objectForKey:kSelectedUsernamesListKey];
-    
-    
-    //
-    // Facebook Selected Friends
-    //
-    
-    NSMutableDictionary *remoteFriendsDict = [[NSMutableDictionary alloc]initWithDictionary:(NSMutableDictionary *)fdc];
-    NSMutableDictionary *localFriendsDict = [[NSMutableDictionary alloc]initWithDictionary:(NSMutableDictionary *)fdl];
-    NSMutableDictionary *cloudDeletionDict = [[NSMutableDictionary alloc]initWithDictionary:(NSMutableDictionary *)ddc]; // from sync-before-this-sync
-
-    NSMutableDictionary *deleteDict = [Settings dropboxDeletedFacebookDictionary];
-
-    for (id key in cloudDeletionDict.allKeys) {
-        [localFriendsDict removeObjectForKey:key];
-        if ([remoteFriendsDict.allKeys containsObject:key]) {
-            [remoteFriendsDict removeObjectForKey:key];
-        }
-    }
-    
-    for (id key in deleteDict.allKeys) {
-        [remoteFriendsDict removeObjectForKey:key];
-        if ([localFriendsDict.allKeys containsObject:key]) {
-            [localFriendsDict removeObjectForKey:key];
-        }
-    }
-    
-    [cloudDeletionDict removeAllObjects];
-    
-    [cloudDeletionDict addEntriesFromDictionary:deleteDict];
-    
-    cloudData[@"deleted_dict_facebook"] = cloudDeletionDict;
-    
-    [deleteDict removeAllObjects];
-    [[NSUserDefaults standardUserDefaults]setObject:deleteDict forKey:kDBSyncDeletedFBDictKey];
-    
-    NSMutableDictionary *combinedDict = [[NSMutableDictionary alloc]init];
-    [combinedDict addEntriesFromDictionary:remoteFriendsDict];
-    [combinedDict addEntriesFromDictionary:localFriendsDict];
-    
-    cloudData[kSelectedFriendsDictionaryKey] = combinedDict;
-    [defaults setObject:combinedDict forKey:kSelectedFriendsDictionaryKey];
-
-    //
-    // Twitter Added Users
-    //
-    
-    NSMutableArray *combinedArray = [[NSMutableArray alloc]init];
-    NSMutableArray *autcA = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)autc];
-    NSMutableArray *autlA = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)autl];
-    
-    NSMutableArray *deleteArray = [Settings dropboxDeletedTwitterArray];
-    
-    NSMutableArray *cloudDeleteArray = [[NSMutableArray alloc]initWithArray:(NSMutableArray *)dac];
-    
-    for (id obj in deleteArray) {
-        if ([autcA containsObject:obj]) {
-            [autcA removeObject:obj];
-        }
-    }
-    
-    for (id obj in cloudDeleteArray) {
-        if ([autlA containsObject:obj]) {
-            [autlA removeObject:obj];
-        }
-    }
-    
-    [combinedArray addObjectsFromArray:autcA];
-    [combinedArray addObjectsFromArray:autlA];
-    
-    NSMutableArray *finalArray = [[NSMutableArray alloc]init];
-    
-    for (id obj in combinedArray) {
-        if (![finalArray containsObject:obj]) {
-            [finalArray addObject:obj];
-        }
-    }
-    
-    cloudData[kAddedUsernamesListKey] = finalArray;
-    [defaults setObject:finalArray forKey:kAddedUsernamesListKey];
-    
-    //
-    // Twitter Selected Users
-    //
-    
-    NSMutableArray *combinedArrayF = [NSMutableArray array];
-    
-    NSMutableArray *selectedUsersTCloud = [NSMutableArray arrayWithArray:(NSMutableArray *)utc];
-    NSMutableArray *selectedUsersTLocal = [NSMutableArray arrayWithArray:(NSMutableArray *)utl];
-    
-    for (id obj in deleteArray) {
-        if ([selectedUsersTCloud containsObject:obj]) {
-            [selectedUsersTCloud removeObject:obj];
-        }
-    }
-    
-    for (id obj in cloudDeleteArray) {
-        if ([selectedUsersTLocal containsObject:obj]) {
-            [selectedUsersTLocal removeObject:obj];
-        }
-    }
-    
-    [cloudDeleteArray removeAllObjects];
-    [cloudDeleteArray addObjectsFromArray:deleteArray];
-    cloudData[@"deleted_array_twitter"] = cloudDeleteArray;
-    
-    [deleteArray removeAllObjects];
-    [[NSUserDefaults standardUserDefaults]setObject:deleteArray forKey:kDBSyncDeletedTArrayKey];
-    
-    [combinedArrayF addObjectsFromArray:selectedUsersTCloud];
-    [combinedArrayF addObjectsFromArray:selectedUsersTLocal];
-    
-    NSMutableArray *finalArrayF = [[NSMutableArray alloc]init];
-    
-    for (id obj in combinedArrayF) {
-        if (![finalArrayF containsObject:obj]) {
-            [finalArrayF addObject:obj];
-        }
-    }
-    
-    cloudData[@"usernames_twitter"] = finalArrayF;
-    [defaults setObject:finalArrayF forKey:@"usernames_twitter"];
-
-    [defaults synchronize];
-    [cloudData writeToFile:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] atomically:YES];
-    [self uploadSyncFile];
-}
-
-- (void)restClient:(DBRestClient *)client uploadedFile:(NSString *)destPath from:(NSString *)srcPath {
-    [self hideHUD];
-    savedRev = nil;
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    NSDate *date = [NSDate date];
-    [[NSUserDefaults standardUserDefaults]setObject:date forKey:@"lastSyncedDateKey"];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"lastSynced" object:nil];
-}
-
-- (void)restClient:(DBRestClient *)client uploadFileFailedWithError:(NSError *)error {
-    [self hideHUD];
-    savedRev = nil;
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
-}
-
-- (void)restClient:(DBRestClient *)client loadedFile:(NSString *)destPath {
-    [self mainSyncStep];
-}
-
-- (void)restClient:(DBRestClient *)client loadFileFailedWithError:(NSError *)error {
-    [self hideHUD];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
-}
-
-- (void)restClient:(DBRestClient *)client loadedMetadata:(DBMetadata *)metadata {
-
-    NSMutableArray *filenames = [[NSMutableArray alloc]init];
-    
-    for (DBMetadata *item in metadata.contents) {
-        NSString *theFileName = item.filename;
-        [filenames addObject:theFileName];
-        if ([theFileName isEqualToString:@"selectedUsernameSync.plist"]) {
-            savedRev = item.rev;
-        }
-    }
-    
-    [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory] stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
-    
-    if ([filenames containsObject:@"selectedUsernameSync.plist"]) {
-        [self checkForSyncingFile]; // makes sure that the selectedUsernameSync.plist is there
-        [self downloadSyncFile];
-    } else {
-        [self mainSyncStep];
-    }
-}
-
-- (void)restClient:(DBRestClient *)client loadMetadataFailedWithError:(NSError *)error {
-    [self hideHUD];
-    [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
-    qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-}
-
-- (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [self hideHUD];
-}
-
-- (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [self hideHUD];
-    if (error.code != 404) {
-        [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
-        qAlert(@"Error Resetting Dropbox Sync", @"TwoFace failed to delete the data stored on Dropbox.");
-    }
-}
-
-- (void)dropboxSync {
-    [self showHUDWithTitle:@"Syncing..."];
-    [self.restClient loadMetadata:@"/"];
-}
-
-- (void)resetDropboxSync {
-    [self showHUDWithTitle:@"Resetting Sync..."];
-    [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableArray alloc]init] forKey:kDBSyncDeletedTArrayKey];
-    [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableDictionary alloc]init] forKey:kDBSyncDeletedFBDictKey];
-    [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
-    [self.restClient deletePath:@"/selectedUsernameSync.plist"];
-}
-
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId {
-    
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     
     if ([FHSTwitterEngine isConnectedToInternet]) {
@@ -481,7 +193,6 @@
     
     [FHSFacebook.shared setAppID:@"314352998657355"];
     [FHSFacebook.shared setDelegate:self];
-    [self tryLoginFromSavedCreds];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
     [[FHSTwitterEngine sharedEngine]setDelegate:self];
@@ -499,6 +210,8 @@
             [self removeTwitterFromTimeline];
         }
     }
+    
+    [FHSFacebook.shared extendAccessTokenIfNeeded];
     
     DBSession *session = [[DBSession alloc]initWithAppKey:@"9fxkta36zv81dc6" appSecret:@"6xbgfmggidmb66a" root:kDBRootAppFolder];
 	session.delegate = self;
@@ -529,14 +242,6 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-    
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [[FHSTwitterEngine sharedEngine]loadAccessToken];
-    }
-    
-    if (!FHSFacebook.shared.isSessionValid) {
-        [self tryLoginFromSavedCreds];
-    }
     [[NSNotificationCenter defaultCenter]postNotificationName:kEnteringForegroundNotif object:nil];
 }
 

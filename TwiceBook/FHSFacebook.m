@@ -7,8 +7,14 @@
 //
 
 #import "FHSFacebook.h"
+#import "FacebookUser.h"
 
 static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
+
+static NSString *kTokenKeychainKey = @"kTokenKeychainKey";
+static NSString *kExprDateKeychainKey = @"kExprDateKeychainKey";
+static NSString *kTokenDateKeychainKey = @"kTokenDateKeychainKey";
+static NSString *kUserKeychainKey = @"kUserKeychianKey";
 
 @interface FHSFacebook ()
 
@@ -27,6 +33,19 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
     return shared;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        NSDictionary *tokenDict = [Keychain objectForKey:kFacebookAccessTokenKey];
+        self.accessToken = tokenDict[kTokenKeychainKey];
+        self.expirationDate = tokenDict[kExprDateKeychainKey];
+        self.tokenDate = tokenDict[kTokenDateKeychainKey];
+        self.user = [FacebookUser facebookUserWithDictionary:tokenDict[kUserKeychainKey]];
+        // clear out unecessary keys
+    }
+    return self;
+}
+
 - (BOOL)isSessionValid {
     return (_accessToken != nil && _expirationDate != nil && NSOrderedDescending == [_expirationDate compare:[NSDate date]]);
 }
@@ -34,6 +53,8 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
 - (void)invalidateSession {
     self.accessToken = nil;
     self.expirationDate = nil;
+    
+    [Keychain removeObjectForKey:kFacebookAccessTokenKey];
     
     NSHTTPCookieStorage *cookies = [NSHTTPCookieStorage sharedHTTPCookieStorage];
     NSArray *facebookCookies = [cookies cookiesForURL:[NSURL URLWithString:@"http://login.facebook.com"]];
@@ -54,11 +75,12 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
         [request setHTTPBody:[self generatePostBody:params]];
     }
     
-    [params setValue:@"json" forKey:@"format"];
-    [params setValue:@"ios" forKey:@"sdk"];
-    [params setValue:@"2" forKey:@"sdk_version"];
+    params[@"format"] = @"json";
+    params[@"sdk"] = @"ios";
+    params[@"sdk_version"] = @"2";
+    
     if ([self isSessionValid]) {
-        [params setValue:_accessToken forKey:@"access_token"];
+        params[@"access_token"] = _accessToken;
     }
     
     [self extendAccessTokenIfNeeded];
@@ -76,22 +98,20 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
                                     @"type": @"user_agent",
                                     @"redirect_uri": @"fbconnect://success",
                                     @"display": @"touch",
-                                    @"sdk": @"ios"
+                                    @"sdk": @"ios",
+                                    @"app_id": _appID
                                     }.mutableCopy;
 
     if (permissions != nil) {
-        NSString *scope = [permissions componentsJoinedByString:@","];
-        [params setValue:scope forKey:@"scope"];
+        params[@"scope"] = [permissions componentsJoinedByString:@","];
     }
 
     NSString *fbAppUrl = [[self class]serializeURL:@"fbauth://authorize" params:params httpMethod:@"GET"];
-    BOOL didOpenOtherApp = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fbAppUrl]];
-    
-    if (!didOpenOtherApp) {
-        NSString *nextUrl = [self baseURL];
-        [params setValue:nextUrl forKey:@"redirect_uri"];
-        NSString *fbAppUrl = [[self class]serializeURL:@"https://m.facebook.com/dialog/oauth" params:params httpMethod:@"GET"];
-        didOpenOtherApp = [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fbAppUrl]];
+
+    if (![[UIApplication sharedApplication] openURL:[NSURL URLWithString:fbAppUrl]]) {
+        params[@"redirect_uri"] = [self baseURL];
+        fbAppUrl = [[self class]serializeURL:@"https://m.facebook.com/dialog/oauth" params:params httpMethod:@"GET"];
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:fbAppUrl]];
     }
 }
 
@@ -113,7 +133,14 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
     if (accessToken.length == 0) {
         if ([_delegate respondsToSelector:@selector(facebookDidNotLogin:)]) {
             NSString *errorReason = params[@"error"];
-            [_delegate facebookDidNotLogin:!params[@"error_code"] && (errorReason.length == 0 || [errorReason isEqualToString:@"access_denied"])];
+            
+            BOOL cancelled = !params[@"error_code"] && (errorReason.length == 0 || [errorReason isEqualToString:@"access_denied"]);
+            
+            if (!cancelled) {
+                [Keychain removeObjectForKey:kFacebookAccessTokenKey];
+            }
+            
+            [_delegate facebookDidNotLogin:cancelled];
         }
         return YES;
     }
@@ -131,9 +158,22 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
     self.expirationDate = expirationDate;
     self.tokenDate = [NSDate date];
     
-    if ([_delegate respondsToSelector:@selector(facebookDidLogin)]) {
-        [_delegate facebookDidLogin];
-    }
+    [Keychain setObject:@{ kTokenKeychainKey: _accessToken, kExprDateKeychainKey: _expirationDate, kTokenDateKeychainKey: _tokenDate } forKey:kFacebookAccessTokenKey];
+    
+    NSURL *userlookupURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",_accessToken]];
+    
+    [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:userlookupURL] queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (!error) {
+            NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+            self.user = [FacebookUser facebookUserWithDictionary:responseDict];
+            
+            [Keychain setObject:@{ kTokenKeychainKey: _accessToken, kExprDateKeychainKey: _expirationDate, kTokenDateKeychainKey: _tokenDate, kUserKeychainKey: _user.dictionaryValue } forKey:kFacebookAccessTokenKey];
+        }
+        
+        if ([_delegate respondsToSelector:@selector(facebookDidLogin)]) {
+            [_delegate facebookDidLogin];
+        }
+    }];
     
     return YES;
 }
@@ -174,15 +214,29 @@ static NSString *kStringBoundary = @"3i2ndDfv2rTHiSisAbouNdArYfORhtTPEefj3q2f";
         NSMutableDictionary *params = @{@"format": @"json", @"sdk": @"ios", @"sdk_version": @"2"}.mutableCopy;
         
         if ([self isSessionValid]) {
-            [params setValue:_accessToken forKey:@"access_token"];
+            params[@"access_token"] = _accessToken;
         }
         
         NSString *url = [[self class]serializeURL:fullURL params:params httpMethod:@"GET"];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:30.0f];
         [request setHTTPMethod:@"GET"];
         
-        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *connectionError) {
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            
             self.isExtendingAccessToken = NO;
+            
+            if (!error) {
+                NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil];
+                self.accessToken = responseDict[@"access_token"];
+                self.expirationDate = responseDict[@"expires_at"];
+                self.tokenDate = [NSDate date];
+                
+                [Keychain setObject:@{ kTokenKeychainKey: _accessToken, kExprDateKeychainKey: _expirationDate, kTokenDateKeychainKey: _tokenDate, kUserKeychainKey: _user.dictionaryValue } forKey:kFacebookAccessTokenKey];
+
+                if ([_delegate respondsToSelector:@selector(facebookDidExtendAccessToken)]) {
+                    [_delegate facebookDidExtendAccessToken];
+                }
+            }
         }];
     }
 }

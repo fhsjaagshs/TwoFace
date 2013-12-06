@@ -592,11 +592,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [_theTableView addSubview:_pull];
     
     if (_isFacebook) {
-        
-        if (!FHSFacebook.shared.isSessionValid) {
-            [ad tryLoginFromSavedCreds];
-        }
-        
         if (_isImmediateSelection) {
             _navBar.topItem.title = @"Select Friend";
         } else {

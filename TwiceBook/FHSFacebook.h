@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @protocol FHSFacebookDelegate;
+@class FacebookUser;
 
 @interface FHSFacebook : NSObject
 
@@ -28,13 +29,16 @@
 @property (nonatomic, strong) NSDate *tokenDate;
 @property (nonatomic, strong) NSString *appID;
 
+@property (nonatomic, strong) FacebookUser *user;
+
 @property (nonatomic, weak) id<FHSFacebookDelegate> delegate;
 
 @end
 
 @protocol FHSFacebookDelegate <NSObject>
-
+@optional
 - (void)facebookDidLogin;
 - (void)facebookDidNotLogin:(BOOL)cancelled;
+- (void)facebookDidExtendAccessToken;
 
 @end
