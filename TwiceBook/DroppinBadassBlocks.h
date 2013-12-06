@@ -19,13 +19,14 @@
 + (void)loadMetadata:(NSString *)path withCompletionBlock:(void(^)(DBMetadata *metadata, NSError *error))block;
 + (void)loadDelta:(NSString *)cursor withCompletionHandler:(void(^)(NSArray *entries, NSString *cursor, BOOL hasMore, BOOL shouldReset, NSError *error))block;
 + (void)loadAccountInfoWithCompletionBlock:(void(^)(DBAccountInfo *info, NSError *error))block;
++ (void)deletePath:(NSString *)path completionHandler:(void(^)(NSString *path, NSError *error))block;
 
 
-+ (BOOL)cancelShareableLinkLoadWithDropboxPath:(NSString *)dbPath;
+/*+ (BOOL)cancelShareableLinkLoadWithDropboxPath:(NSString *)dbPath;
 + (BOOL)cancelDownloadWithDropboxPath:(NSString *)dbPath;
 + (BOOL)cancelUploadWithDropboxPath:(NSString *)dbPath;
 + (int)cancelAllDownloads;
 + (int)cancelAllMiscRequests;
-+ (int)cancel;
++ (int)cancel;*/
 
 @end

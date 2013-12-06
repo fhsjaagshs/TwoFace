@@ -7,19 +7,20 @@
 //
 
 #import "DroppinBadassBlocks.h"
-#import "DBRestClient.h"
+#import <DropboxSDK/DBRestClient.h>
 
 @interface DroppinBadassBlocks () <DBRestClientDelegate>
 
-@property (nonatomic, strong) id uploadBlock;
-@property (nonatomic, strong) id uploadProgressBlock;
-@property (nonatomic, strong) id deltaBlock;
-@property (nonatomic, strong) id linkBlock;
-@property (nonatomic, strong) id downloadBlock;
-@property (nonatomic, strong) id downloadProgressBlock;
-@property (nonatomic, strong) id metadataBlock;
-@property (nonatomic, strong) id accountInfoBlock;
-@property (nonatomic, strong) id streamableURLBlock;
+@property (nonatomic, copy) id uploadBlock;
+@property (nonatomic, copy) id uploadProgressBlock;
+@property (nonatomic, copy) id deltaBlock;
+@property (nonatomic, copy) id linkBlock;
+@property (nonatomic, copy) id downloadBlock;
+@property (nonatomic, copy) id downloadProgressBlock;
+@property (nonatomic, copy) id metadataBlock;
+@property (nonatomic, copy) id accountInfoBlock;
+@property (nonatomic, copy) id streamableURLBlock;
+@property (nonatomic, copy) id deletionBlock;
 
 @end
 
@@ -167,7 +168,25 @@
 // Delete Files
 //
 
++ (void)deletePath:(NSString *)path completionHandler:(void(^)(NSString *path, NSError *error))block {
+    [[DroppinBadassBlocks sharedInstance]setDeletionBlock:block];
+    [[DroppinBadassBlocks sharedInstance]deletePath:path];
+}
 
+- (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path {
+    void(^deletionBlock)(NSString *path, NSError *error) = [[DroppinBadassBlocks sharedInstance]deletionBlock];
+    deletionBlock(path,nil);
+}
+
+- (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error {
+    void(^deletionBlock)(NSString *path, NSError *error) = [[DroppinBadassBlocks sharedInstance]deletionBlock];
+    deletionBlock(nil,error);
+}
+
+/*+ (void)loadMetadata:(NSString *)path withCompletionBlock:(void(^)(DBMetadata *metadata, NSError *error))block {
+    [[DroppinBadassBlocks sharedInstance]setMetadataBlock:block];
+    [[DroppinBadassBlocks sharedInstance]loadMetadata:path];
+}*/
 
 //
 // Account Info Loading
@@ -192,7 +211,7 @@
 // Cancellation
 //
 
-+ (BOOL)cancelShareableLinkLoadWithDropboxPath:(NSString *)dbPath {
+/*+ (BOOL)cancelShareableLinkLoadWithDropboxPath:(NSString *)dbPath {
     return [[DroppinBadassBlocks sharedInstance]cancelSharableLinkLoadWithDropboxPath:dbPath];
 }
 
@@ -210,7 +229,7 @@
 
 + (int)cancelAllMiscRequests {
     return [[DroppinBadassBlocks sharedInstance]cancelAllMiscRequests];
-}
+}*/
 
 + (int)cancel {
     float requestCount = [[DroppinBadassBlocks sharedInstance]requestCount];

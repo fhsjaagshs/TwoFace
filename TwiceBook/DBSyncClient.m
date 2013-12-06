@@ -10,13 +10,6 @@
 
 @implementation DBSyncClient
 
-- (void)checkForSyncingFile {
-    NSString *path = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
-    if (![[NSFileManager defaultManager]fileExistsAtPath:path]) {
-        [[NSFileManager defaultManager]createFileAtPath:path contents:nil attributes:nil];
-    }
-}
-
 - (void)mainSyncStep:(NSString *)rev {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
@@ -165,26 +158,19 @@
     }];
 }
 
-- (void)restClient:(DBRestClient *)client deletedPath:(NSString *)path {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [Settings.appDelegate hideHUD];
-}
-
-- (void)restClient:(DBRestClient *)client deletePathFailedWithError:(NSError *)error {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [Settings.appDelegate hideHUD];
-    if (error.code != 404) {
-        [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
-        qAlert(@"Error Resetting Dropbox Sync", @"TwoFace failed to delete the data stored on Dropbox.");
-    }
-}
-
 - (void)resetDropboxSync {
     [Settings.appDelegate showHUDWithTitle:@"Resetting Sync..."];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableArray alloc]init] forKey:kDBSyncDeletedTArrayKey];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableDictionary alloc]init] forKey:kDBSyncDeletedFBDictKey];
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
-   // [self.restClient deletePath:@"/selectedUsernameSync.plist"];
+    [DroppinBadassBlocks deletePath:@"/selectedUsernameSync.plist" completionHandler:^(NSString *path, NSError *error) {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [Settings.appDelegate hideHUD];
+        if (error && error.code != 404) {
+            [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
+            qAlert(@"Failed to Reset Sync", @"TwoFace failed to delete the sync data on Dropbox.");
+        }
+    }];
 }
 
 @end

@@ -10,4 +10,7 @@
 
 @interface DBSyncClient : NSObject
 
+- (void)resetDropboxSync;
+- (void)dropboxSync;
+
 @end
