@@ -47,7 +47,7 @@
     return ret;
 }
 
-+ (void)deleteObjectForKey:(NSString *)service {
++ (void)removeObjectForKey:(NSString *)service {
     SecItemDelete((__bridge CFDictionaryRef)[self getKeychainQuery:service]);
 }
 

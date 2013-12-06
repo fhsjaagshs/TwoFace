@@ -14,6 +14,6 @@ extern NSString * const kKeychainAccessTokenKey;
 
 + (void)setObject:(id)object forKey:(NSString *)key;
 + (id)objectForKey:(NSString *)service;
-+ (void)deleteObjectForKey:(NSString *)key;
++ (void)removeObjectForKey:(NSString *)key;
 
 @end

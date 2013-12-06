@@ -12,7 +12,7 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, FBSessionDelegate, DBRestClientDelegate, DBSessionDelegate, FHSTwitterEngineAccessTokenDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, DBRestClientDelegate, DBSessionDelegate, FHSTwitterEngineAccessTokenDelegate> {
     NSString *savedRev;
 }
 
@@ -29,7 +29,7 @@
 - (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
 
 // Facebook
-@property (strong, nonatomic) Facebook *facebook;
+//@property (strong, nonatomic) Facebook *facebook;
 
 - (void)loginFacebook;
 - (void)logoutFacebook;

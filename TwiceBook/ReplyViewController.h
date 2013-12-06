@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ReplyViewController : UIViewController <FBRequestDelegate, UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+@interface ReplyViewController : UIViewController <UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 // Facebook
 @property (assign, nonatomic) BOOL isFacebook;

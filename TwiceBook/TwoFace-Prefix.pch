@@ -11,7 +11,7 @@
 
     #import "HelperFunctions.h"
 
-    #import "Facebook.h"
+    //#import "Facebook.h"
     #import <DropboxSDK/DropboxSDK.h>
     #import "FHSTwitterEngine.h"
 
@@ -27,13 +27,10 @@
     #import "UIActionSheet+BlockExtensions.h"
     #import "UIAlertView+BlockExtensions.h"
     #import "UIImage+Scale.h"
-    #import "Facebook+Facebook_cancel.h"
     #import "UIScrollView+UIScrollView_ZoomToPoint.h"
-    #import "UIViewController+InitWithAutoNib.h"
     #import "NSArray+RemoveDuplicates.h"
     #import "UIImage+NSCoder.h"
     #import "NSArray+FirstObject.h"
-    #import "FHSTwitterEngine+Date2String.h"
 
     #import "Settings.h"
     #import "Cache.h"

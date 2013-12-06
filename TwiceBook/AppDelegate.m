@@ -81,8 +81,8 @@
 // Facebook
 //
 
-- (void)clearSavedToken {
-    [Keychain setObject:nil forKey:kFacebookAccessTokenKey];
+- (void)clearFBAccessToken {
+    [Keychain removeObjectForKey:kFacebookAccessTokenKey];
 }
 
 - (void)tryLoginFromSavedCreds {
@@ -95,23 +95,22 @@
     _facebook.expirationDate = creds[@"expiration_date"];
 }
 
-- (void)saveAccessToken:(NSString *)accessToken andExpirationDate:(NSDate *)date {
+- (void)saveFBAccessToken:(NSString *)accessToken andExpirationDate:(NSDate *)date {
     [Keychain setObject:@{@"access_token": accessToken, @"expiration-date": date } forKey:kFacebookAccessTokenKey];
 }
 
 - (void)logoutFacebook {
-    [self clearSavedToken];
+    [self clearFBAccessToken];
     [self clearFriends];
-    [self.facebook logout:self];
+    [_facebook logout];
 }
 
 - (void)loginFacebook {
+    [self tryLoginFromSavedCreds];
     
     if ([self.facebook isSessionValid]) {
         return;
     }
-    
-    [self tryLoginFromSavedCreds];
     
     if (![self.facebook isSessionValid]) {
         [self.facebook authorize:@[@"read_stream", @"friends_status", @"publish_stream", @"friends_photos", @"user_photos", @"friends_online_presence",  @"user_online_presence"]];
@@ -128,14 +127,11 @@
 }
 
 - (NSString *)getFacebookUsernameSync {
-    
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",self.facebook.accessToken]];
-    
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me?access_token=%@",_facebook.accessToken]];
     
     NSError *err = nil;
     NSURLResponse *resp = nil;
-    NSData *response = [NSURLConnection sendSynchronousRequest:request returningResponse:&resp error:&err];
+    NSData *response = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:url] returningResponse:&resp error:&err];
     
     if (resp != nil && err == nil) {
         NSDictionary *responseDict = [NSJSONSerialization JSONObjectWithData:response options:NSJSONReadingMutableContainers error:nil];
@@ -147,30 +143,25 @@
 
 - (void)fbDidNotLogin:(BOOL)cancelled {
     [self clearFriends];
-    [self clearSavedToken];
+    [self clearFBAccessToken];
     if (!cancelled) {
         qAlert(@"Login Failed", @"Please try again.");
     }
 }
 
 - (void)fbDidLogin {
-    [self saveAccessToken:self.facebook.accessToken andExpirationDate:self.facebook.expirationDate];
+    [self saveFBAccessToken:self.facebook.accessToken andExpirationDate:self.facebook.expirationDate];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }
 
-- (void)fbDidLogout {
-    [self clearFriends];
-    [self clearSavedToken];
-}
-
 - (void)fbDidExtendToken:(NSString *)accessToken expiresAt:(NSDate *)expiresAt {
-    [self saveAccessToken:accessToken andExpirationDate:expiresAt];
+    [self saveFBAccessToken:accessToken andExpirationDate:expiresAt];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"FBButtonNotif" object:nil];
 }
 
 - (void)fbSessionInvalidated {
     [self hideHUD];
-    [self clearSavedToken];
+    [self clearFBAccessToken];
     [self clearFriends];
     
     UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Facebook Login Expired" message:@"Do you wish to reauthenticate?" completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
@@ -179,20 +170,6 @@
         }
     } cancelButtonTitle:@"No" otherButtonTitles:@"Yes", nil];
     [av show];
-}
-
-- (NSDictionary*)parseURLParams:(NSString *)query {
-	NSArray *pairs = [query componentsSeparatedByString:@"&"];
-	NSMutableDictionary *params = [NSMutableDictionary dictionary];
-	for (NSString *pair in pairs) {
-		NSArray *kv = [pair componentsSeparatedByString:@"="];
-		NSString *val =
-        [kv[1]
-         stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        
-		params[kv[0]] = val;
-	}
-    return params;
 }
 
 

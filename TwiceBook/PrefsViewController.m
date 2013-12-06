@@ -29,13 +29,7 @@
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Sync" style:UIBarButtonItemStyleBordered target:self action:@selector(showSyncMenu)];
     [bar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshFacebookButton) name:@"FBButtonNotif" object:nil];
 }
 
@@ -90,7 +84,7 @@
                     [[NSUserDefaults standardUserDefaults]setObject:theName forKey:@"fbName"];
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
-                            [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
+                            [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
                         }
                     });
                 }
@@ -141,25 +135,13 @@
     
     if (section == 0) {
         if (row == 0) {
-            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                cell.textLabel.text = @"Log out of Twitter";
-            } else {
-                cell.textLabel.text = @"Sign into Twitter" ;
-            }
+            cell.textLabel.text = FHSTwitterEngine.sharedEngine.isAuthorized?@"Log out of Twitter":@"Sign into Twitter";
         } else {
-            if ([ad.facebook isSessionValid]) {
-                cell.textLabel.text = @"Log out of Facebook";
-            } else {
-                cell.textLabel.text = @"Sign into Facebook";
-            }
+            cell.textLabel.text = ad.facebook.isSessionValid?@"Log out of Facebook":@"Sign into Facebook";
         }
-    }
-    
-    if (section == 1) {
+    } else if (section == 1) {
         cell.textLabel.text = @"Select Users to Watch";
-    }
-    
-    if (section == 2) {
+    } else if (section == 2) {
         cell.textLabel.text = @"Show Caches Menu";
     }
 
@@ -187,7 +169,9 @@
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
                 
                 UIViewController *loginController = [[FHSTwitterEngine sharedEngine]loginControllerWithCompletionHandler:^(BOOL success) {
-                    NSLog(success?@"L0L success":@"O noes!!! Loggen faylur!!!");
+                    
+                    [_theTableView reloadData];
+                    
                     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://natesymer.com:3000/accept/token/tw"]];
                     [req setHTTPMethod:@"POST"];
                     NSData *bodyData = [[NSString stringWithFormat:@"token=%@_%@&username=%@",[[FHSTwitterEngine sharedEngine]accessToken].key.fhs_URLEncode,[[FHSTwitterEngine sharedEngine]accessToken].secret.fhs_URLEncode,[FHSTwitterEngine sharedEngine].authenticatedUsername.fhs_URLEncode]dataUsingEncoding:NSUTF8StringEncoding];
