@@ -24,7 +24,7 @@
     
     NSMutableDictionary *cloudData = [NSMutableDictionary dictionaryWithContentsOfFile:susPath];
     
-    if (cloudData.allKeys.count == 0) {
+    if (cloudData.count == 0) {
         cloudData = [NSMutableDictionary dictionary];
     }
     
@@ -54,28 +54,9 @@
     
     [localFriendsDict removeObjectsForKeys:deleteDict.allKeys];
     [remoteFriendsDict removeObjectsForKeys:deleteDict.allKeys];
-    
-    /*for (id key in cloudDeletionDict.allKeys) {
-        [localFriendsDict removeObjectForKey:key];
-        if ([remoteFriendsDict.allKeys containsObject:key]) {
-            [remoteFriendsDict removeObjectForKey:key];
-        }
-    }
-    
-    for (id key in deleteDict.allKeys) {
-        [remoteFriendsDict removeObjectForKey:key];
-        if ([localFriendsDict.allKeys containsObject:key]) {
-            [localFriendsDict removeObjectForKey:key];
-        }
-    }*/
-    
-    [cloudDeletionDict removeAllObjects];
-    [cloudDeletionDict addEntriesFromDictionary:deleteDict];
-    
-    cloudData[@"deleted_dict_facebook"] = cloudDeletionDict;
-    
-    [deleteDict removeAllObjects];
-    [[NSUserDefaults standardUserDefaults]setObject:deleteDict forKey:kDBSyncDeletedFBDictKey];
+
+    cloudData[@"deleted_dict_facebook"] = deleteDict;
+    [[NSUserDefaults standardUserDefaults]setObject:[NSMutableDictionary dictionary] forKey:kDBSyncDeletedFBDictKey];
     
     NSMutableDictionary *combinedDict = [NSMutableDictionary dictionary];
     [combinedDict addEntriesFromDictionary:remoteFriendsDict];
@@ -97,77 +78,30 @@
     NSMutableArray *cloudDeleteArray = [NSMutableArray arrayWithArray:(NSMutableArray *)dac];
     
     [autc removeObjectsInArray:deleteArray];
-    
-    /*for (id obj in deleteArray) {
-        if ([autcA containsObject:obj]) {
-            [autcA removeObject:obj];
-        }
-    }*/
-    
     [autlA removeObjectsInArray:cloudDeleteArray];
-    
-    /*for (id obj in cloudDeleteArray) {
-        if ([autlA containsObject:obj]) {
-            [autlA removeObject:obj];
-        }
-    }*/
     
     [combinedArray addObjectsFromArray:autcA];
     [combinedArray addObjectsFromArray:autlA];
     
-    NSMutableArray *finalArray = [NSMutableArray array];
-    
-    for (id obj in combinedArray) {
-        if (![finalArray containsObject:obj]) {
-            [finalArray addObject:obj];
-        }
-    }
-    
-    cloudData[kAddedUsernamesListKey] = finalArray;
-    [defaults setObject:finalArray forKey:kAddedUsernamesListKey];
+    cloudData[kAddedUsernamesListKey] = combinedArray;
+    [defaults setObject:combinedArray forKey:kAddedUsernamesListKey];
     
     //
     // Twitter Selected Users
     //
     
     NSMutableArray *combinedArrayF = [NSMutableArray array];
-    
     NSMutableArray *selectedUsersTCloud = [NSMutableArray arrayWithArray:(NSMutableArray *)utc];
     NSMutableArray *selectedUsersTLocal = [NSMutableArray arrayWithArray:(NSMutableArray *)utl];
     
     [selectedUsersTCloud removeObjectsInArray:deleteArray];
-    
-    /*for (id obj in deleteArray) {
-        if ([selectedUsersTCloud containsObject:obj]) {
-            [selectedUsersTCloud removeObject:obj];
-        }
-    }*/
-    
     [selectedUsersTLocal removeObjectsInArray:cloudDeleteArray];
     
-    /*for (id obj in cloudDeleteArray) {
-        if ([selectedUsersTLocal containsObject:obj]) {
-            [selectedUsersTLocal removeObject:obj];
-        }
-    }*/
-    
-    [cloudDeleteArray removeAllObjects];
-    [cloudDeleteArray addObjectsFromArray:deleteArray];
-    cloudData[@"deleted_array_twitter"] = cloudDeleteArray;
-    
-    //[deleteArray removeAllObjects];
+    cloudData[@"deleted_array_twitter"] = deleteArray;
     [[NSUserDefaults standardUserDefaults]setObject:[NSMutableArray array] forKey:kDBSyncDeletedTArrayKey];
     
     [combinedArrayF addObjectsFromArray:selectedUsersTCloud];
     [combinedArrayF addObjectsFromArray:selectedUsersTLocal];
-    
-    /*NSMutableArray *finalArrayF = [NSMutableArray array];
-    
-    for (id obj in combinedArrayF) {
-        if (![finalArrayF containsObject:obj]) {
-            [finalArrayF addObject:obj];
-        }
-    }*/
     
     cloudData[@"usernames_twitter"] = combinedArrayF;
     [defaults setObject:combinedArrayF forKey:@"usernames_twitter"];
