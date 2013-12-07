@@ -77,4 +77,69 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
     return ((loaded.count == 0)?@{}:loaded).mutableCopy;
 }
 
++ (void)reloadMainTableView {
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"reloadTableView" object:nil];
+}
+
++ (void)removeFacebookFromTimeline {
+    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
+    
+    /* NSMutableArray *timeline = [[Cache sharedCache]timeline];
+     
+     for (NSDictionary *dict in timeline) {
+     if ([dict[@"social_network_name"] isEqualToString:@"facebook"]) {
+     [[[Cache sharedCache]timeline]removeObject:dict];
+     }
+     }*/
+}
+
++ (void)removeTwitterFromTimeline {
+    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
+    /*NSMutableArray *timeline = [[Cache sharedCache]timeline].mutableCopy;
+     
+     for (NSDictionary *dict in timeline) {
+     if ([dict[@"social_network_name"] isEqualToString:@"twitter"]) {
+     [[[Cache sharedCache]timeline]removeObject:dict];
+     }
+     }*/
+}
+
+//
+// HUD management Methods
+//
+
++ (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted {
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:Settings.appDelegate.window animated:YES];
+    hud.mode = MBProgressHUDModeCustomView;
+    hud.labelText = shouldSayCompleted?@"Completed":@"Success";
+    hud.customView = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"Checkmark"]];
+    [hud hide:YES afterDelay:1.5];
+}
+
++ (void)showHUDWithTitle:(NSString *)title {
+    [MBProgressHUD hideAllHUDsForView:Settings.appDelegate.window animated:YES];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:Settings.appDelegate.window animated:YES];
+    hud.mode = MBProgressHUDModeIndeterminate;
+    hud.labelText = title;
+}
+
++ (void)hideHUD {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [MBProgressHUD hideAllHUDsForView:Settings.appDelegate.window animated:YES];
+}
+
++ (void)setTitleOfVisibleHUD:(NSString *)newTitle {
+    MBProgressHUD *hud = [MBProgressHUD HUDForView:Settings.appDelegate.window];
+    hud.labelText = newTitle;
+}
+
++ (void)showSelfHidingHudWithTitle:(NSString *)title {
+    [MBProgressHUD hideAllHUDsForView:Settings.appDelegate.window animated:YES];
+    MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:Settings.appDelegate.window animated:YES];
+    hud.mode = MBProgressHUDModeText;
+    hud.labelText = title;
+    [hud hide:YES afterDelay:1.5];
+}
+
 @end

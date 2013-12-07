@@ -71,10 +71,8 @@
 }
 
 - (void)post {
-    AppDelegate *ad = [Settings appDelegate];
-    
     [_commentField resignFirstResponder];
-    [ad showHUDWithTitle:@"Posting..."];
+    [Settings showHUDWithTitle:@"Posting..."];
     
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/%@/comments",_postIdentifier]]];
     [req setHTTPMethod:@"POST"];
@@ -101,7 +99,7 @@
     
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
         
-        [ad hideHUD];
+        [Settings hideHUD];
         
         if (error) {
             [_commentField becomeFirstResponder];

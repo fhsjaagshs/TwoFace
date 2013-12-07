@@ -177,8 +177,6 @@
 }
 
 - (void)replyOrRetweet {
-    AppDelegate *ad = [Settings appDelegate];
-
     __block BOOL isFavorite = _tweet.isFavorited;
     
     if ([_tweet.user.screename isEqualToString:[[FHSTwitterEngine sharedEngine]authenticatedUsername]]) {
@@ -191,7 +189,7 @@
                 ReplyViewController *d = [[ReplyViewController alloc]initWithTweet:_tweet];
                 [self presentModalViewController:d animated:YES];
             } else if (buttonIndex == 1) {
-                [ad showHUDWithTitle:@"Retweeting..."];
+                [Settings showHUDWithTitle:@"Retweeting..."];
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     @autoreleasepool {
@@ -200,9 +198,9 @@
                         
                         dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
-                                [ad hideHUD];
+                                [Settings hideHUD];
                                 if (error) {
-                                    [ad showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
                                 }
                             }
                         });
@@ -211,9 +209,9 @@
             } else if (buttonIndex == 2) {
                 
                 if (!isFavorite) {
-                    [ad showHUDWithTitle:@"Favoriting..."];
+                    [Settings showHUDWithTitle:@"Favoriting..."];
                 } else {
-                    [ad showHUDWithTitle:@"Unfavoriting..."];
+                    [Settings showHUDWithTitle:@"Unfavoriting..."];
                 }
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -223,10 +221,10 @@
                         
                         dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
-                                [ad hideHUD];
+                                [Settings hideHUD];
                                 
                                 if (error) {
-                                    [ad showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
                                 } else {
                                     int index = [[[Cache sharedCache]timeline]indexOfObject:_tweet];
                                     if (index != INT_MAX) {
@@ -247,8 +245,6 @@
 }
 
 - (void)openURL:(NSNotification *)notif {
-    AppDelegate *ad = [Settings appDelegate];
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             
@@ -258,18 +254,18 @@
             if (imageData.length == 0) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [ad showHUDWithTitle:@"Loading Image..."];
+                        [Settings showHUDWithTitle:@"Loading Image..."];
                     }
                 });
                 imageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[notif object]] returningResponse:nil error:nil];
             }
             
-            [ad hideHUD];
+            [Settings hideHUD];
             
             if (imageData.length == 0) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [ad showSelfHidingHudWithTitle:@"Error Loading Image"];
+                        [Settings showSelfHidingHudWithTitle:@"Error Loading Image"];
                     }
                 });
             } else {

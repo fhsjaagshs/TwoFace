@@ -10,7 +10,7 @@
 
 @implementation DBSyncClient
 
-- (void)mainSyncStep:(NSString *)rev {
++ (void)mainSyncStep:(NSString *)rev {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     
     NSString *susPath = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
@@ -114,7 +114,7 @@
     } andProgressBlock:nil];
 }
 
-- (void)dropboxSync {
++ (void)dropboxSync {
     [Settings.appDelegate showHUDWithTitle:@"Syncing..."];
     NSString *susPath = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
     
@@ -148,17 +148,17 @@
                         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                         qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
                     } else {
-                        [self mainSyncStep:savedRev];
+                        [DBSyncClient mainSyncStep:savedRev];
                     }
                 } andProgressBlock:nil];
             } else {
-                [self mainSyncStep:savedRev];
+                [DBSyncClient mainSyncStep:savedRev];
             }
         }
     }];
 }
 
-- (void)resetDropboxSync {
++ (void)resetDropboxSync {
     [Settings.appDelegate showHUDWithTitle:@"Resetting Sync..."];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableArray alloc]init] forKey:kDBSyncDeletedTArrayKey];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableDictionary alloc]init] forKey:kDBSyncDeletedFBDictKey];

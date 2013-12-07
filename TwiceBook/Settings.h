@@ -31,6 +31,7 @@ extern NSString * const kEnteringForegroundNotif;
 @interface Settings : NSObject
 
 + (AppDelegate *)appDelegate;
+
 + (NSString *)documentsDirectory;
 + (NSString *)cachesDirectory;
 + (NSString *)invalidUsersCachePath;
@@ -42,5 +43,16 @@ extern NSString * const kEnteringForegroundNotif;
 + (NSMutableDictionary *)selectedFacebookFriends;
 + (NSMutableArray *)dropboxDeletedTwitterArray;
 + (NSMutableDictionary *)dropboxDeletedFacebookDictionary;
+
++ (void)reloadMainTableView;
+
++ (void)showHUDWithTitle:(NSString *)title;
++ (void)hideHUD;
++ (void)setTitleOfVisibleHUD:(NSString *)newTitle;
++ (void)showSelfHidingHudWithTitle:(NSString *)title;
++ (void)showSuccessHUDWithCompletedTitle:(BOOL)shouldSayCompleted;
+
++ (void)removeFacebookFromTimeline;
++ (void)removeTwitterFromTimeline;
 
 @end

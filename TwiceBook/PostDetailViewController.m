@@ -453,7 +453,6 @@
 - (id)initWithPost:(Status *)posty {
     self = [super init];
     if (self) {
-        NSLog(@"%@",posty);
         [self setPost:posty];
         [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     }
@@ -464,16 +463,14 @@
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
-            
-            AppDelegate *ad = [Settings appDelegate];
-            
+
             NSString *cachePath = [[Settings cachesDirectory]stringByAppendingPathComponent:[notif.object lastPathComponent]];
             NSData *imageDataD = [NSData dataWithContentsOfFile:cachePath];
             
             if (imageDataD.length == 0) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [[Settings appDelegate]showHUDWithTitle:@"Loading Image..."];
+                        [Settings showHUDWithTitle:@"Loading Image..."];
                     }
                 });
                 imageDataD = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[notif object]] returningResponse:nil error:nil];
@@ -482,15 +479,15 @@
             if (imageDataD.length == 0) {
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [ad hideHUD];
-                        [ad showSelfHidingHudWithTitle:@"Error Loading Image"];
+                        [Settings hideHUD];
+                        [Settings showSelfHidingHudWithTitle:@"Error Loading Image"];
                     }
                 });
             } else {
                 [imageDataD writeToFile:cachePath atomically:YES];
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        [ad hideHUD];
+                        [Settings hideHUD];
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageDataD];
                         vc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
                         [self presentModalViewController:vc animated:YES];

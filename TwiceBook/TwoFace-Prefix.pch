@@ -16,6 +16,8 @@
     #import "FHSTwitterEngine.h"
     #import "FHSFacebook.h"
 
+    #import "DBSyncClient.h"
+
     #import "AdditionalLabelCell.h"
     #import "FHSGradientView.h"
     #import "ZoomingImageView.h"

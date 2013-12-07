@@ -47,15 +47,7 @@
     [super viewDidLoad];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(setLastSyncedDate) name:@"lastSynced" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(setLoggedInAccount:) name:@"dropboxLoggedInUser" object:nil];
-    NSString *savedUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"loggedInDropboxUser"];
-    if (savedUsername.length > 0) {
-        self.loggedInUsername = savedUsername;
-    } else {
-        if ([[DBSession sharedSession]isLinked]) {
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            [[[Settings appDelegate]restClient]loadAccountInfo];
-        }
-    }
+    self.loggedInUsername = [[NSUserDefaults standardUserDefaults]objectForKey:@"loggedInDropboxUser"];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -140,8 +132,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
     int section = indexPath.section;
     int row = indexPath.row;
     
@@ -155,7 +145,6 @@
             [self.theTableView reloadData];
         }
     } else if (section == 1) {
-        
         if (![FHSTwitterEngine isConnectedToInternet]) {
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             qAlert(@"Connection Offline", @"Your Internet connection appears to be offline. Please verify that your connection is valid.");
@@ -163,20 +152,19 @@
         }
         
         if (row == 0) {
-            [[Settings appDelegate]dropboxSync];
+            [DBSyncClient dropboxSync];
         } else if (row == 1) {
             UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Are You Sure?" message:@"Resetting your Dropbox sync cannot be undone." completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
-                
                 if (buttonIndex == 1) {
                     [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
-                    [self.theTableView reloadData];
-                    [[Settings appDelegate]resetDropboxSync];
+                    [_theTableView reloadData];
+                    [DBSyncClient resetDropboxSync];
                 }
-                
             } cancelButtonTitle:@"Cancel" otherButtonTitles:@"Reset",nil];
             [av show];
         }
     }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)close {

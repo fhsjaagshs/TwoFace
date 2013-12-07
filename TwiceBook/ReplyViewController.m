@@ -86,7 +86,7 @@
 
 - (void)kickoffTweetPost {
     NSString *messageBody = [_replyZone.text stringByTrimmingWhitespace];
-    [[Settings appDelegate] showHUDWithTitle:@"Tweeting..."];
+    [Settings showHUDWithTitle:@"Tweeting..."];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             NSError *error = nil;
@@ -296,7 +296,7 @@
 
 - (void)dismissModalViewControllerAnimated:(BOOL)animated {
     [self purgeDraftImages];
-    [[Settings appDelegate]hideHUD];
+    [Settings hideHUD];
     [self removeObservers];
     [super dismissModalViewControllerAnimated:animated];
 }
@@ -445,12 +445,11 @@
     if (_replyZone.text.length == 0 && _isFacebook) {
         return;
     }
-    
-    AppDelegate *ad = [Settings appDelegate];
+
     [_replyZone resignFirstResponder];
     
     if (_isFacebook) {
-        [ad showHUDWithTitle:@"Posting..."];
+        [Settings showHUDWithTitle:@"Posting..."];
         
         NSMutableDictionary *params = @{ @"message":_replyZone.text }.mutableCopy;
         
@@ -478,7 +477,7 @@
         
         if (self.imageFromCameraRoll) {
             [self scaleImageFromCameraRoll];
-            [ad showHUDWithTitle:@"Uploading..."];
+            [Settings showHUDWithTitle:@"Uploading..."];
             NSString *message = [self.replyZone.text stringByTrimmingWhitespace];
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -488,7 +487,7 @@
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
                             if ([returnValue isKindOfClass:[NSError class]]) {
-                                [ad hideHUD];
+                                [Settings hideHUD];
                                 [self.replyZone becomeFirstResponder];
                                 qAlert(@"Image Upload Failed", [NSString stringWithFormat:@"%@",[(NSError *)returnValue localizedDescription]]);
                             } else if ([returnValue isKindOfClass:[NSDictionary class]]) {

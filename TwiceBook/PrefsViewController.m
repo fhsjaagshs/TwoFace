@@ -190,22 +190,20 @@
 }
 
 - (void)close {
-    AppDelegate *ad = [Settings appDelegate];
-    
     BOOL shouldReload = NO;
     
     if (!FHSFacebook.shared.isSessionValid) {
-        [ad removeFacebookFromTimeline];
+        [Settings removeFacebookFromTimeline];
         shouldReload = YES;
     }
     
     if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [ad removeTwitterFromTimeline];
+        [Settings removeTwitterFromTimeline];
         shouldReload = YES;
     }
     
     if (shouldReload) {
-        [ad reloadMainTableView];
+        [Settings reloadMainTableView];
     }
     
     [self dismissModalViewControllerAnimated:YES];
