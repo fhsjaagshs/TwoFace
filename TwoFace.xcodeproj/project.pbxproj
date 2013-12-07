@@ -21,11 +21,9 @@
 		9B3C672615F68B690019F346 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B3C672515F68B690019F346 /* icon.png */; };
 		9B3C672915F68B7B0019F346 /* icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B3C672815F68B7B0019F346 /* icon@2x.png */; };
 		9B400FE31603EA430050774F /* SyncingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B400FE21603EA430050774F /* SyncingViewController.m */; };
-		9B4D79D815D1AB3D004B9B87 /* FHSGradientView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */; };
 		9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */; };
 		9B5DA1C9162CF6410034ABDC /* Checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */; };
 		9B5EE1F81624EA9000BFC265 /* DraftsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */; };
-		9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B604030163C9E9C003C5262 /* AboutViewController.m */; };
 		9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */; };
 		9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D860F15D74DC70085E640 /* UIImage+Scale.m */; };
 		9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7F43F1158E4D4300462D0D /* IntermediateUserSelectorViewController.m */; };
@@ -37,8 +35,6 @@
 		9BBD602315D48FA80078838C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BBD602215D48FA80078838C /* MobileCoreServices.framework */; };
 		9BCEB749162220550048CC43 /* NSArray+RemoveDuplicates.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEB748162220550048CC43 /* NSArray+RemoveDuplicates.m */; };
 		9BCEB74D16222AF90048CC43 /* CachesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BCEB74C16222AF90048CC43 /* CachesViewController.m */; };
-		9BD4D666162A6D6300724644 /* NSArray+FirstObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD4D665162A6D6300724644 /* NSArray+FirstObject.m */; };
-		9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */; };
 		9BE3E7E21601738D00F64709 /* inner-shadow.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BE3E7E11601738D00F64709 /* inner-shadow.png */; };
 		9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */; };
 		F1288F641852600800DECE1B /* DBSyncClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F1288F631852600800DECE1B /* DBSyncClient.m */; };
@@ -91,15 +87,11 @@
 		9B3C672815F68B7B0019F346 /* icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "icon@2x.png"; path = "../icon@2x.png"; sourceTree = "<group>"; };
 		9B400FE11603EA420050774F /* SyncingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SyncingViewController.h; sourceTree = "<group>"; };
 		9B400FE21603EA430050774F /* SyncingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SyncingViewController.m; sourceTree = "<group>"; };
-		9B4D79D615D1AB3D004B9B87 /* FHSGradientView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSGradientView.h; sourceTree = "<group>"; };
-		9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSGradientView.m; sourceTree = "<group>"; };
 		9B4FF41C160FF1FF00563A31 /* PrefsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefsViewController.h; sourceTree = "<group>"; };
 		9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrefsViewController.m; sourceTree = "<group>"; };
 		9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Checkmark@2x.png"; sourceTree = "<group>"; };
 		9B5EE1F51624EA9000BFC265 /* DraftsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DraftsViewController.h; sourceTree = "<group>"; };
 		9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DraftsViewController.m; sourceTree = "<group>"; };
-		9B60402F163C9E9C003C5262 /* AboutViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutViewController.h; sourceTree = "<group>"; };
-		9B604030163C9E9C003C5262 /* AboutViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutViewController.m; sourceTree = "<group>"; };
 		9B6DC063161D1073006C2B2F /* InterceptTwitPicLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterceptTwitPicLink.h; sourceTree = "<group>"; };
 		9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterceptTwitPicLink.m; sourceTree = "<group>"; };
 		9B7D860E15D74DC70085E640 /* UIImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Scale.h"; sourceTree = "<group>"; };
@@ -119,10 +111,6 @@
 		9BCEB748162220550048CC43 /* NSArray+RemoveDuplicates.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+RemoveDuplicates.m"; sourceTree = "<group>"; };
 		9BCEB74B16222AF90048CC43 /* CachesViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CachesViewController.h; sourceTree = "<group>"; };
 		9BCEB74C16222AF90048CC43 /* CachesViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CachesViewController.m; sourceTree = "<group>"; };
-		9BD4D664162A6D6300724644 /* NSArray+FirstObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+FirstObject.h"; sourceTree = "<group>"; };
-		9BD4D665162A6D6300724644 /* NSArray+FirstObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+FirstObject.m"; sourceTree = "<group>"; };
-		9BD5621115BE67E40017E542 /* AdditionalLabelCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdditionalLabelCell.h; sourceTree = "<group>"; };
-		9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdditionalLabelCell.m; sourceTree = "<group>"; };
 		9BE3E7E11601738D00F64709 /* inner-shadow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "inner-shadow.png"; sourceTree = "<group>"; };
 		9BE8001E1634C77C006D91B8 /* PullToRefreshView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PullToRefreshView.h; sourceTree = "<group>"; };
 		9BE8001F1634C77C006D91B8 /* PullToRefreshView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PullToRefreshView.m; sourceTree = "<group>"; };
@@ -222,8 +210,6 @@
 				9B2378DD15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m */,
 				9BCEB747162220550048CC43 /* NSArray+RemoveDuplicates.h */,
 				9BCEB748162220550048CC43 /* NSArray+RemoveDuplicates.m */,
-				9BD4D664162A6D6300724644 /* NSArray+FirstObject.h */,
-				9BD4D665162A6D6300724644 /* NSArray+FirstObject.m */,
 			);
 			name = Categories;
 			sourceTree = "<group>";
@@ -237,14 +223,10 @@
 				F1288F631852600800DECE1B /* DBSyncClient.m */,
 				F1288F651852757000DECE1B /* DroppinBadassBlocks.h */,
 				F1288F661852757000DECE1B /* DroppinBadassBlocks.m */,
-				9B4D79D615D1AB3D004B9B87 /* FHSGradientView.h */,
-				9B4D79D715D1AB3D004B9B87 /* FHSGradientView.m */,
 				F1C8CE62183BFF7700DD2544 /* MBProgressHUD.h */,
 				F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */,
 				9B2A621215AF8CEB00C4A426 /* ZoomingImageView.h */,
 				9B2A621315AF8CEB00C4A426 /* ZoomingImageView.m */,
-				9BD5621115BE67E40017E542 /* AdditionalLabelCell.h */,
-				9BD5621215BE67E40017E542 /* AdditionalLabelCell.m */,
 				9B6DC063161D1073006C2B2F /* InterceptTwitPicLink.h */,
 				9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */,
 				9BE8001E1634C77C006D91B8 /* PullToRefreshView.h */,
@@ -317,8 +299,6 @@
 				9B2A621C15AF8D5000C4A426 /* PostDetailViewController.m */,
 				9B5EE1F51624EA9000BFC265 /* DraftsViewController.h */,
 				9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */,
-				9B60402F163C9E9C003C5262 /* AboutViewController.h */,
-				9B604030163C9E9C003C5262 /* AboutViewController.m */,
 				F1D1FE21183EBB3800DED9D3 /* SDKs */,
 				F18042C1175A87E3008D191D /* Containers */,
 				9B298C6615B62EBE00A7C594 /* Custom Classes */,
@@ -500,13 +480,11 @@
 				9B2A621E15AF8D5000C4A426 /* CommentViewController.m in Sources */,
 				9B2A622015AF8D5000C4A426 /* ImageDetailViewController.m in Sources */,
 				9B2A622215AF8D5000C4A426 /* PostDetailViewController.m in Sources */,
-				9BD5621315BE67E40017E542 /* AdditionalLabelCell.m in Sources */,
 				9BA753BB15BF1A2000717D94 /* NSDate+Helper.m in Sources */,
 				9B0B127715CF2A0400217981 /* HelperFunctions.m in Sources */,
 				9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */,
 				F1288F671852757000DECE1B /* DroppinBadassBlocks.m in Sources */,
 				9B0B127E15CF2DCF00217981 /* UIAlertView+BlockExtensions.m in Sources */,
-				9B4D79D815D1AB3D004B9B87 /* FHSGradientView.m in Sources */,
 				9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */,
 				9B2378DE15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m in Sources */,
 				9B400FE31603EA430050774F /* SyncingViewController.m in Sources */,
@@ -517,9 +495,7 @@
 				F1DA26291850CDC500ED0A06 /* FHSFacebook.m in Sources */,
 				9BCEB74D16222AF90048CC43 /* CachesViewController.m in Sources */,
 				9B5EE1F81624EA9000BFC265 /* DraftsViewController.m in Sources */,
-				9BD4D666162A6D6300724644 /* NSArray+FirstObject.m in Sources */,
 				9BE800201634C77C006D91B8 /* PullToRefreshView.m in Sources */,
-				9B604032163C9E9C003C5262 /* AboutViewController.m in Sources */,
 				F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */,
 				F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */,
 				F1288F641852600800DECE1B /* DBSyncClient.m in Sources */,

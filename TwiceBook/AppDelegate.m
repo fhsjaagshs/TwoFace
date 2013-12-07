@@ -57,25 +57,19 @@
     [Keychain setObject:accessToken forKey:kTwitterAccessTokenKey];
 }
 
-
 //
 // Dropbox
 //
 
 - (void)sessionDidReceiveAuthorizationFailure:(DBSession *)session userId:(NSString *)userId {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    
-    if ([FHSTwitterEngine isConnectedToInternet]) {
-        qAlert(@"Authorization Failure", @"Please verify your login credentials and retry login.");
-    } else {
-        qAlert(@"Authorization Failure", @"Please check your internet connection and retry login.");
-    }
+    qAlert(@"Authorization Failure", FHSTwitterEngine.isConnectedToInternet?@"Please verify your login credentials and retry login.":@"Please check your internet connection and retry login.");
 }
 
 - (void)loadDropboxAccountInfo {
     [DroppinBadassBlocks loadAccountInfoWithCompletionBlock:^(DBAccountInfo *info, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        if (error) {
+        if (!error) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"dropboxLoggedInUser" object:info.displayName];
         }
     }];
@@ -86,7 +80,7 @@
 //
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    self.window = [[UIWindow alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
+    self.window = [[UIWindow alloc]initWithFrame:UIScreen.mainScreen.bounds];
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
@@ -99,11 +93,11 @@
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
     [[FHSTwitterEngine sharedEngine]setDelegate:self];
     
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [[FHSTwitterEngine sharedEngine]loadAccessToken];
+    if (!FHSTwitterEngine.sharedEngine.isAuthorized) {
+        [FHSTwitterEngine.sharedEngine loadAccessToken];
     }
     
-    if ([[Cache sharedCache]timeline].count > 0) {
+    if (Cache.sharedCache.timeline.count > 0) {
         if (!FHSFacebook.shared.isSessionValid) {
             [Settings removeFacebookFromTimeline];
         }
@@ -125,8 +119,8 @@
     if ([[url.scheme substringToIndex:2]isEqualToString:@"fb"]) {
         return [FHSFacebook.shared handleOpenURL:url];
     } else {
-        if ([[DBSession sharedSession]handleOpenURL:url]) {
-            if ([[DBSession sharedSession]isLinked]) {
+        if ([DBSession.sharedSession handleOpenURL:url]) {
+            if (DBSession.sharedSession.isLinked) {
                 [self loadDropboxAccountInfo];
             }
             return YES;

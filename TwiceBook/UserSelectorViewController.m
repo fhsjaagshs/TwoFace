@@ -88,7 +88,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)clearFriends {
     [[[Cache sharedCache]facebookFriends]removeAllObjects];
-    [[Settings appDelegate]removeFacebookFromTimeline];
+    [Settings removeFacebookFromTimeline];
 }
 
 - (void)loadFacebookFriends {
@@ -270,9 +270,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)resetSelectedUsers {
-    
-    AppDelegate *ad = [Settings appDelegate];
-    
     if (_isFacebook) {
         NSMutableDictionary *selectedDictionary = [Settings selectedFacebookFriends];
         NSMutableDictionary *deletedDictionary = [Settings dropboxDeletedFacebookDictionary];
@@ -283,7 +280,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         [selectedDictionary removeAllObjects];
         [[NSUserDefaults standardUserDefaults]setObject:selectedDictionary forKey:kSelectedFriendsDictionaryKey];
         
-        [ad removeFacebookFromTimeline];
+        [Settings removeFacebookFromTimeline];
     } else {
         NSMutableArray *usernames = [Settings selectedTwitterUsernames];
         NSMutableArray *addedUsernames = [Settings addedTwitterUsernames];
@@ -305,10 +302,10 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         [usernames removeAllObjects];
         [[NSUserDefaults standardUserDefaults]setObject:usernames forKey:kSelectedUsernamesListKey];
-        [ad removeTwitterFromTimeline];
+        [Settings removeTwitterFromTimeline];
     }
     
-    [ad reloadMainTableView];
+    [Settings reloadMainTableView];
     [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     [self updateCounter];
 }
@@ -575,7 +572,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)enableButtons {
-    [[Settings appDelegate]hideHUD];
+    [Settings hideHUD];
     _navBar.topItem.leftBarButtonItem.enabled = YES;
     _navBar.topItem.rightBarButtonItem.enabled = YES;
     [_pull finishedLoading];
@@ -584,9 +581,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
-    AppDelegate *ad = [Settings appDelegate];
-    
     self.pull = [[PullToRefreshView alloc]initWithScrollView:_theTableView];
     [_pull setDelegate:self];
     [_theTableView addSubview:_pull];
@@ -609,7 +603,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         if ([[Cache sharedCache]facebookFriends].allKeys.count == 0) {
             if (FHSFacebook.shared.isSessionValid) {
-                [ad showHUDWithTitle:@"Loading..."];
+                [Settings showHUDWithTitle:@"Loading..."];
                 [self loadFacebookFriends];
             }
         }
@@ -629,7 +623,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         if ([[Cache sharedCache]twitterFriends].count == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [ad showHUDWithTitle:@"Loading..."];
+                [Settings showHUDWithTitle:@"Loading..."];
                 [self fetchFriends];
             }
         } else {

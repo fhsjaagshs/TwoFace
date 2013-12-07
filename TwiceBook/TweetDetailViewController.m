@@ -73,12 +73,6 @@
         height = maxHeight;
     }
     
-    CGRect bgviewFrame = CGRectMake(5, 49, 310, height);
-    
-    FHSGradientView *gradientBG = [[FHSGradientView alloc]initWithFrame:bgviewFrame];
-    [self.view addSubview:gradientBG];
-    [self.view sendSubviewToBack:gradientBG];
-    
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
     [self getProfileImage];
     [self performSelector:@selector(setTitleText) withObject:nil afterDelay:1.0f];

@@ -16,7 +16,7 @@
 
 - (void)parseDictionary:(NSDictionary *)dict {
     self.from = [FacebookUser facebookUserWithDictionary:dict[@"from"]];
-    self.to = [FacebookUser facebookUserWithDictionary:[dict[@"to"][@"data"]firstObjectA]];
+    self.to = [FacebookUser facebookUserWithDictionary:[dict[@"to"][@"data"]firstObject]];
     self.identifier = dict[@"id"];
     self.message = [dict[@"message"]stringByTrimmingWhitespace];
     self.createdAt = [NSDate dateWithTimeIntervalSince1970:[dict[@"updated_time"]floatValue]+1800];

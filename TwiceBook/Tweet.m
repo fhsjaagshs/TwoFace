@@ -125,7 +125,7 @@
                 NSString *shortenedURL = entity[@"url"];
                 NSString *fullURL = entity[@"expanded_url"];
                 
-                NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""]componentsSeparatedByString:@"/"]firstObjectA]componentsSeparatedByString:@"."]lastObject];
+                NSString *dotWhatever = [[[[[fullURL stringByReplacingOccurrencesOfString:@"://" withString:@""]componentsSeparatedByString:@"/"]firstObject]componentsSeparatedByString:@"."]lastObject];
                 
                 if ([@[@"com",@"net",@"gov",@"us",@"me",@"org",@"edu"] containsObject:dotWhatever]) {
                     fullURL = [fullURL stringByReplacingOccurrencesOfString:@"http://" withString:@""];

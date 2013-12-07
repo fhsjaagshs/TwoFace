@@ -103,7 +103,7 @@
     [cloudData writeToFile:susPath atomically:YES];
     
     [DroppinBadassBlocks uploadFile:@"selectedUsernameSync.plist" toPath:@"/" withParentRev:rev fromPath:susPath withBlock:^(NSString *destPath, NSString *srcPath, DBMetadata *metadata, NSError *error) {
-        [Settings.appDelegate hideHUD];
+        [Settings hideHUD];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         if (error) {
             qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
@@ -115,12 +115,12 @@
 }
 
 + (void)dropboxSync {
-    [Settings.appDelegate showHUDWithTitle:@"Syncing..."];
+    [Settings showHUDWithTitle:@"Syncing..."];
     NSString *susPath = [[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"];
     
     [DroppinBadassBlocks loadMetadata:@"/" withCompletionBlock:^(DBMetadata *metadata, NSError *error) {
         if (error) {
-            [Settings.appDelegate hideHUD];
+            [Settings hideHUD];
             [[NSFileManager defaultManager]removeItemAtPath:susPath error:nil];
             qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -144,7 +144,7 @@
             if ([filenames containsObject:@"selectedUsernameSync.plist"]) {
                 [DroppinBadassBlocks loadFile:@"/selectedUsernameSync.plist" intoPath:susPath withCompletionBlock:^(DBMetadata *metadata, NSError *error) {
                     if (error) {
-                        [Settings.appDelegate hideHUD];
+                        [Settings hideHUD];
                         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                         qAlert(@"Syncing Error", @"TwoFace failed to sync your selected users.");
                     } else {
@@ -159,13 +159,13 @@
 }
 
 + (void)resetDropboxSync {
-    [Settings.appDelegate showHUDWithTitle:@"Resetting Sync..."];
+    [Settings showHUDWithTitle:@"Resetting Sync..."];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableArray alloc]init] forKey:kDBSyncDeletedTArrayKey];
     [[NSUserDefaults standardUserDefaults]setObject:[[NSMutableDictionary alloc]init] forKey:kDBSyncDeletedFBDictKey];
     [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
     [DroppinBadassBlocks deletePath:@"/selectedUsernameSync.plist" completionHandler:^(NSString *path, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        [Settings.appDelegate hideHUD];
+        [Settings hideHUD];
         if (error && error.code != 404) {
             [[NSFileManager defaultManager]removeItemAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"selectedUsernameSync.plist"] error:nil];
             qAlert(@"Failed to Reset Sync", @"TwoFace failed to delete the sync data on Dropbox.");

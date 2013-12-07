@@ -42,17 +42,10 @@
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"\u2699" style:UIBarButtonItemStyleBordered target:self action:@selector(showPrefs)];
     [topItem.rightBarButtonItem setTitlePositionAdjustment:UIOffsetMake(0, 15.0f) forBarMetrics:UIBarMetricsDefault];
     [topItem.rightBarButtonItem setTitleTextAttributes:@{ UITextAttributeFont: [UIFont systemFontOfSize:24.0f] } forState:UIControlStateNormal];
-    
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
-
-    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(90, 20, 160, 44);
-    [button addTarget:self action:@selector(showVersion) forControlEvents:UIControlEventTouchUpInside];
-    [self.view addSubview:button];
-    [self.view bringSubviewToFront:button];
     
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(reloadTableView) name:@"reloadTableView" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:_theTableView selector:@selector(reloadData) name:@"reloadTableView" object:nil];
 }
 
 - (void)refreshTimeline {
@@ -255,9 +248,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
-    
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     if (timeline.count == 0) {
@@ -279,21 +269,14 @@
         TweetDetailViewController *d = [[TweetDetailViewController alloc]initWithTweet:tappedItem];
         [self presentModalViewController:d animated:YES];
     }
-}
-
-- (void)reloadTableView {
-    [_theTableView reloadData];
+    
+    [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if ([[Cache sharedCache]timeline].count == 0) {
+    if (Cache.sharedCache.timeline.count == 0) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
-}
-
-- (void)showVersion {
-    AboutViewController *vc = [[AboutViewController alloc]init];
-    [self presentModalViewController:vc animated:YES];
 }
 
 - (void)showPrefs {
@@ -315,7 +298,7 @@
     
     AppDelegate *ad = [Settings appDelegate];
     
-    BOOL twitter = [[FHSTwitterEngine sharedEngine]isAuthorized];
+    BOOL twitter = FHSTwitterEngine.sharedEngine.isAuthorized;
     BOOL facebook = FHSFacebook.shared.isSessionValid;
     
     if (twitter) {

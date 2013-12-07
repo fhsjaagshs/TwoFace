@@ -14,17 +14,6 @@
 
 - (id)initWithPost:(Status *)posty;
 
-@property (strong, nonatomic) UIButton *linkButton;
-
-@property (strong, nonatomic) UITableView *commentsTableView;
-@property (strong, nonatomic) UIImageView *theImageView;
-@property (strong, nonatomic) UINavigationBar *navBar;
-@property (strong, nonatomic) UILabel *displayNameLabel;
-@property (strong, nonatomic) UITextView *messageView;
-@property (strong, nonatomic) FHSGradientView *gradientView;
-@property (strong, nonatomic) PullToRefreshView *pull;
-@property (strong, nonatomic) UIActivityIndicatorView *aivy;
-
 @property (strong, nonatomic) Status *post;
 
 @property (assign, nonatomic) BOOL isLoadingImage;

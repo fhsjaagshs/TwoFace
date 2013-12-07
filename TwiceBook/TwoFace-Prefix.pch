@@ -18,8 +18,6 @@
 
     #import "DBSyncClient.h"
 
-    #import "AdditionalLabelCell.h"
-    #import "FHSGradientView.h"
     #import "ZoomingImageView.h"
     #import "MBProgressHUD.h"
     #import "PullToRefreshView.h"
@@ -33,7 +31,6 @@
     #import "UIScrollView+UIScrollView_ZoomToPoint.h"
     #import "NSArray+RemoveDuplicates.h"
     #import "UIImage+NSCoder.h"
-    #import "NSArray+FirstObject.h"
 
     #import "Settings.h"
     #import "Cache.h"
@@ -59,7 +56,6 @@
     #import "PrefsViewController.h"
     #import "CachesViewController.h"
     #import "DraftsViewController.h"
-    #import "AboutViewController.h"
     #import "UserSelectorViewController.h"
 
     #import "InterceptTwitPicLink.h"

@@ -15,6 +15,21 @@
 #define whereBGViewStarts 49
 #define betweenMessageViewAndStartOfBGView 53
 
+@interface PostDetailViewController ()
+
+@property (strong, nonatomic) UIButton *linkButton;
+
+@property (strong, nonatomic) UITableView *commentsTableView;
+@property (strong, nonatomic) UIImageView *theImageView;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UILabel *displayNameLabel;
+@property (strong, nonatomic) UITextView *messageView;
+@property (strong, nonatomic) UIView *gradientView;
+@property (strong, nonatomic) PullToRefreshView *pull;
+@property (strong, nonatomic) UIActivityIndicatorView *aivy;
+
+@end
+
 @implementation PostDetailViewController
 
 - (void)loadView {
@@ -648,7 +663,7 @@
     CGRect bgviewFrame = [self getBGViewRect];
     
     if (!_gradientView) {
-        self.gradientView = [[FHSGradientView alloc]init];
+        self.gradientView = [[UIView alloc]init];
     }
     
     _gradientView.frame = bgviewFrame;

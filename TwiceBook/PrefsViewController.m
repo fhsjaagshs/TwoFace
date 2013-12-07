@@ -94,7 +94,7 @@
     }
     
     if (section == 2) {
-        return @"Opens a menu with a list of caches that you can clear if you encounter problems.";
+        return [@"TwoFace v" stringByAppendingString:[[NSBundle mainBundle]infoDictionary][@"CFBundleVersion"]];
     }
     
     return nil;
