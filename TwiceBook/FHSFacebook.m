@@ -78,10 +78,13 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
     params[@"format"] = @"json";
     params[@"sdk"] = @"ios";
     params[@"sdk_version"] = @"2";
+    params[@"app_id"] = _appID;
     
     if ([self isSessionValid]) {
         params[@"access_token"] = _accessToken;
     }
+    
+    NSLog(@"%@",params);
     
     [self extendAccessTokenIfNeeded];
     

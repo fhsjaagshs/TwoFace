@@ -17,7 +17,7 @@
     }
     
     NSMutableArray *reqs = [NSMutableArray array];
-    
+
     for (NSString *identifier in identifiers) {
         NSString *req = [NSString stringWithFormat:@"{\"method\":\"GET\",\"relative_url\":\"%@/feed?&date_format=U&limit=25\"}",identifier];
         [reqs addObject:req];

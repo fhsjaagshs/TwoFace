@@ -67,6 +67,7 @@
 }
 
 - (void)loadDropboxAccountInfo {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [DroppinBadassBlocks loadAccountInfoWithCompletionBlock:^(DBAccountInfo *info, NSError *error) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         if (!error) {
@@ -102,7 +103,7 @@
             [Settings removeFacebookFromTimeline];
         }
         
-        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+        if (!FHSTwitterEngine.sharedEngine.isAuthorized) {
             [Settings removeTwitterFromTimeline];
         }
     }
@@ -135,6 +136,7 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
+    [FHSFacebook.shared extendAccessTokenIfNeeded];
     [[NSNotificationCenter defaultCenter]postNotificationName:kEnteringForegroundNotif object:nil];
 }
 

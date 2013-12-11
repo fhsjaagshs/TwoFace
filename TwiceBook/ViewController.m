@@ -115,6 +115,7 @@
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
+                        [_refreshControl endRefreshing];
                         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 
@@ -180,14 +181,13 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
+        cell.textLabel.highlightedTextColor = [UIColor blackColor];
+        cell.detailTextLabel.highlightedTextColor = [UIColor blackColor];
+        
+        cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
+        cell.detailTextLabel.numberOfLines = 0;
     }
  
-    cell.textLabel.highlightedTextColor = [UIColor blackColor];  
-    cell.detailTextLabel.highlightedTextColor = [UIColor blackColor];
-    
-    cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
-    cell.detailTextLabel.numberOfLines = 0;
-    
     NSMutableArray *timeline = [[Cache sharedCache]timeline];
     
     if (oneIsCorrect(_refreshControl.isRefreshing, timeline.count == 0)) {
@@ -296,8 +296,6 @@
     } cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
     
-    AppDelegate *ad = [Settings appDelegate];
-    
     BOOL twitter = FHSTwitterEngine.sharedEngine.isAuthorized;
     BOOL facebook = FHSFacebook.shared.isSessionValid;
     
@@ -317,7 +315,7 @@
     }
     as.cancelButtonIndex = as.numberOfButtons-1;
     
-    [as showInView:ad.window];
+    [as showInView:Settings.appDelegate.window];
 }
 
 @end
