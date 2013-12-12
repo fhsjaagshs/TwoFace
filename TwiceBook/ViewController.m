@@ -32,7 +32,7 @@
     _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
     
-    self.refreshControl = [[UIRefreshControl alloc] init];
+    self.refreshControl = [[UIRefreshControl alloc]init];
     [_refreshControl addTarget:self action:@selector(refreshTimeline) forControlEvents:UIControlEventValueChanged];
     [_theTableView addSubview:_refreshControl];
     
@@ -70,7 +70,7 @@
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         [_refreshControl endRefreshing];
     } else {
-        [[[Cache sharedCache]timeline]removeAllObjects];
+        [[[Cache shared]timeline]removeAllObjects];
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
@@ -90,28 +90,8 @@
                         returnValue = retValFB;
                     }
                 }
-                
-                if ([[Cache sharedCache]invalidUsers].count > 0) {
-                    NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
-                    NSMutableArray *selectedUsers = [Settings selectedTwitterUsernames];
-                    
-                    for (NSString *obj in [[Cache sharedCache]invalidUsers]) {
-                        if ([addedUsers containsObject:obj]) {
-                            [addedUsers removeObject:obj];
-                        }
-                        
-                        if ([selectedUsers containsObject:obj]) {
-                            [selectedUsers removeObject:obj];
-                        }
-                    }
-                    
-                    [[[Cache sharedCache]invalidUsers]removeAllObjects];
-                    
-                    [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
-                    [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
-                }
-                
-                [[Cache sharedCache]sortTimeline];
+
+                [[Cache shared]sortTimeline];
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
@@ -146,7 +126,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    NSMutableArray *timeline = [[Cache shared]timeline];
     
     if (timeline.count > 0) {
         
@@ -171,7 +151,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = [[Cache sharedCache]timeline].count;
+    int count = Cache.shared.timeline.count;
     return (count == 0)?1:count;
 }
 
@@ -188,7 +168,7 @@
         cell.detailTextLabel.numberOfLines = 0;
     }
  
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    NSMutableArray *timeline = [[Cache shared]timeline];
     
     if (oneIsCorrect(_refreshControl.isRefreshing, timeline.count == 0)) {
         cell.textLabel.textColor = [UIColor blackColor];
@@ -199,14 +179,16 @@
             [[FHSTwitterEngine sharedEngine]loadAccessToken];
         }
 
-        if (![[FHSTwitterEngine sharedEngine]isAuthorized] && !FHSFacebook.shared.isSessionValid) {
+        if (!FHSTwitterEngine.sharedEngine.isAuthorized && !FHSFacebook.shared.isSessionValid) {
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
-            if (oneIsCorrect([[[Settings selectedFacebookFriends]allKeys]count] > 0, [[Settings selectedTwitterUsernames]count] > 0)) {
+            if (oneIsCorrect(Settings.selectedFacebookFriends.count > 0, Settings.selectedTwitterUsernames.count > 0)) {
                 if (!_refreshControl.isRefreshing) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";
+                } else {
+                    cell.textLabel.text = @"Loading...";
                 }
             } else {
                 cell.textLabel.text = @"No Users Selected";
@@ -248,7 +230,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSMutableArray *timeline = [[Cache sharedCache]timeline];
+    NSMutableArray *timeline = [[Cache shared]timeline];
     
     if (timeline.count == 0) {
         return;
@@ -274,7 +256,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if (Cache.sharedCache.timeline.count == 0) {
+    if (Cache.shared.timeline.count == 0) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
 }

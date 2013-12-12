@@ -12,19 +12,15 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
-    self.view.backgroundColor = [UIColor underPageBackgroundColor];
-    UITableView *theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
+    UITableView *theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, screenBounds.size.height) style:UITableViewStyleGrouped];
     theTableView.delegate = self;
     theTableView.dataSource = self;
-    theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:theTableView.frame];
-    bgView.backgroundColor = [UIColor clearColor];
-    [theTableView setBackgroundView:bgView];
+    theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:theTableView];
-    [self.view bringSubviewToFront:theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Caches"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
@@ -34,52 +30,22 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 4;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 44;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section < 4) {
-        return 1;
-    }
-    return 0;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 0;
+    return 4;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if (section == 0) {
-        return @"Image Cache";
-    } else if (section == 1) {
-        return @"Twitter Cache";
-    } else if (section == 2) {
-        return @"Facebook Cache";
-    } else if (section == 3) {
-        return @"Timeline";
-    }
-    return nil;
+    return @"Caches Menu";
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if (section == 0) {
-        return @"Images from Facebook and Twitter";
-    } else if (section == 1) {
-        return @"Tweets and Twitter Users";
-    } else if (section == 2) {
-        return @"Statuses and Facebook Users";
-    } else {
-        return @"The timeline";
-    }
-    return nil;
+    return @"You can clear these caches to free some disk space.";
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     static NSString *CellIdentifier = @"CellCaches";
     
     UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
@@ -87,18 +53,15 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    int section = indexPath.section;
-
-    if (section == 0) {
+    if (indexPath.row == 0) {
         cell.textLabel.text = @"Clear Image Cache";
-    } else if (section == 1) {
+    } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Clear Twitter Cache";
-    } else if (section == 2) {
+    } else if (indexPath.row == 2) {
         cell.textLabel.text = @"Clear Facebook Cache";
-    } else if (section == 3) {
-        cell.textLabel.text = @"Clear Timeline";
+    } else if (indexPath.row == 3) {
+        cell.textLabel.text = @"Clear Timeline Cache";
     }
-    cell.textLabel.textAlignment = UITextAlignmentCenter;
     return cell;
 }
 
@@ -110,14 +73,12 @@
     if (section == 0) {
         [Cache clearImageCache];
     } else if (section == 1) {
-        [[[Cache sharedCache]nonTimelineTweets]removeAllObjects];
-        [[[Cache sharedCache]twitterIdToUsername]removeAllObjects];
-        [[[Cache sharedCache]invalidUsers]removeAllObjects];
-        [[[Cache sharedCache]twitterFriends]removeAllObjects];
+        [[[Cache shared]nonTimelineTweets]removeAllObjects];
+        [[[Cache shared]twitterFriends]removeAllObjects];
     } else if (section == 2) {
-        [[[Cache sharedCache]facebookFriends]removeAllObjects];
+        [[[Cache shared]facebookFriends]removeAllObjects];
     } else if (section == 3) {
-        [[[Cache sharedCache]timeline]removeAllObjects];
+        [[[Cache shared]timeline]removeAllObjects];
     }
 }
 

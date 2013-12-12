@@ -15,6 +15,7 @@
     #import "DroppinBadassBlocks.h"
     #import "FHSTwitterEngine.h"
     #import "FHSFacebook.h"
+    #import "FMDatabase.h"
 
     #import "DBSyncClient.h"
 

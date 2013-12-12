@@ -13,7 +13,7 @@
 
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[Cache sharedCache]facebookFriends][_toID]componentsSeparatedByString:@" "]firstObject]];
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[Cache shared]facebookFriends][_toID]componentsSeparatedByString:@" "]firstObject]];
 }
 
 - (void)loadView {

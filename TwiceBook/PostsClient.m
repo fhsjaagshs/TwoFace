@@ -75,24 +75,25 @@
                 }
             }
         }
-        [Cache.sharedCache.timeline addObjectsFromArray:parsedPosts];
+        [Cache.shared.timeline addObjectsFromArray:parsedPosts];
     }
     return returnValue;
 }
 
 + (BOOL)loadTweetsForUsernames:(NSArray *)usernames {
-    
     BOOL returnValue = YES;
     
     NSMutableArray *tweets = [NSMutableArray array];
-    NSMutableArray *nonTimelineTweets = [[Cache sharedCache]nonTimelineTweets];
+    NSMutableArray *nonTimelineTweets = [[Cache shared]nonTimelineTweets];
+    
+    NSMutableArray *invalidUsers = [NSMutableArray array];
     
     for (NSString *username in usernames) {
         id fetched = [[FHSTwitterEngine sharedEngine]getTimelineForUser:username isID:NO count:3];
         
         if ([fetched isKindOfClass:[NSError class]]) {
             if ([(NSError *)fetched code] == 404) {
-                [[[Cache sharedCache]invalidUsers]addObject:username];
+                [invalidUsers addObject:username];
             }
         } else if ([fetched isKindOfClass:[NSArray class]]) {
             for (NSDictionary *dict in fetched) {
@@ -117,7 +118,7 @@
                     
                     if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
                         Tweet *irt = [Tweet tweetWithDictionary:retrievedTweet];
-                        [[[Cache sharedCache]nonTimelineTweets]addObject:irt];
+                        [[[Cache shared]nonTimelineTweets]addObject:irt];
                         [tweets addObject:irt];
                     } else if ([retrievedTweet isKindOfClass:[Tweet class]]) {
                         [tweets addObject:retrievedTweet];
@@ -130,7 +131,19 @@
             }
         }
     }
-    [[[Cache sharedCache]timeline]addObjectsFromArray:[[NSSet setWithArray:tweets]allObjects]];
+    
+    if (invalidUsers.count > 0) {
+        NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
+        NSMutableArray *selectedUsers = [Settings selectedTwitterUsernames];
+        
+        [addedUsers removeObjectsInArray:invalidUsers];
+        [selectedUsers removeObjectsInArray:invalidUsers];
+        
+        [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
+        [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
+    }
+    
+    [[[Cache shared]timeline]addObjectsFromArray:[[NSSet setWithArray:tweets]allObjects]];
     return YES;
 }
 

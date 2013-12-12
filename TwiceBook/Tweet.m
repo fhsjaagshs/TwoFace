@@ -102,19 +102,16 @@
         }
     }
     
-    if (entities.allKeys.count > 0) {
+    if (entities.count > 0) {
         for (NSMutableDictionary *mediadict in entities[@"media"]) {
-            
             NSString *picTwitterComLink = mediadict[@"display_url"];
             NSString *picTwitterURLtoReplace = mediadict[@"url"];
             NSString *picTwitterComImageLink = mediadict[@"media_url"];
-            
-            BOOL hasTwitPicLink = (picTwitterComImageLink.length > 0);
-            
-            if (hasTwitPicLink) {
+
+            if (picTwitterComImageLink.length > 0) {
                 picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
                 self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-                Cache.sharedCache.pictwitterURLs[picTwitterComLink] = picTwitterComImageLink;
+                [Cache.shared setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
             }
         }
         

@@ -61,6 +61,9 @@
 		F1DA26291850CDC500ED0A06 /* FHSFacebook.m in Sources */ = {isa = PBXBuildFile; fileRef = F1DA26281850CDC500ED0A06 /* FHSFacebook.m */; };
 		F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */; };
 		F1E182B9184FBC92002ABBD9 /* PostsClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E182B8184FBC92002ABBD9 /* PostsClient.m */; };
+		F1E3DDBB185A036900DED240 /* FMDatabase.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E3DDB6185A036900DED240 /* FMDatabase.m */; };
+		F1E3DDBC185A036900DED240 /* FMDatabaseAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E3DDB8185A036900DED240 /* FMDatabaseAdditions.m */; };
+		F1E3DDBD185A036900DED240 /* FMResultSet.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E3DDBA185A036900DED240 /* FMResultSet.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -159,6 +162,12 @@
 		F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSelectorViewController.m; sourceTree = "<group>"; };
 		F1E182B7184FBC92002ABBD9 /* PostsClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PostsClient.h; sourceTree = "<group>"; };
 		F1E182B8184FBC92002ABBD9 /* PostsClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostsClient.m; sourceTree = "<group>"; };
+		F1E3DDB5185A036900DED240 /* FMDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabase.h; sourceTree = "<group>"; };
+		F1E3DDB6185A036900DED240 /* FMDatabase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabase.m; sourceTree = "<group>"; };
+		F1E3DDB7185A036900DED240 /* FMDatabaseAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMDatabaseAdditions.h; sourceTree = "<group>"; };
+		F1E3DDB8185A036900DED240 /* FMDatabaseAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMDatabaseAdditions.m; sourceTree = "<group>"; };
+		F1E3DDB9185A036900DED240 /* FMResultSet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FMResultSet.h; sourceTree = "<group>"; };
+		F1E3DDBA185A036900DED240 /* FMResultSet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FMResultSet.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -299,7 +308,7 @@
 				9B2A621C15AF8D5000C4A426 /* PostDetailViewController.m */,
 				9B5EE1F51624EA9000BFC265 /* DraftsViewController.h */,
 				9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */,
-				F1D1FE21183EBB3800DED9D3 /* SDKs */,
+				F1D1FE21183EBB3800DED9D3 /* Libraries */,
 				F18042C1175A87E3008D191D /* Containers */,
 				9B298C6615B62EBE00A7C594 /* Custom Classes */,
 				F129B665157B8237005353EB /* Supporting Files */,
@@ -378,13 +387,14 @@
 			path = FHSTwitterEngine;
 			sourceTree = "<group>";
 		};
-		F1D1FE21183EBB3800DED9D3 /* SDKs */ = {
+		F1D1FE21183EBB3800DED9D3 /* Libraries */ = {
 			isa = PBXGroup;
 			children = (
+				F1E3DDB4185A036900DED240 /* fmdb */,
 				F1DA26261850CDB600ED0A06 /* FHSFacebook */,
 				F19D0A42184919A700891122 /* FHSTwitterEngine */,
 			);
-			name = SDKs;
+			name = Libraries;
 			sourceTree = "<group>";
 		};
 		F1DA26261850CDB600ED0A06 /* FHSFacebook */ = {
@@ -394,6 +404,19 @@
 				F1DA26281850CDC500ED0A06 /* FHSFacebook.m */,
 			);
 			name = FHSFacebook;
+			sourceTree = "<group>";
+		};
+		F1E3DDB4185A036900DED240 /* fmdb */ = {
+			isa = PBXGroup;
+			children = (
+				F1E3DDB5185A036900DED240 /* FMDatabase.h */,
+				F1E3DDB6185A036900DED240 /* FMDatabase.m */,
+				F1E3DDB7185A036900DED240 /* FMDatabaseAdditions.h */,
+				F1E3DDB8185A036900DED240 /* FMDatabaseAdditions.m */,
+				F1E3DDB9185A036900DED240 /* FMResultSet.h */,
+				F1E3DDBA185A036900DED240 /* FMResultSet.m */,
+			);
+			path = fmdb;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -483,6 +506,7 @@
 				9BA753BB15BF1A2000717D94 /* NSDate+Helper.m in Sources */,
 				9B0B127715CF2A0400217981 /* HelperFunctions.m in Sources */,
 				9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */,
+				F1E3DDBB185A036900DED240 /* FMDatabase.m in Sources */,
 				F1288F671852757000DECE1B /* DroppinBadassBlocks.m in Sources */,
 				9B0B127E15CF2DCF00217981 /* UIAlertView+BlockExtensions.m in Sources */,
 				9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */,
@@ -505,7 +529,9 @@
 				F18042CD175A896C008D191D /* FacebookUser.m in Sources */,
 				F13964F5175EB9710073EE5E /* Settings.m in Sources */,
 				F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */,
+				F1E3DDBD185A036900DED240 /* FMResultSet.m in Sources */,
 				F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */,
+				F1E3DDBC185A036900DED240 /* FMDatabaseAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

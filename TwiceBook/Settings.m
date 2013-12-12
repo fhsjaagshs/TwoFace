@@ -82,26 +82,11 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
 }
 
 + (void)removeFacebookFromTimeline {
-    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
-    
-    /* NSMutableArray *timeline = [[Cache sharedCache]timeline];
-     
-     for (NSDictionary *dict in timeline) {
-     if ([dict[@"social_network_name"] isEqualToString:@"facebook"]) {
-     [[[Cache sharedCache]timeline]removeObject:dict];
-     }
-     }*/
+    [[[Cache shared]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
 }
 
 + (void)removeTwitterFromTimeline {
-    [[[Cache sharedCache]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
-    /*NSMutableArray *timeline = [[Cache sharedCache]timeline].mutableCopy;
-     
-     for (NSDictionary *dict in timeline) {
-     if ([dict[@"social_network_name"] isEqualToString:@"twitter"]) {
-     [[[Cache sharedCache]timeline]removeObject:dict];
-     }
-     }*/
+    [[[Cache shared]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
 }
 
 //

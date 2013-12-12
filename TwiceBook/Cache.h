@@ -10,24 +10,23 @@
 
 @interface Cache : NSObject
 
-@property (nonatomic, strong) NSMutableArray *twitterFriends; // theFetchedUsernames
-@property (nonatomic, strong) NSMutableDictionary *facebookFriends; // facebookFriendsDict
+@property (nonatomic, strong) NSMutableDictionary *twitterFriends; // theFetchedUsernames
+//@property (nonatomic, strong) NSMutableDictionary *facebookFriends; // facebookFriendsDict
 @property (nonatomic, strong) NSMutableArray *timeline;
 @property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
-@property (nonatomic, strong) NSMutableArray *invalidUsers; // protectedUsers
-@property (nonatomic, strong) NSMutableDictionary *twitterIdToUsername;
-@property (nonatomic, strong) NSMutableDictionary *pictwitterURLs; // link url is key, image url is object
 
 - (void)cache;
 - (void)loadCaches;
 
 - (void)sortTimeline;
 
-+ (Cache *)sharedCache;
++ (Cache *)shared;
 
 + (void)clearImageCache;
 + (UIImage *)imageFromCache:(NSString *)imageName;
 + (void)setImage:(UIImage *)image forName:(NSString *)name;
 
+- (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL;
+- (NSString *)getImageURLForLinkURL:(NSString *)linkURL;
 
 @end

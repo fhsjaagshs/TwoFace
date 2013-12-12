@@ -10,18 +10,15 @@
 
 @implementation InterceptTwitPicLink
 
-@synthesize picTwitterLinks;
-
 - (BOOL)openURLWithoutHandling:(NSURL *)url; {
     return [super openURL:url];
 }
 
 - (BOOL)openURL:(NSURL *)url {
-    
-    NSString *urlString = [NSString stringWithFormat:@"%@",url];
+    NSString *urlString = url.absoluteString;
     
     if ([urlString containsString:@"twitpic.com/"]) {
-        urlString = [NSString stringWithFormat:@"http://twitpic.com/show/large/%@.jpg",[url lastPathComponent]];
+        urlString = [NSString stringWithFormat:@"http://twitpic.com/show/large/%@.jpg",url.lastPathComponent];
         url = [NSURL URLWithString:urlString];
     }
     
@@ -30,12 +27,12 @@
     if (extension.length >= 3) {
         extension = [extension substringToIndex:3];
     }
-    
-    if (([extension isEqualToString:@"png"] || [extension isEqualToString:@"jpg"] || [extension isEqualToString:@"tif"] || [extension isEqualToString:@"jpe"] || [urlString containsString:@"pic.twitter.com/"])) {
-        NSString *newURL = [[Cache sharedCache]pictwitterURLs][[[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""]];
+
+    if ([@[@"png", @"jpg", @"tif", @"jpe"] containsObject:extension]) {
+        NSString *linkURL = [[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""];
+        NSString *newURL = [Cache.shared getImageURLForLinkURL:linkURL];
         if (newURL.length > 0) {
-            urlString = newURL;
-            url = [NSURL URLWithString:urlString];
+            url = [NSURL URLWithString:newURL];
         }
         [[NSNotificationCenter defaultCenter]postNotificationName:@"imageOpen" object:url];
         return YES;

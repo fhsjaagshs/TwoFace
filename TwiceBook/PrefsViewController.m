@@ -15,7 +15,6 @@
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, screenBounds.size.height) style:UITableViewStyleGrouped];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
@@ -30,91 +29,52 @@
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Sync" style:UIBarButtonItemStyleBordered target:self action:@selector(showSyncMenu)];
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(refreshFacebookButton) name:@"FBButtonNotif" object:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.theTableView reloadData];
-}
-
-- (void)refreshFacebookButton {
-    [self.theTableView reloadData];
+    [_theTableView reloadData];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     return 3;
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 44;
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 0) {
-        return 2;
-    }
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 0;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    if (section == 1) {
-        return 20;
-    }
-    return 0;
+    return (section == 0)?2:1;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section == 0) {
-        NSString *twitterUsername = [[FHSTwitterEngine sharedEngine]authenticatedUsername];
-        NSString *fbUsername = FHSFacebook.shared.user.name;
+        NSMutableArray *usernames = [NSMutableArray array];
         
-        BOOL fbUsernameIsThere = fbUsername.length > 0;
-        BOOL twitterUsernameIsThere = twitterUsername.length > 0;
-
-        if (fbUsernameIsThere && twitterUsernameIsThere) {
-            return [NSString stringWithFormat:@"@%@, %@",twitterUsername, fbUsername];
+        if (FHSFacebook.shared.user.name.length > 0) {
+            [usernames addObject:FHSFacebook.shared.user.name];
         }
         
-        if (fbUsernameIsThere && !twitterUsernameIsThere) {
-            return fbUsername;
+        if (FHSTwitterEngine.sharedEngine.authenticatedUsername.length > 0) {
+            [usernames addObject:[NSString stringWithFormat:@"@%@",FHSTwitterEngine.sharedEngine.authenticatedUsername]];
         }
-        
-        if (!fbUsernameIsThere && twitterUsernameIsThere) {
-            return [@"@" stringByAppendingString:twitterUsername];
-        }
-        
-        if (!fbUsernameIsThere && !twitterUsernameIsThere) {
-            return nil;
-        }
+        return [usernames componentsJoinedByString:@", "];
+    } else if (section == 2) {
+        return [@"TwoFace v" stringByAppendingString:NSBundle.mainBundle.infoDictionary[@"CFBundleVersion"]];
     }
-    
-    if (section == 2) {
-        return [@"TwoFace v" stringByAppendingString:[[NSBundle mainBundle]infoDictionary][@"CFBundleVersion"]];
-    }
-    
     return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     static NSString *CellIdentifier = @"Cell4";
 
-    UITableViewCell *cell = (UITableViewCell *)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
     int section = indexPath.section;
-    int row = indexPath.row;
- 
+
     if (section == 0) {
-        if (row == 0) {
+        if (indexPath.row == 0) {
             cell.textLabel.text = FHSTwitterEngine.sharedEngine.isAuthorized?@"Log out of Twitter":@"Sign into Twitter";
         } else {
             cell.textLabel.text = FHSFacebook.shared.isSessionValid?@"Log out of Facebook":@"Sign into Facebook";
@@ -139,7 +99,7 @@
     if (section == 0) {
         if (row == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [[[Cache sharedCache]twitterFriends]removeAllObjects];
+                [[[Cache shared]twitterFriends]removeAllObjects];
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
             } else {
                 if (![FHSTwitterEngine isConnectedToInternet]) {
@@ -149,7 +109,6 @@
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
                 
                 UIViewController *loginController = [[FHSTwitterEngine sharedEngine]loginControllerWithCompletionHandler:^(BOOL success) {
-                    
                     [_theTableView reloadData];
                     
                     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"http://natesymer.com:3000/accept/token/tw"]];
@@ -207,10 +166,6 @@
     }
     
     [self dismissModalViewControllerAnimated:YES];
-}
-
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"FBButtonNotif" object:nil];
 }
 
 @end

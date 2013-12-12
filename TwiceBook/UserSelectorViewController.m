@@ -13,7 +13,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 @implementation UserSelectorViewController
 
-- (id)initWithIsFacebook:(BOOL)isfacebook isImmediateSelection:(BOOL)isimdtselection {
+- (instancetype)initWithIsFacebook:(BOOL)isfacebook isImmediateSelection:(BOOL)isimdtselection {
     if (self = [super init]) {
         self.isFacebook = isfacebook;
         self.isImmediateSelection = isimdtselection;
@@ -21,7 +21,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     return self;
 }
 
-- (id)initWithIsFacebook:(BOOL)isfacebook {
+- (instancetype)initWithIsFacebook:(BOOL)isfacebook {
     if (self = [super init]) {
         self.isFacebook = isfacebook;
         self.isImmediateSelection = NO;
@@ -31,14 +31,12 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
-    _theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-88)];
+    self.theTableView = [[UITableView alloc]initWithFrame:screenBounds];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
     [self.view addSubview:_theTableView];
-    [self.view bringSubviewToFront:_theTableView];
     
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Users"];
@@ -47,11 +45,14 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [_navBar pushNavigationItem:topItem animated:NO];
     
     [self.view addSubview:_navBar];
-    [self.view bringSubviewToFront:_navBar];
     
     if (_isImmediateSelection) {
-        _theTableView.frame = CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44);
+        _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+        _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     } else {
+        _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 44, 0);
+        _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 44, 0);
+        
         UIToolbar *bottomBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, screenBounds.size.height-44, screenBounds.size.width, 44)];
         
         if (!_isFacebook) {
@@ -61,18 +62,65 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         }
         
         [self.view addSubview:bottomBar];
-        [self.view bringSubviewToFront:bottomBar];
         
         self.counter = [[UILabel alloc]initWithFrame:bottomBar.frame];
         _counter.backgroundColor = [UIColor clearColor];
         _counter.textAlignment = UITextAlignmentCenter;
-        _counter.textColor = [UIColor whiteColor];
+        _counter.textColor = [UIColor blackColor];
         _counter.font = [UIFont boldSystemFontOfSize:19];
-        _counter.shadowColor = [UIColor blackColor];
-        _counter.shadowOffset = CGSizeMake(0, -1);
         [self.view addSubview:_counter];
-        [self.view bringSubviewToFront:_counter];
     }
+    
+    self.pull = [[PullToRefreshView alloc]initWithScrollView:_theTableView];
+    [_pull setDelegate:self];
+    [_theTableView addSubview:_pull];
+    
+    if (_isFacebook) {
+        if (_isImmediateSelection) {
+            _navBar.topItem.title = @"Select Friend";
+        } else {
+            _navBar.topItem.title = @"Select Friends";
+        }
+        
+        self.savedFriendsDict = [Settings selectedFacebookFriends];
+        
+        [self loadCachedFriendsOrderedArray];
+        
+        if (!_orderedFriendsArray) {
+            self.orderedFriendsArray = [NSMutableArray array];
+            [Cache.shared.facebookFriends removeAllObjects];
+        }
+        
+        if (Cache.shared.facebookFriends.count == 0) {
+            if (FHSFacebook.shared.isSessionValid) {
+                [Settings showHUDWithTitle:@"Loading..."];
+                [self loadFacebookFriends];
+            }
+        }
+    } else {
+        if (_isImmediateSelection) {
+            _navBar.topItem.title = @"Select User";
+        } else {
+            _navBar.topItem.title = @"Select Users";
+        }
+        
+        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
+            [[FHSTwitterEngine sharedEngine]loadAccessToken];
+        }
+        
+        self.savedSelectedArrayTwitter = [Settings selectedTwitterUsernames];
+        
+        if (Cache.shared.twitterFriends.count == 0) {
+            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
+                [Settings showHUDWithTitle:@"Loading..."];
+                [self fetchFriends];
+            }
+        } else {
+            [self updateListTwitter];
+        }
+    }
+    
+    [self updateCounter];
 }
 
 // Facebook Stuff
@@ -87,7 +135,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)clearFriends {
-    [[[Cache sharedCache]facebookFriends]removeAllObjects];
+    [[[Cache shared]facebookFriends]removeAllObjects];
     [Settings removeFacebookFromTimeline];
 }
 
@@ -117,20 +165,26 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 
                 NSArray *data = ((NSDictionary *)parsedJSONResponse)[@"data"];
                 
-                for (int i = 0; i < data.count; i++) {
+                for (NSDictionary *dict in data) {
+                    NSString *identifier = dict[@"uid"];
+                    NSString *name = dict[@"name"];
+                    Cache.shared.facebookFriends[identifier] = name;
+                }
+                
+                /*for (int i = 0; i < data.count; i++) {
                     NSString *username = [NSString stringWithString:data[i][@"name"]];
                     
-                    if ([[[Cache sharedCache]facebookFriends].allValues containsObject:username]) {
+                    if ([[[Cache shared]facebookFriends].allValues containsObject:username]) {
                         username = [username stringByAppendingString:@" "];
                     }
                     
                     NSString *identifier = [NSString stringWithFormat:@"%@",data[i][@"uid"]];
-                    [[[Cache sharedCache]facebookFriends]setValue:username forKey:identifier];
+                    [[[Cache shared]facebookFriends]setValue:username forKey:identifier];
                     
                     [_orderedFriendsArray addObject:username];
-                }
+                }*/
                 
-                [self.theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+                [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
                 
                 [self cacheFriendsOrderedArray];
             }
@@ -145,7 +199,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     NSMutableArray *unmodifiedTwitterUsernamesList = [NSMutableArray arrayWithContentsOfFile:[[Settings cachesDirectory]stringByAppendingPathComponent:@"cached_list_twitter_friends.plist"]];
 
     // Update added array
-    for (id object in [usernames mutableCopy]) {
+    for (id object in usernames.mutableCopy) {
         if (![unmodifiedTwitterUsernamesList containsObject:object]) {
             if (![addedUsernames containsObject:object]) {
                 [addedUsernames addObject:object];
@@ -153,22 +207,21 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         }
     }
 
-    for (id object in [addedUsernames mutableCopy]) {
+    for (id object in addedUsernames.mutableCopy) {
         if ([unmodifiedTwitterUsernamesList containsObject:object]) {
             [addedUsernames removeObject:object]; // its a user
         } else {
-            if (![[[Cache sharedCache]twitterFriends]containsObject:object]) {
-                [[[Cache sharedCache]twitterFriends]addObject:object];
+            if (![[[Cache shared]twitterFriends]containsObject:object]) {
+                [[[Cache shared]twitterFriends]addObject:object];
             }
         }
     }
     
     [[NSUserDefaults standardUserDefaults]setObject:addedUsernames forKey:kAddedUsernamesListKey];
-    [[[Cache sharedCache]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];
+    [[[Cache shared]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];
 }
 
 - (void)fetchFriends {
-    
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             id retIDs = [[FHSTwitterEngine sharedEngine]getFriendsIDs];
@@ -184,12 +237,12 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 
                 NSMutableArray *usernames = [NSMutableArray array];
                 NSMutableArray *idsToLookUp = [NSMutableArray array];
-                NSMutableDictionary *cachedUsernamesLookupDict = [[Cache sharedCache]twitterIdToUsername];
+                NSMutableDictionary *cachedUsernamesLookupDict = [[Cache shared]twitterIdToUsername];
                 
                 for (NSString *identifier in ids) {
-                    if ([cachedUsernamesLookupDict.allKeys containsObject:identifier]) {
-                        NSString *theUsernameFromCache = cachedUsernamesLookupDict[identifier];
-                        [[Cache sharedCache]twitterIdToUsername][identifier] = theUsernameFromCache;
+                    NSString *theUsernameFromCache = cachedUsernamesLookupDict[identifier];
+                    if (theUsernameFromCache.length > 0) {
+                        Cache.shared.twitterIdToUsername[identifier] = theUsernameFromCache;
                         [usernames addObject:theUsernameFromCache];
                     } else {
                         [idsToLookUp addObject:identifier];
@@ -218,7 +271,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                             for (NSDictionary *dict in userDicts) {
                                 NSString *screen_name = dict[@"screen_name"];
                                 NSString *user_id = dict[@"id_str"];
-                                [[Cache sharedCache]twitterIdToUsername][user_id] = screen_name;
+                                [[Cache shared]twitterIdToUsername][user_id] = screen_name;
                                 [usernames addObject:screen_name];
                             }
                         }
@@ -226,9 +279,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 }
                 
                 if (succeeded && usernames.count > 0) {
-                    [[[Cache sharedCache]twitterFriends]removeAllObjects];
-                    [[[Cache sharedCache]twitterFriends]addObjectsFromArray:usernames];
-                    [[[Cache sharedCache]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];
+                    Cache.shared.twitterFriends = [usernames sortedArrayUsingSelector:@selector(caseInsensitiveCompare:)].mutableCopy;
                 }
             }
             
@@ -296,12 +347,9 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         [[NSUserDefaults standardUserDefaults]setObject:deletedArray forKey:kDBSyncDeletedTArrayKey];
         
-        [[[Cache sharedCache]twitterFriends] removeObjectsInArray:addedUsernames];
-        [addedUsernames removeAllObjects];
-        [[NSUserDefaults standardUserDefaults]setObject:addedUsernames forKey:kAddedUsernamesListKey];
-        
-        [usernames removeAllObjects];
-        [[NSUserDefaults standardUserDefaults]setObject:usernames forKey:kSelectedUsernamesListKey];
+        [[[Cache shared]twitterFriends]removeObjectsInArray:addedUsernames];
+        [[NSUserDefaults standardUserDefaults]setObject:[NSMutableArray array] forKey:kAddedUsernamesListKey];
+        [[NSUserDefaults standardUserDefaults]setObject:[NSMutableArray array] forKey:kSelectedUsernamesListKey];
         [Settings removeTwitterFromTimeline];
     }
     
@@ -351,12 +399,11 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)manuallyAddUsername:(NSString *)username {
-    
     if (username.length == 0) {
         return;
     }
 
-    if ([Settings selectedTwitterUsernames].count < 5) {
+    if (Settings.selectedTwitterUsernames.count < 5) {
         
         if ([username hasPrefix:@"@"]) {
             username = [username substringFromIndex:1];
@@ -368,12 +415,12 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             [[NSUserDefaults standardUserDefaults]setObject:deletedArray forKey:kDBSyncDeletedTArrayKey];
         }
 
-        if (![[[Cache sharedCache]twitterFriends]containsObject:username]) {
+        if (![[[Cache shared]twitterFriends]containsObject:username]) {
             NSMutableArray *addedUsernames = [Settings addedTwitterUsernames];
             [addedUsernames addObject:username];
             [[NSUserDefaults standardUserDefaults]setObject:addedUsernames forKey:kAddedUsernamesListKey];
-            [[[Cache sharedCache]twitterFriends]addObject:username];
-            [[[Cache sharedCache]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];
+            [[[Cache shared]twitterFriends]addObject:username];
+            [[[Cache shared]twitterFriends]sortUsingSelector:@selector(caseInsensitiveCompare:)];
         }
         
         NSMutableArray *usernames = [Settings selectedTwitterUsernames];
@@ -396,7 +443,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = _isFacebook?[[Cache sharedCache]facebookFriends].allKeys.count:[[Cache sharedCache]twitterFriends].count;
+    int count = _isFacebook?Cache.shared.facebookFriends.count:Cache.shared.twitterFriends.count;
     return (count > 0)?count:1;
 }
 
@@ -411,7 +458,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     cell.accessoryType = UITableViewCellAccessoryNone;
 
     if (_isFacebook) {
-        
         NSDictionary *selectedDictionary = [Settings selectedFacebookFriends];
 
         if (_orderedFriendsArray.count == 0) {
@@ -420,17 +466,17 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             return cell;
         }
         
-        if ([[Cache sharedCache]facebookFriends].allValues.count == 0) {
+        if (Cache.shared.facebookFriends.count == 0) {
             cell.textLabel.text = @"No friends loaded...";
             return cell;
         }
         
-        NSString *theValue = (self.orderedFriendsArray)[indexPath.row];
-        int indexOfKey = [[[Cache sharedCache]facebookFriends].allValues indexOfObject:theValue];
+        NSString *theValue = _orderedFriendsArray[indexPath.row];
+        int indexOfKey = [[[Cache shared]facebookFriends].allValues indexOfObject:theValue];
         
-        if ([[[Cache sharedCache]facebookFriends].allValues containsObject:theValue]) {
+        if ([[[Cache shared]facebookFriends].allValues containsObject:theValue]) {
             if (indexOfKey < INT_MAX) {
-                NSString *secondValue = ([[Cache sharedCache]facebookFriends].allKeys)[indexOfKey];
+                NSString *secondValue = ([[Cache shared]facebookFriends].allKeys)[indexOfKey];
                 if ([selectedDictionary.allKeys containsObject:secondValue]) {
                     cell.accessoryType = UITableViewCellAccessoryCheckmark;
                 } else {
@@ -440,21 +486,14 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         }
         cell.textLabel.text = theValue;
     } else {
-        
-        if ([[Cache sharedCache]twitterFriends].count == 0) {
+        if (Cache.shared.twitterFriends.count == 0) {
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.textLabel.text = @"No usernames loaded...";
             return cell;
         }
         
-        NSString *username = [[Cache sharedCache]twitterFriends][indexPath.row];
-        
-        if ([[Settings selectedTwitterUsernames]containsObject:username]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        }
-        
+        NSString *username = Cache.shared.twitterFriends[indexPath.row];
+        cell.accessoryType = [Settings.selectedTwitterUsernames containsObject:username]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
         cell.textLabel.text = [@"@" stringByAppendingString:username];
     }
     
@@ -474,15 +513,15 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         NSMutableDictionary *deletedDictionary = [Settings dropboxDeletedFacebookDictionary];
         
         NSString *selectedObject = _orderedFriendsArray[indexPath.row];
-        int correctedRow = [[[Cache sharedCache]facebookFriends].allValues indexOfObject:selectedObject];
+        int correctedRow = [Cache.shared.facebookFriends.allValues indexOfObject:selectedObject];
         
         if (correctedRow == INT_MAX) {
             return;
         }
         
-        NSString *identifier = ([[Cache sharedCache]facebookFriends].allKeys)[correctedRow];
+        NSString *identifier = Cache.shared.facebookFriends.allKeys[correctedRow];
         
-        if (self.isImmediateSelection) {
+        if (_isImmediateSelection) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"passFriendID" object:identifier];
             [self dismissModalViewControllerAnimated:YES];
             return;
@@ -490,7 +529,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         if (![selectedDictionary.allKeys containsObject:identifier]) {
             if (selectedDictionary.allKeys.count < 5) {
-                NSString *name = ([[Cache sharedCache]facebookFriends].allValues)[correctedRow];
+                NSString *name = Cache.shared.facebookFriends.allValues[correctedRow];
                 [selectedDictionary setValue:name forKey:identifier];
                 [[NSUserDefaults standardUserDefaults]setObject:selectedDictionary forKey:kSelectedFriendsDictionaryKey];
                 [cell setAccessoryType:UITableViewCellAccessoryCheckmark];
@@ -517,7 +556,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         }
     } else {
         NSMutableArray *usernames = [Settings selectedTwitterUsernames];
-        NSString *username = [[Cache sharedCache]twitterFriends][indexPath.row];
+        NSString *username = Cache.shared.twitterFriends[indexPath.row];
         
         if (_isImmediateSelection) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"passFriendID" object:username];
@@ -563,8 +602,8 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             if ([addedUsernames containsObject:username]) {
                 [addedUsernames removeObject:username];
                 [[NSUserDefaults standardUserDefaults]setObject:addedUsernames forKey:kAddedUsernamesListKey];
-                [[[Cache sharedCache]twitterFriends]removeObject:username];
-                [self.theTableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section]] withRowAnimation:UITableViewRowAnimationLeft];
+                [[[Cache shared]twitterFriends]removeObject:username];
+                [_theTableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationLeft];
             }
         }
     }
@@ -577,61 +616,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     _navBar.topItem.rightBarButtonItem.enabled = YES;
     [_pull finishedLoading];
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-}
-
-- (void)viewDidLoad {
-    [super viewDidLoad];
-    self.pull = [[PullToRefreshView alloc]initWithScrollView:_theTableView];
-    [_pull setDelegate:self];
-    [_theTableView addSubview:_pull];
-    
-    if (_isFacebook) {
-        if (_isImmediateSelection) {
-            _navBar.topItem.title = @"Select Friend";
-        } else {
-            _navBar.topItem.title = @"Select Friends";
-        }
-        
-        self.savedFriendsDict = [Settings selectedFacebookFriends];
-        
-        [self loadCachedFriendsOrderedArray];
-        
-        if (!_orderedFriendsArray) {
-            self.orderedFriendsArray = [NSMutableArray array];
-            [[[Cache sharedCache]facebookFriends]removeAllObjects];
-        }
-        
-        if ([[Cache sharedCache]facebookFriends].allKeys.count == 0) {
-            if (FHSFacebook.shared.isSessionValid) {
-                [Settings showHUDWithTitle:@"Loading..."];
-                [self loadFacebookFriends];
-            }
-        }
-    } else {
-        
-        if (_isImmediateSelection) {
-            _navBar.topItem.title = @"Select User";
-        } else {
-            _navBar.topItem.title = @"Select Users";
-        }
-        
-        if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-            [[FHSTwitterEngine sharedEngine]loadAccessToken];
-        }
-        
-        self.savedSelectedArrayTwitter = [Settings selectedTwitterUsernames];
-        
-        if ([[Cache sharedCache]twitterFriends].count == 0) {
-            if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [Settings showHUDWithTitle:@"Loading..."];
-                [self fetchFriends];
-            }
-        } else {
-            [self updateListTwitter];
-        }
-    }
-    
-    [self updateCounter];
 }
 
 - (void)back {

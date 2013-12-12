@@ -306,7 +306,7 @@
         }
         
         if (!error) {
-            NSMutableArray *timeline = [[Cache sharedCache]timeline];
+            NSMutableArray *timeline = [[Cache shared]timeline];
             
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             
@@ -349,7 +349,7 @@
                 
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;
-                    [[Cache sharedCache]timeline][index] = _post;
+                    [[Cache shared]timeline][index] = _post;
                 }
             }
             

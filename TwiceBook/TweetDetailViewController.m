@@ -14,55 +14,46 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    self.view.backgroundColor = [UIColor underPageBackgroundColor];
+    self.view.backgroundColor = [UIColor whiteColor];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     NSString *timestamp = [_tweet.createdAt timeElapsedSinceCurrentDate];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:[@"Tweet" stringByAppendingFormat:@" - %@ Ago",timestamp]];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(replyOrRetweet)];
-                                
     [bar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
     
-    self.tv = [[UITextView alloc]initWithFrame:CGRectMake(5, 124, screenBounds.size.width-10, screenBounds.size.height-124)];
+    self.tv = [[UITextView alloc]initWithFrame:CGRectMake(5, 144, screenBounds.size.width-10, screenBounds.size.height-124)];
     _tv.text = _tweet.text;
     _tv.font = [UIFont systemFontOfSize:14];
     _tv.dataDetectorTypes = UIDataDetectorTypeLink;
     _tv.backgroundColor = [UIColor clearColor];
     _tv.editable = NO;
-    
     [self.view addSubview:_tv];
-    [self.view bringSubviewToFront:_tv];
     
-    self.displayName = [[UILabel alloc]initWithFrame:CGRectMake(14, 57, 219, 21)];
+    self.displayName = [[UILabel alloc]initWithFrame:CGRectMake(14, 77, 219, 21)];
     _displayName.text = _tweet.user.name;
     _displayName.font = [UIFont boldSystemFontOfSize:17];
     _displayName.backgroundColor = [UIColor clearColor];
     [self.view addSubview:_displayName];
     [self.view bringSubviewToFront:_displayName];
     
-    self.username = [[UILabel alloc]initWithFrame:CGRectMake(14, 86, 219, 21)];
+    self.username = [[UILabel alloc]initWithFrame:CGRectMake(14, 106, 219, 21)];
     _username.text = [@"@" stringByAppendingString:_tweet.user.screename];
     _username.font = [UIFont systemFontOfSize:17];
     _username.backgroundColor = [UIColor clearColor];
-    
     [self.view addSubview:_username];
-    [self.view bringSubviewToFront:_username];
     
-    self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(229, 53, 71, 71)];
+    self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(229, 73, 71, 71)];
     _theImageView.layer.masksToBounds = YES;
     _theImageView.layer.borderColor = [UIColor blackColor].CGColor;
     _theImageView.layer.borderWidth = 1;
     _theImageView.layer.cornerRadius = 5;
     _theImageView.backgroundColor = [UIColor darkGrayColor];
-    
     [self.view addSubview:_theImageView];
-    [self.view bringSubviewToFront:_theImageView];
     
     CGSize labelSize = _tv.contentSize;
     CGFloat height = 73+labelSize.height;
@@ -83,10 +74,9 @@
 }
 
 - (void)getProfileImage {
-
     NSString *imageSavePath = [self imageInCachesDir];
     if ([[NSFileManager defaultManager]fileExistsAtPath:imageSavePath]) {
-        UIImage *image = [[UIImage alloc]initWithContentsOfFile:imageSavePath];
+        UIImage *image = [UIImage imageWithContentsOfFile:imageSavePath];
         
         for (UIView *view in self.view.subviews) {
             if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
@@ -94,20 +84,17 @@
             }
         }
         
-        [self.theImageView setImage:image];
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        [_theImageView setImage:image];
     } else {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         UIActivityIndicatorView *aiv = [[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-        aiv.center = self.theImageView.center;
+        aiv.center = _theImageView.center;
         [self.view addSubview:aiv];
         [self.view bringSubviewToFront:aiv];
         [aiv startAnimating];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             @autoreleasepool {
-                id image = nil;
-
                 NSString *rawProfileURL = _tweet.user.profileImageURL;
 
                 rawProfileURL = [rawProfileURL stringByReplacingOccurrencesOfString:@"_normal" withString:@"_bigger"]; //
@@ -117,54 +104,34 @@
                 NSHTTPURLResponse *response = nil;
                 NSError *error = nil;
                 NSData *theImageData = [NSURLConnection sendSynchronousRequest:imageRequest returningResponse:&response error:&error];
-                
-                if (oneIsCorrect(response == nil, error != nil)) {
-                    image = nil;
-                } else if (response.statusCode >= 304) {
-                    image = nil;
-                } else {
-                    image = [UIImage imageWithData:theImageData];
-                }
 
-                if (image == nil) {
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        @autoreleasepool {
-                            for (UIView *view in self.view.subviews) {
-                                if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
-                                    [view removeFromSuperview];
-                                }
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    @autoreleasepool {
+                        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                        
+                        for (UIView *view in self.view.subviews) {
+                            if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
+                                [view removeFromSuperview];
                             }
-                            [self.theImageView setHidden:YES];
-                            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                         }
-                    });
-                } else {
-                    dispatch_sync(dispatch_get_main_queue(), ^{
-                        @autoreleasepool {
-                            for (UIView *view in self.view.subviews) {
-                                if ([view isKindOfClass:[UIActivityIndicatorView class]]) {
-                                    [view removeFromSuperview];
-                                }
-                            }
-                            
-                            if ([image isKindOfClass:[UIImage class]]) {
-                                UIImage *downloadedImage = (UIImage *)image;
-                                [UIImagePNGRepresentation(downloadedImage) writeToFile:imageSavePath atomically:YES];
-                                [self.theImageView setImage:downloadedImage];
-                            } else {
-                                [self.theImageView setHidden:YES];
-                            }
-                            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                        
+                        if (error) {
+                            [_theImageView setHidden:YES];
+                        } else {
+                            UIImage *downloadedImage = [UIImage imageWithData:theImageData];
+                            [UIImagePNGRepresentation(downloadedImage) writeToFile:imageSavePath atomically:YES];
+                            [_theImageView setImage:downloadedImage];
                         }
-                    });
-                }
+                    }
+                });
             }
         });
     }
 }
 
 - (id)initWithTweet:(Tweet *)aTweet {
-    if (self = [super init]) {
+    self = [super init];
+    if (self) {
         self.tweet = aTweet;
     }
     return self;
@@ -178,7 +145,6 @@
         [self presentModalViewController:d animated:YES];
     } else {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
-            
             if (buttonIndex == 0) {
                 ReplyViewController *d = [[ReplyViewController alloc]initWithTweet:_tweet];
                 [self presentModalViewController:d animated:YES];
@@ -187,43 +153,36 @@
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     @autoreleasepool {
-                        
-                        NSError *error = [[FHSTwitterEngine sharedEngine]retweet:_tweet.identifier];
+                        id returnValue = [[FHSTwitterEngine sharedEngine]retweet:_tweet.identifier];
                         
                         dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
                                 [Settings hideHUD];
-                                if (error) {
-                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
+                                if ([returnValue isKindOfClass:[NSError class]]) {
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",[returnValue code]]];
                                 }
                             }
                         });
                     }
                 });
             } else if (buttonIndex == 2) {
-                
-                if (!isFavorite) {
-                    [Settings showHUDWithTitle:@"Favoriting..."];
-                } else {
-                    [Settings showHUDWithTitle:@"Unfavoriting..."];
-                }
+                [Settings showHUDWithTitle:isFavorite?@"Unfavoriting...":@"Favoriting..."];
                 
                 dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                     @autoreleasepool {
-                        
-                        NSError *error = [[FHSTwitterEngine sharedEngine]markTweet:_tweet.identifier asFavorite:!isFavorite];
+                        id returnValue = [[FHSTwitterEngine sharedEngine]markTweet:_tweet.identifier asFavorite:!isFavorite];
                         
                         dispatch_sync(dispatch_get_main_queue(), ^{
                             @autoreleasepool {
                                 [Settings hideHUD];
                                 
-                                if (error) {
-                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",error.code]];
+                                if ([returnValue isKindOfClass:[NSError class]]) {
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",[returnValue code]]];
                                 } else {
-                                    int index = [[[Cache sharedCache]timeline]indexOfObject:_tweet];
+                                    int index = [[[Cache shared]timeline]indexOfObject:_tweet];
                                     if (index != INT_MAX) {
                                         [_tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
-                                        [[Cache sharedCache]timeline][index] = _tweet;
+                                        [[Cache shared]timeline][index] = _tweet;
                                     }
                                 }
                             }
@@ -241,7 +200,6 @@
 - (void)openURL:(NSNotification *)notif {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
-            
             NSString *cachePath = [[Settings cachesDirectory]stringByAppendingPathComponent:[notif.object lastPathComponent]];
             NSData *imageData = [NSData dataWithContentsOfFile:cachePath];
             
@@ -251,7 +209,7 @@
                         [Settings showHUDWithTitle:@"Loading Image..."];
                     }
                 });
-                imageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:[notif object]] returningResponse:nil error:nil];
+                imageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:notif.object] returningResponse:nil error:nil];
             }
             
             [Settings hideHUD];

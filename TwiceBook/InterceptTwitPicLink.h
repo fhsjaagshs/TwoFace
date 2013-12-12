@@ -10,6 +10,6 @@
 
 @interface InterceptTwitPicLink : UIApplication
 
-@property (nonatomic, strong) NSMutableDictionary *picTwitterLinks;
+//@property (nonatomic, strong) NSMutableDictionary *picTwitterLinks;
 
 @end

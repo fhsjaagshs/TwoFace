@@ -29,13 +29,13 @@
 
 - (void)facebookDidNotLogin:(BOOL)cancelled {
     if (!cancelled) {
-        [[[Cache sharedCache]facebookFriends]removeAllObjects];
-        qAlert(@"Login Failed", @"Please try again.");
+        [self logoutFacebook];
+        qAlert(@"Login Failed", @"Please try logging into Facebook again later.");
     }
 }
 
 - (void)logoutFacebook {
-    [[[Cache sharedCache]facebookFriends]removeAllObjects];
+    [Cache.shared.facebookFriends removeAllObjects];
     [FHSFacebook.shared invalidateSession];
 }
 
@@ -66,16 +66,6 @@
     qAlert(@"Authorization Failure", FHSTwitterEngine.isConnectedToInternet?@"Please verify your login credentials and retry login.":@"Please check your internet connection and retry login.");
 }
 
-- (void)loadDropboxAccountInfo {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [DroppinBadassBlocks loadAccountInfoWithCompletionBlock:^(DBAccountInfo *info, NSError *error) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-        if (!error) {
-            [[NSNotificationCenter defaultCenter]postNotificationName:@"dropboxLoggedInUser" object:info.displayName];
-        }
-    }];
-}
-
 //
 // AppDelegate
 //
@@ -85,8 +75,6 @@
     self.viewController = [[ViewController alloc]init];
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
-
-    [[Cache sharedCache]loadCaches];
     
     [FHSFacebook.shared setAppID:@"314352998657355"];
     [FHSFacebook.shared setDelegate:self];
@@ -98,7 +86,7 @@
         [FHSTwitterEngine.sharedEngine loadAccessToken];
     }
     
-    if (Cache.sharedCache.timeline.count > 0) {
+    if (Cache.shared.timeline.count > 0) {
         if (!FHSFacebook.shared.isSessionValid) {
             [Settings removeFacebookFromTimeline];
         }
@@ -122,7 +110,13 @@
     } else {
         if ([DBSession.sharedSession handleOpenURL:url]) {
             if (DBSession.sharedSession.isLinked) {
-                [self loadDropboxAccountInfo];
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                [DroppinBadassBlocks loadAccountInfoWithCompletionBlock:^(DBAccountInfo *info, NSError *error) {
+                    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                    if (!error) {
+                        [[NSNotificationCenter defaultCenter]postNotificationName:@"dropboxLoggedInUser" object:info.displayName];
+                    }
+                }];
             }
             return YES;
         }
@@ -132,12 +126,16 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[Cache sharedCache]cache];
+    [[Cache shared]cache];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     [FHSFacebook.shared extendAccessTokenIfNeeded];
     [[NSNotificationCenter defaultCenter]postNotificationName:kEnteringForegroundNotif object:nil];
+}
+
+- (void)applicationWillTerminate:(UIApplication *)application {
+    [[Cache shared]cache];
 }
 
 @end
