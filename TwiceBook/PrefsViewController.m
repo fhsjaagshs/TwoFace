@@ -21,7 +21,6 @@
     _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
     _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
-    [self.view bringSubviewToFront:_theTableView];
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Settings"];
@@ -100,12 +99,14 @@
         if (row == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [[[Cache shared]twitterFriends]removeAllObjects];
+                [Settings removeTwitterFromTimeline];
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
             } else {
                 if (![FHSTwitterEngine isConnectedToInternet]) {
                     qAlert(@"Connection Offline", @"Your Internet connection appears to be offline. Please verify that your connection is valid.");
                     return;
                 }
+                
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
                 
                 UIViewController *loginController = [[FHSTwitterEngine sharedEngine]loginControllerWithCompletionHandler:^(BOOL success) {
@@ -124,7 +125,8 @@
         } else if (row == 1) {
             if (FHSFacebook.shared.isSessionValid) {
                 [ad logoutFacebook];
-                [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"fbName"];
+                [Settings removeFacebookFromTimeline];
+                [_theTableView reloadData];
             } else {
                 if (![FHSTwitterEngine isConnectedToInternet]) {
                     qAlert(@"Connection Offline", @"Your Internet connection appears to be offline. Please verify that your connection is valid.");
@@ -135,37 +137,22 @@
         }
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:section] withRowAnimation:UITableViewRowAnimationFade];
     } else if (section == 1) {
-        IntermediateUserSelectorViewController *iusvc = [[IntermediateUserSelectorViewController alloc]init];
-        [self presentModalViewController:iusvc animated:YES];
+        IntermediateUserSelectorViewController *vc = [[IntermediateUserSelectorViewController alloc]init];
+        [self presentViewController:vc animated:YES completion:nil];
     } else if (section == 2) {
         CachesViewController *vc = [[CachesViewController alloc]init];
-        [self presentModalViewController:vc animated:YES];
+        [self presentViewController:vc animated:YES completion:nil];
     }
 }
 
 - (void)showSyncMenu {
     SyncingViewController *ics = [[SyncingViewController alloc]init];
-    [self presentModalViewController:ics animated:YES];
+    [self presentViewController:ics animated:YES completion:nil];
 }
 
 - (void)close {
-    BOOL shouldReload = NO;
-    
-    if (!FHSFacebook.shared.isSessionValid) {
-        [Settings removeFacebookFromTimeline];
-        shouldReload = YES;
-    }
-    
-    if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
-        [Settings removeTwitterFromTimeline];
-        shouldReload = YES;
-    }
-    
-    if (shouldReload) {
-        [Settings reloadMainTableView];
-    }
-    
-    [self dismissModalViewControllerAnimated:YES];
+    [Settings reloadMainTableView];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

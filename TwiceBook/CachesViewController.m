@@ -67,23 +67,21 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
-    int section = indexPath.section;
-    
-    if (section == 0) {
+
+    if (indexPath.section == 0) {
         [Cache clearImageCache];
-    } else if (section == 1) {
+    } else if (indexPath.section == 1) {
         [[[Cache shared]nonTimelineTweets]removeAllObjects];
         [[[Cache shared]twitterFriends]removeAllObjects];
-    } else if (section == 2) {
+    } else if (indexPath.section == 2) {
         [Cache.shared cacheFacebookDicts:nil];
-    } else if (section == 3) {
+    } else if (indexPath.section == 3) {
         [[[Cache shared]timeline]removeAllObjects];
     }
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

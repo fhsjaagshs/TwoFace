@@ -91,7 +91,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         self.counter = [[UILabel alloc]initWithFrame:bottomBar.frame];
         _counter.backgroundColor = [UIColor clearColor];
-        _counter.textAlignment = UITextAlignmentCenter;
+        _counter.textAlignment = NSTextAlignmentCenter;
         _counter.textColor = [UIColor blackColor];
         _counter.font = [UIFont boldSystemFontOfSize:19];
         [self.view addSubview:_counter];
@@ -374,7 +374,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         if (_isImmediateSelection) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"passFriendID" object:identifier];
-            [self dismissModalViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
             return;
         }
         
@@ -408,7 +408,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
         if (_isImmediateSelection) {
             [[NSNotificationCenter defaultCenter]postNotificationName:@"passFriendID" object:cell.username];
-            [self dismissModalViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
         }
         
         if (![selectedUsernames containsObject:cell.username]) { // Selecting the username
@@ -456,7 +456,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)back {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

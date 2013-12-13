@@ -35,14 +35,6 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
     return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-+ (NSString *)invalidUsersCachePath {
-    return [[Settings cachesDirectory]stringByAppendingPathComponent:@"invalid_users.plist"];
-}
-
-+ (NSString *)usernameLookupCachePath {
-    return [[Settings cachesDirectory]stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"];
-}
-
 + (NSString *)draftsPath {
     return [[Settings documentsDirectory]stringByAppendingPathComponent:@"drafts.plist"];
 }

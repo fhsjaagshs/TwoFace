@@ -133,13 +133,8 @@
     }
     
     if (invalidUsers.count > 0) {
-        NSMutableArray *addedUsers = [Settings addedTwitterUsernames];
         NSMutableArray *selectedUsers = [Settings selectedTwitterUsernames];
-        
-        [addedUsers removeObjectsInArray:invalidUsers];
         [selectedUsers removeObjectsInArray:invalidUsers];
-        
-        [[NSUserDefaults standardUserDefaults]setObject:addedUsers forKey:kAddedUsernamesListKey];
         [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
     }
     

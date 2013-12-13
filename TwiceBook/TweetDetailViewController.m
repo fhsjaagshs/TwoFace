@@ -26,43 +26,33 @@
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
     
-    self.tv = [[UITextView alloc]initWithFrame:CGRectMake(5, 144, screenBounds.size.width-10, screenBounds.size.height-124)];
+    self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(15, 79, 70, 70)];
+    _theImageView.layer.masksToBounds = YES;
+    _theImageView.layer.cornerRadius = 35;
+    _theImageView.backgroundColor = [UIColor lightGrayColor];
+    _theImageView.layer.borderColor = [UIColor darkGrayColor].CGColor;
+    _theImageView.layer.borderWidth = 1.0f;
+    [self.view addSubview:_theImageView];
+    
+    self.displayName = [[UILabel alloc]initWithFrame:CGRectMake(100, 85, 210, 20)];
+    _displayName.text = _tweet.user.name;
+    _displayName.font = [UIFont boldSystemFontOfSize:17];
+    _displayName.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:_displayName];
+    
+    self.username = [[UILabel alloc]initWithFrame:CGRectMake(100, 110, 210, 20)];
+    _username.text = [@"@" stringByAppendingString:_tweet.user.screename];
+    _username.font = [UIFont systemFontOfSize:17];
+    _username.backgroundColor = [UIColor clearColor];
+    [self.view addSubview:_username];
+    
+    self.tv = [[UITextView alloc]initWithFrame:CGRectMake(5, 150, screenBounds.size.width-10, screenBounds.size.height-150)];
     _tv.text = _tweet.text;
     _tv.font = [UIFont systemFontOfSize:14];
     _tv.dataDetectorTypes = UIDataDetectorTypeLink;
     _tv.backgroundColor = [UIColor clearColor];
     _tv.editable = NO;
     [self.view addSubview:_tv];
-    
-    self.displayName = [[UILabel alloc]initWithFrame:CGRectMake(14, 77, 219, 21)];
-    _displayName.text = _tweet.user.name;
-    _displayName.font = [UIFont boldSystemFontOfSize:17];
-    _displayName.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:_displayName];
-    [self.view bringSubviewToFront:_displayName];
-    
-    self.username = [[UILabel alloc]initWithFrame:CGRectMake(14, 106, 219, 21)];
-    _username.text = [@"@" stringByAppendingString:_tweet.user.screename];
-    _username.font = [UIFont systemFontOfSize:17];
-    _username.backgroundColor = [UIColor clearColor];
-    [self.view addSubview:_username];
-    
-    self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(229, 73, 71, 71)];
-    _theImageView.layer.masksToBounds = YES;
-    _theImageView.layer.borderColor = [UIColor blackColor].CGColor;
-    _theImageView.layer.borderWidth = 1;
-    _theImageView.layer.cornerRadius = 5;
-    _theImageView.backgroundColor = [UIColor darkGrayColor];
-    [self.view addSubview:_theImageView];
-    
-    CGSize labelSize = _tv.contentSize;
-    CGFloat height = 73+labelSize.height;
-    
-    CGFloat maxHeight = self.view.frame.size.height-49-5;
-    
-    if (height > maxHeight) {
-        height = maxHeight;
-    }
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
     [self getProfileImage];
@@ -240,8 +230,11 @@
 }
 
 - (void)close {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"imageOpen" object:nil];
     [self dismissModalViewControllerAnimated:YES];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"imageOpen" object:nil];
 }
 
 @end

@@ -10,7 +10,7 @@
 
 @class FHSGradientView;
 
-@interface PostDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, PullToRefreshViewDelegate>
+@interface PostDetailViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 - (id)initWithPost:(Status *)posty;
 

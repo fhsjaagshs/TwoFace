@@ -25,7 +25,7 @@
 @property (strong, nonatomic) UILabel *displayNameLabel;
 @property (strong, nonatomic) UITextView *messageView;
 @property (strong, nonatomic) UIView *gradientView;
-@property (strong, nonatomic) PullToRefreshView *pull;
+@property (strong, nonatomic) UIRefreshControl *refreshControl;
 @property (strong, nonatomic) UIActivityIndicatorView *aivy;
 
 @end
@@ -36,7 +36,7 @@
     [super loadView];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadTheCommentsMethinks) name:@"commentsNotif" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadComments) name:@"commentsNotif" object:nil];
     
     NSString *posterName = _post.from.name;
     NSString *postBody = _post.message;
@@ -51,8 +51,7 @@
     BOOL hasLink = (linkURL.length > 0);
     BOOL isPhoto = [type isEqualToString:@"photo"];
     
-    self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]applicationFrame]];
-    self.view.backgroundColor = [UIColor underPageBackgroundColor];
+    self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     
     NSString *timestamp = [_post.createdAt timeElapsedSinceCurrentDate];
     NSString *title = [[type stringByCapitalizingFirstLetter]stringByAppendingFormat:@" - %@ ago",timestamp];
@@ -60,19 +59,15 @@
     UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:title];
     item.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(showReply)];
     item.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    
-    [self.navBar pushNavigationItem:item animated:YES];
-    
-    [self.view addSubview:self.navBar];
-    [self.view bringSubviewToFront:self.navBar];
+    [_navBar pushNavigationItem:item animated:YES];
+    [self.view addSubview:_navBar];
     
     self.displayNameLabel = [[UILabel alloc]initWithFrame:CGRectMake(14, 53, 292, 21)];
-    self.displayNameLabel.textAlignment = UITextAlignmentCenter;
+    self.displayNameLabel.textAlignment = NSTextAlignmentCenter;
     self.displayNameLabel.font = [UIFont boldSystemFontOfSize:17];
     self.displayNameLabel.backgroundColor = [UIColor clearColor];
     self.displayNameLabel.text = (toName.length > 0)?[posterName stringByAppendingFormat:@" to %@",toName]:posterName;
     [self.view addSubview:self.displayNameLabel];
-    [self.view bringSubviewToFront:self.displayNameLabel];
     
     self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(218, 82, 92, 92)];
     self.theImageView.contentMode = UIViewContentModeScaleAspectFit;
@@ -83,7 +78,6 @@
     self.theImageView.layer.borderWidth = 1;
     self.theImageView.layer.cornerRadius = 5;
     [self.view addSubview:self.theImageView];
-    [self.view bringSubviewToFront:self.theImageView];
 
     self.messageView = [[UITextView alloc]initWithFrame:CGRectMake(7, 82, (hasImage?214:307), 236)]; // 236 or (460-(44*3)-10-82)
     self.messageView.editable = NO;
@@ -94,7 +88,6 @@
     self.messageView.showsVerticalScrollIndicator = YES;
     self.messageView.text = postBody;
     [self.view addSubview:self.messageView];
-    [self.view bringSubviewToFront:self.messageView];
     
     self.commentsTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 199, 320, 261)];
     self.commentsTableView.delegate = self;
@@ -105,21 +98,15 @@
     bgView.backgroundColor = [UIColor clearColor];
     [self.commentsTableView setBackgroundView:bgView];
     [self.view addSubview:self.commentsTableView];
-    [self.view bringSubviewToFront:self.commentsTableView];
     
     self.linkButton = [UIButton buttonWithType:UIButtonTypeCustom];
-    self.linkButton.frame = CGRectMake(215, 173, 95, 37);
-    self.linkButton.titleLabel.font = [UIFont boldSystemFontOfSize:19];
-    [self.linkButton setTitle:@"Visit Link" forState:UIControlStateNormal];
-    self.linkButton.titleLabel.textColor = [UIColor colorWithRed:31.0f/255.0f green:102.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
-    [self.linkButton addTarget:self action:@selector(linkAction) forControlEvents:UIControlEventTouchUpInside];
-    self.linkButton.hidden = YES;
-    [self.view addSubview:self.linkButton];
-    [self.view bringSubviewToFront:self.linkButton];
-    
-    if (!hasActions) {
-        [self.navBar.topItem.rightBarButtonItem setEnabled:NO];
-    }
+    _linkButton.frame = CGRectMake(215, 173, 95, 37);
+    _linkButton.titleLabel.font = [UIFont boldSystemFontOfSize:19];
+    [_linkButton setTitle:@"Visit Link" forState:UIControlStateNormal];
+    _linkButton.titleLabel.textColor = [UIColor colorWithRed:31.0f/255.0f green:102.0f/255.0f blue:146.0f/255.0f alpha:1.0f];
+    [_linkButton addTarget:self action:@selector(linkAction) forControlEvents:UIControlEventTouchUpInside];
+    _linkButton.hidden = YES;
+    [self.view addSubview:_linkButton];
 
     if (hasImage) {
         [_theImageView setHidden:NO];
@@ -152,15 +139,15 @@
     [self.view addSubview:_aivy];
     
     if (hasActions) {
-        self.pull = [[PullToRefreshView alloc]initWithScrollView:self.commentsTableView];
-        [_pull setDelegate:self];
-        [_pull setSubtitleText:@"Comments"];
-        [_pull setBackgroundColor:[UIColor clearColor]];
-        [_commentsTableView addSubview:_pull];
+        self.refreshControl = [[UIRefreshControl alloc]init];
+        [_refreshControl addTarget:self action:@selector(loadComments) forControlEvents:UIControlEventValueChanged];
+        [_commentsTableView addSubview:_refreshControl];
+    } else {
+        [_navBar.topItem.rightBarButtonItem setEnabled:NO];
     }
     
     if (comments.count == 0) {
-        [self loadTheCommentsMethinks];
+        [self loadComments];
     }
     
     [self layoutViews];
@@ -272,14 +259,13 @@
     }];
 }
 
-- (void)loadTheCommentsMethinks {
-    
+- (void)loadComments {
     if ([_post.actionsAvailable isEqualToString:@"no"]) {
         return;
     }
     
     if (![FHSTwitterEngine isConnectedToInternet]) {
-        [_pull finishedLoading];
+        [_refreshControl endRefreshing];
         return;
     }
 
@@ -357,7 +343,7 @@
             [self layoutViews];
             [_aivy stopAnimating];
         }
-        [_pull finishedLoading];
+        [_refreshControl endRefreshing];
     }];
 }
 
@@ -455,21 +441,20 @@
 }
 
 - (void)showReply {
-    CommentViewController *cvc = [[CommentViewController alloc]initWithPostID:_post.identifier];
-    [self presentModalViewController:cvc animated:YES];
+    CommentViewController *vc = [[CommentViewController alloc]initWithPostID:_post.identifier];
+    [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (void)close {
     //[[[Settings appDelegate]facebook]cancelAllRequests];
     [[NSNotificationCenter defaultCenter]removeObserver:self];
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (id)initWithPost:(Status *)posty {
     self = [super init];
     if (self) {
         [self setPost:posty];
-        [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
     }
     return self;
 }
@@ -526,7 +511,7 @@
         
         ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:self.theImageView.image];
         idvc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-        [self presentModalViewController:idvc animated:YES];
+        [self presentViewController:idvc animated:YES completion:nil];
     }
 }
 
@@ -686,10 +671,6 @@
 - (void)setTitleText {
     _navBar.topItem.title = [NSString stringWithFormat:@"%@ - %@ ago",[_post.type stringByCapitalizingFirstLetter],[_post.createdAt timeElapsedSinceCurrentDate]];
     [self performSelector:@selector(setTitleText) withObject:nil afterDelay:5.0f];
-}
-
-- (void)pullToRefreshViewShouldRefresh:(PullToRefreshView *)view {
-    [self loadTheCommentsMethinks];
 }
 
 @end

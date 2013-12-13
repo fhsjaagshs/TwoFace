@@ -9,7 +9,7 @@
 #import "ViewController.h"
 #import "FHSTwitterEngine.h"
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource, PullToRefreshViewDelegate>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) UITableView *theTableView;
@@ -41,7 +41,7 @@
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(showCompose)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"\u2699" style:UIBarButtonItemStyleBordered target:self action:@selector(showPrefs)];
     [topItem.rightBarButtonItem setTitlePositionAdjustment:UIOffsetMake(0, 15.0f) forBarMetrics:UIBarMetricsDefault];
-    [topItem.rightBarButtonItem setTitleTextAttributes:@{ UITextAttributeFont: [UIFont systemFontOfSize:24.0f] } forState:UIControlStateNormal];
+    [topItem.rightBarButtonItem setTitleTextAttributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:24.0f] } forState:UIControlStateNormal];
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
     
@@ -112,11 +112,9 @@
 - (void)clearImageCachesIfNecessary {
     double time = [[NSDate date]timeIntervalSince1970];
     double previousTime = [[NSUserDefaults standardUserDefaults]doubleForKey:@"previousClearTime"];
-    double remainder = time-previousTime;
-    if (remainder > 172800) { // 2 days (172800 seconds)
+    if (time-previousTime > 172800) { // 2 days (172800 seconds)
         [[NSUserDefaults standardUserDefaults]setDouble:time forKey:@"previousClearTime"];
         [Cache clearImageCache];
-        [[NSFileManager defaultManager]removeItemAtPath:[Settings invalidUsersCachePath] error:nil];
     }
 }
 
@@ -246,10 +244,10 @@
     
     if ([tappedItem isKindOfClass:[Status class]]) {
         PostDetailViewController *p = [[PostDetailViewController alloc]initWithPost:tappedItem];
-        [self presentModalViewController:p animated:YES];
+        [self presentViewController:p animated:YES completion:nil];
     } else if ([tappedItem isKindOfClass:[Tweet class]]) {
         TweetDetailViewController *d = [[TweetDetailViewController alloc]initWithTweet:tappedItem];
-        [self presentModalViewController:d animated:YES];
+        [self presentViewController:d animated:YES completion:nil];
     }
     
     [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -263,17 +261,17 @@
 
 - (void)showPrefs {
     PrefsViewController *p = [[PrefsViewController alloc]init];
-    [self presentModalViewController:p animated:YES];
+    [self presentViewController:p animated:YES completion:nil];
 }
 
 - (void)showCompose {
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"Compose" completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if ([[actionSheet buttonTitleAtIndex:buttonIndex]isEqualToString:@"Tweet"]) {
             ReplyViewController *composer = [[ReplyViewController alloc]initWithTweet:nil];
-            [self presentModalViewController:composer animated:YES];
+            [self presentViewController:composer animated:YES completion:nil];
         } else if ([[actionSheet buttonTitleAtIndex:buttonIndex]isEqualToString:@"Status"]) {
             ReplyViewController *composer = [[ReplyViewController alloc]initWithToID:nil];
-            [self presentModalViewController:composer animated:YES];
+            [self presentViewController:composer animated:YES completion:nil];
         }
     } cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
     as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;

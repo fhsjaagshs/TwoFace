@@ -40,9 +40,9 @@
 
 - (void)setLoggedInAccount:(NSNotification *)notif {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    self.loggedInUsername = [notif object];
+    self.loggedInUsername = notif.object;
     [[NSUserDefaults standardUserDefaults]setObject:_loggedInUsername forKey:@"loggedInDropboxUser"];
-    [self.theTableView reloadData];
+    [_theTableView reloadData];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -50,21 +50,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if (section == 1) {
-        return 2;
-    } else {
-        return 1;
-    }
-    return 0;
+    return (section == 1)?2:1;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
     if (section == 0) {
         if ([[DBSession sharedSession]isLinked]) {
-            if (_loggedInUsername == nil || _loggedInUsername.length == 0) {
-                return @"Loading username...";
-            }
-            return [NSString stringWithFormat:@"Logged in as %@",_loggedInUsername];
+            return (_loggedInUsername.length == 0)?@"Loading username...":[NSString stringWithFormat:@"Logged in as %@",_loggedInUsername];
         }
         return @"Not logged in";
     } else if (section == 1) {
@@ -107,10 +99,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    int section = indexPath.section;
-    int row = indexPath.row;
-    
-    if (section == 0) {
+    if (indexPath.section == 0) {
         if (![[DBSession sharedSession]isLinked]) {
             [[DBSession sharedSession]linkFromController:self];
         } else {
@@ -119,16 +108,16 @@
             self.loggedInUsername = nil;
             [_theTableView reloadData];
         }
-    } else if (section == 1) {
+    } else if (indexPath.section == 1) {
         if (![FHSTwitterEngine isConnectedToInternet]) {
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             qAlert(@"Connection Offline", @"Your Internet connection appears to be offline. Please verify that your connection is valid.");
             return;
         }
         
-        if (row == 0) {
+        if (indexPath.row == 0) {
             [DBSyncClient dropboxSync];
-        } else if (row == 1) {
+        } else if (indexPath.row == 1) {
             UIAlertView *av = [[UIAlertView alloc]initWithTitle:@"Are You Sure?" message:@"Resetting your Dropbox sync cannot be undone." completionBlock:^(NSUInteger buttonIndex, UIAlertView *alertView) {
                 if (buttonIndex == 1) {
                     [[NSUserDefaults standardUserDefaults]removeObjectForKey:@"lastSyncedDateKey"];
@@ -139,11 +128,11 @@
             [av show];
         }
     }
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    [_theTableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)dealloc {

@@ -152,7 +152,9 @@
 }
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
+    [_db open];
     [_db executeUpdate:@"INSERT or REPLACE INTO twitter_img_urls (img_url, link_url) VALUES(?,?)",imageURL,linkURL];
+    [_db close];
 }
 
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL {

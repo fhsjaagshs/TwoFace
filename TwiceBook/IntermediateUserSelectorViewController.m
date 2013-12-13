@@ -12,26 +12,20 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
-    _theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-44) style:UITableViewStyleGrouped];
+    _theTableView = [[UITableView alloc]initWithFrame:screenBounds style:UITableViewStyleGrouped];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
-    _theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:self.theTableView.frame];
-    bgView.backgroundColor = [UIColor clearColor];
-    [_theTableView setBackgroundView:bgView];
+    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
-    [self.view bringSubviewToFront:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Social Network"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -48,10 +42,9 @@
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
-    
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-    
+
     if (indexPath.row == 0) {
         cell.textLabel.text = @"Twitter";
         BOOL authorized = [[FHSTwitterEngine sharedEngine]isAuthorized];
@@ -63,7 +56,7 @@
     } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Facebook";
         BOOL authorized = FHSFacebook.shared.isSessionValid;
-        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[[Settings selectedFacebookFriends]allKeys]count]]:@"Login Required";
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[Settings selectedFacebookFriends]count]]:@"Login Required";
         
         if (!authorized) {
             cell.detailTextLabel.textColor = [UIColor redColor];

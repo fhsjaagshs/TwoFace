@@ -57,6 +57,7 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
 }
 
 - (void)invalidateSession {
+    self.user = nil;
     self.accessToken = nil;
     self.expirationDate = nil;
     

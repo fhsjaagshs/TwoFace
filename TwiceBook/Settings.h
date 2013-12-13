@@ -34,12 +34,9 @@ extern NSString * const kEnteringForegroundNotif;
 
 + (NSString *)documentsDirectory;
 + (NSString *)cachesDirectory;
-+ (NSString *)invalidUsersCachePath;
-+ (NSString *)usernameLookupCachePath;
 + (NSString *)draftsPath;
 + (NSMutableArray *)drafts;
 + (NSMutableArray *)selectedTwitterUsernames;
-+ (NSMutableArray *)addedTwitterUsernames;
 + (NSMutableDictionary *)selectedFacebookFriends;
 + (NSMutableArray *)dropboxDeletedTwitterArray;
 + (NSMutableDictionary *)dropboxDeletedFacebookDictionary;
