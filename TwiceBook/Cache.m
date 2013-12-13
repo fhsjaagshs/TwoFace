@@ -43,7 +43,7 @@
     //self.facebookFriends = [NSMutableDictionary dictionary];
     self.twitterFriends = [NSMutableDictionary dictionary];
     
-    FMResultSet *tw = [_db executeQuery:@"SELECT * FROM twitter_usernames"];
+    FMResultSet *tw = [_db executeQuery:@"SELECT * FROM twitter_friends"];
     while ([tw next]) {
         _twitterFriends[[tw stringForColumn:@"user_id"]] = [tw stringForColumn:@"usernames"];
     }
@@ -101,17 +101,39 @@
     [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
 }
 
+- (NSMutableDictionary *)facebookFriendsFromCache:(NSMutableArray **)array {
+    [_db open];
+    
+    FMResultSet *s = [_db executeQuery:@"SELECT * FROM facebook_friends ORDER BY last_name"];
+    
+    NSMutableDictionary *d = [NSMutableDictionary dictionary];
+    
+    while ([s next]) {
+        NSString *uid = [s stringForColumn:@"uid"];
+        d[uid] = [s stringForColumn:@"name"];
+        [*array addObject:uid];
+    }
+    
+    [s close];
+    [_db close];
+    return d;
+}
+
 - (void)cacheFacebookDicts:(NSArray *)array {
     [_db open];
     [_db executeUpdate:@"DELETE * FROM facebook_friends"];
     
-    [_db beginTransaction];
-    
-    for (NSDictionary *dict in array) {
-        [_db executeUpdate:@"INSERT into facebook_friends (name, last_name, uid) values(?,?,?)",dict[@"name"],dict[@"last_name"],dict[@"uid"]];
+    if (array.count > 0) {
+        [_db beginTransaction];
+        
+        for (NSDictionary *dict in array) {
+            [_db executeUpdate:@"INSERT into facebook_friends (name, last_name, uid) values(?,?,?)",dict[@"name"],dict[@"last_name"],dict[@"uid"]];
+        }
+        
+        [_db commit];
     }
-    
-    [_db commit];
+
+    [_db close];
 }
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
@@ -119,11 +141,15 @@
 }
 
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
+    NSString *ret = nil;
+    [_db open];
     FMResultSet *s = [_db executeQuery:@"SELECT img_url FROM twitter_img_urls WHERE link_url=?",linkURL];
     if ([s next]) {
-        return [s stringForColumn:@"img_url"];
+        ret = [s stringForColumn:@"img_url"];
     }
-    return nil;
+    [s close];
+    [_db close];
+    return ret;
 }
 
 + (void)setImage:(UIImage *)image forName:(NSString *)name {

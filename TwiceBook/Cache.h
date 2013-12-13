@@ -29,4 +29,7 @@
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL;
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL;
 
+- (NSMutableDictionary *)facebookFriendsFromCache:(NSMutableArray **)array;
+- (void)cacheFacebookDicts:(NSArray *)array;
+
 @end
