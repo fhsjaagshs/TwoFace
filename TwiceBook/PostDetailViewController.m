@@ -134,7 +134,7 @@
     if (hasLink) {
         _linkButton.hidden = isPhoto;
         
-        if (oneIsCorrect(postBody.length == 0, [postBody isEqualToString:linkURL])) {
+        if (any(postBody.length == 0, [postBody isEqualToString:linkURL])) {
             _messageView.text = [NSString stringWithFormat:@"%@ wants to share a %@ with you. %@.",posterName,type,isPhoto?@"Tap the preview on the right for a full-size image.":@"Please tap \"Visit Link\""];
         }
         
@@ -170,7 +170,7 @@
 - (void)adjustImageDimentions {
     
     if (![_post.type isEqualToString:@"photo"]) {
-        if (oneIsCorrect(!_theImageView.image, _theImageView.hidden)) {
+        if (any(!_theImageView.image, _theImageView.hidden)) {
             return;
         }
     }

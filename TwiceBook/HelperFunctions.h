@@ -11,5 +11,5 @@
 void qAlert(NSString *title, NSString *message);
 CGRect resizeRectToWidth(CGRect rect, CGFloat newWidth);
 BOOL is5();
-BOOL oneIsCorrect(BOOL one, BOOL two);
+BOOL any(BOOL one, BOOL two);
 NSString * encodeForURL(NSString *urlString);

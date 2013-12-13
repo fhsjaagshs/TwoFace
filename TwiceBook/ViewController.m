@@ -170,7 +170,7 @@
  
     NSMutableArray *timeline = [[Cache shared]timeline];
     
-    if (oneIsCorrect(_refreshControl.isRefreshing, timeline.count == 0)) {
+    if (any(_refreshControl.isRefreshing, timeline.count == 0)) {
         cell.textLabel.textColor = [UIColor blackColor];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -183,7 +183,7 @@
             cell.textLabel.text = @"Not Logged in.";
             cell.detailTextLabel.text = @"You need to login in Prefs.";
         } else {
-            if (oneIsCorrect(Settings.selectedFacebookFriends.count > 0, Settings.selectedTwitterUsernames.count > 0)) {
+            if (any(Settings.selectedFacebookFriends.count > 0, Settings.selectedTwitterUsernames.count > 0)) {
                 if (!_refreshControl.isRefreshing) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";

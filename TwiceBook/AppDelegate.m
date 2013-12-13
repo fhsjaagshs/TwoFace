@@ -35,7 +35,7 @@
 }
 
 - (void)logoutFacebook {
-    [Cache.shared.facebookFriends removeAllObjects];
+    [Cache.shared cacheFacebookDicts:nil];
     [FHSFacebook.shared invalidateSession];
 }
 

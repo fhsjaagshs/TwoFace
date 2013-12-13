@@ -23,7 +23,7 @@ BOOL is5() {
     return ([[UIScreen mainScreen]bounds].size.height == 568);
 }
 
-BOOL oneIsCorrect(BOOL one, BOOL two) {
+BOOL any(BOOL one, BOOL two) {
     return ((one || two) || (one && two));
 }
 

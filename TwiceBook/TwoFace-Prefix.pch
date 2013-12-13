@@ -22,6 +22,7 @@
     #import "ZoomingImageView.h"
     #import "MBProgressHUD.h"
     #import "PullToRefreshView.h"
+    #import "UserSelectorCell.h"
     
     #import "NSString+mods.h"
     #import "NSDate+Helper.h"

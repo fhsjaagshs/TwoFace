@@ -31,5 +31,6 @@
 
 - (NSMutableDictionary *)facebookFriendsFromCache:(NSMutableArray **)array;
 - (void)cacheFacebookDicts:(NSArray *)array;
+- (NSString *)nameForFacebookID:(NSString *)uid;
 
 @end

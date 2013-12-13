@@ -37,6 +37,7 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
     self = [super init];
     if (self) {
         NSDictionary *tokenDict = [Keychain objectForKey:kFacebookAccessTokenKey];
+        NSLog(@"%@",tokenDict);
         self.accessToken = tokenDict[kTokenKeychainKey];
         self.expirationDate = tokenDict[kExprDateKeychainKey];
         self.tokenDate = tokenDict[kTokenDateKeychainKey];
@@ -47,6 +48,11 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
 }
 
 - (BOOL)isSessionValid {
+    
+    if (![_expirationDate isKindOfClass:[NSDate class]]) {
+        return NO;
+    }
+    
     return (_accessToken != nil && _expirationDate != nil && NSOrderedDescending == [_expirationDate compare:[NSDate date]]);
 }
 

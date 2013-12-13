@@ -88,7 +88,7 @@
         NSString *retweetedText = rt_status[@"text"];
         
         if ([[_text substringToIndex:2]isEqualToString:@"RT"]) {
-            if (oneIsCorrect(retweetedUsername.length > 0, retweetedText.length > 0)) {
+            if (any(retweetedUsername.length > 0, retweetedText.length > 0)) {
                 NSMutableDictionary *newEntities = dictionary[@"retweeted_status"][@"entities"];
                 if (newEntities.allKeys.count > 0) {
                     [rt_status removeObjectForKey:@"in_reply_to_screen_name"];

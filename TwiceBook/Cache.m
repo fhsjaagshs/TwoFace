@@ -29,9 +29,11 @@
     self = [super init];
     if (self) {
         self.db = [FMDatabase databaseWithPath:[Settings.cachesDirectory stringByAppendingPathComponent:@"caches.db"]];
+        [_db open];
         [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_friends (username varchar(255), user_id varchar(255))"];
         [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS facebook_friends (name varchar(255), last_name varchar(255), uid varchar(255))"];
         [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_img_urls (link_url varchar(255), img_url varchar(255))"];
+        [_db close];
         [self loadCaches];
     }
     return self;
@@ -99,6 +101,19 @@
     }
     
     [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
+}
+
+- (NSString *)nameForFacebookID:(NSString *)uid {
+    [_db open];
+    NSString *name = nil;
+    
+    FMResultSet *s = [_db executeQuery:@"SELECT name FROM facebook_Frieds WHERE uid=? LIMIT 1",uid];
+    if ([s next]) {
+        name = [s stringForColumn:@"name"];
+    }
+    [s close];
+    [_db close];
+    return name;
 }
 
 - (NSMutableDictionary *)facebookFriendsFromCache:(NSMutableArray **)array {

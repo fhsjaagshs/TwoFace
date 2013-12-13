@@ -13,7 +13,7 @@
 
 - (void)saveToID:(NSNotification *)notif {
     self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[(NSString *)[[Cache shared]facebookFriends][_toID]componentsSeparatedByString:@" "]firstObject]];
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[[Cache.shared nameForFacebookID:_toID]componentsSeparatedByString:@" "]firstObject]];
 }
 
 - (void)loadView {
@@ -29,15 +29,14 @@
     [self.navBar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:self.navBar];
     
-    self.replyZone = [[UITextView alloc]initWithFrame:CGRectMake(0, self.navBar.frame.size.height, screenBounds.size.width, screenBounds.size.height-44)];
-    self.replyZone.backgroundColor = [UIColor whiteColor];
-    self.replyZone.editable = YES;
-    self.replyZone.clipsToBounds = YES;
-    self.replyZone.font = [UIFont systemFontOfSize:14];
-    self.replyZone.delegate = self;
-    self.replyZone.text = @"";
-    [self.view addSubview:self.replyZone];
-    [self.view bringSubviewToFront:self.navBar];
+    self.replyZone = [[UITextView alloc]initWithFrame:CGRectMake(0, _navBar.frame.size.height, screenBounds.size.width, screenBounds.size.height-_navBar.frame.size.height)];
+    _replyZone.backgroundColor = [UIColor whiteColor];
+    _replyZone.editable = YES;
+    _replyZone.clipsToBounds = NO;
+    _replyZone.font = [UIFont systemFontOfSize:14];
+    _replyZone.delegate = self;
+    _replyZone.text = @"";
+    [self.view addSubview:_replyZone];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadDraft:) name:@"draft" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(saveToID:) name:@"passFriendID" object:nil];
@@ -53,27 +52,25 @@
     
     if (!self.isFacebook) {
         self.charactersLeft = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 310, 44)];
-        self.charactersLeft.font = [UIFont boldSystemFontOfSize:20];
-        self.charactersLeft.textAlignment = UITextAlignmentRight;
-        self.charactersLeft.textColor = [UIColor whiteColor];
-        self.charactersLeft.backgroundColor = [UIColor clearColor];
-        self.charactersLeft.shadowColor = [UIColor blackColor];
-        self.charactersLeft.shadowOffset = CGSizeMake(0, -1);
-        [self.bar addSubview:self.charactersLeft];
+        _charactersLeft.font = [UIFont boldSystemFontOfSize:20];
+        _charactersLeft.textAlignment = UITextAlignmentRight;
+        _charactersLeft.textColor = [UIColor blackColor];
+        _charactersLeft.backgroundColor = [UIColor clearColor];
+        [_bar addSubview:_charactersLeft];
     }
     
-    self.replyZone.inputAccessoryView = self.bar;
+    _replyZone.inputAccessoryView = _bar;
 
-    if (self.tweet) {
-        self.replyZone.text = [NSString stringWithFormat:@"@%@ ",_tweet.user.screename];
-        self.navBar.topItem.title = @"Reply";
+    if (_tweet) {
+        _replyZone.text = [NSString stringWithFormat:@"@%@ ",_tweet.user.screename];
+        _navBar.topItem.title = @"Reply";
     }
     
-    if (self.isFacebook) {
-        self.navBar.topItem.title = @"Compose Status";
+    if (_isFacebook) {
+        _navBar.topItem.title = @"Compose Status";
     }
     
-    [self.replyZone becomeFirstResponder];
+    [_replyZone becomeFirstResponder];
     [self refreshCounter];
 }
 
@@ -555,7 +552,7 @@
 
     BOOL isJustMention = ([self.replyZone.text componentsSeparatedByString:@" "].count == 1) && (self.replyZone.text.length > 0)?[[self.replyZone.text substringToIndex:1]isEqualToString:@"@"]:NO;
     
-    if (oneIsCorrect(self.imageFromCameraRoll != nil, (self.replyZone.text.length > 0 && !isJustMention))) {
+    if (any(self.imageFromCameraRoll != nil, (self.replyZone.text.length > 0 && !isJustMention))) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
             
             if (buttonIndex == 1) {

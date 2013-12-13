@@ -76,7 +76,7 @@
         [[[Cache shared]nonTimelineTweets]removeAllObjects];
         [[[Cache shared]twitterFriends]removeAllObjects];
     } else if (section == 2) {
-        [[[Cache shared]facebookFriends]removeAllObjects];
+        [Cache.shared cacheFacebookDicts:nil];
     } else if (section == 3) {
         [[[Cache shared]timeline]removeAllObjects];
     }
