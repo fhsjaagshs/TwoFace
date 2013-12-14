@@ -31,7 +31,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 @property (strong, nonatomic) NSMutableArray *savedSelectedArrayTwitter;
 
 // Facebook
-@property (strong, nonatomic) NSMutableDictionary *savedFriendsDict;
+@property (strong, nonatomic) NSMutableDictionary *savedSelectedFriendsDict;
 @property (nonatomic, strong) NSMutableDictionary *facebookFriends;
 @property (nonatomic, strong) NSMutableArray *orderedFacebookUIDs;
 
@@ -62,23 +62,22 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     self.theTableView = [[UITableView alloc]initWithFrame:screenBounds];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
+    _theTableView.contentInset = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
+    _theTableView.scrollIndicatorInsets = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
     [self.view addSubview:_theTableView];
+    
+    self.refreshControl = [[UIRefreshControl alloc]init];
+    [_refreshControl addTarget:self action:@selector(refreshUsers) forControlEvents:UIControlEventValueChanged];
+    [_theTableView addSubview:_refreshControl];
     
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Users"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(back)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Reset" style:UIBarButtonItemStyleBordered target:self action:@selector(resetSelectedUsers)];
     [_navBar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:_navBar];
     
-    if (_isImmediateSelection) {
-        _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
-        _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
-    } else {
-        _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 44, 0);
-        _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 44, 0);
-        
+    if (!_isImmediateSelection) {
         UIToolbar *bottomBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, screenBounds.size.height-44, screenBounds.size.width, 44)];
         
         if (!_isFacebook) {
@@ -97,22 +96,19 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         [self.view addSubview:_counter];
     }
     
-    self.refreshControl = [[UIRefreshControl alloc]init];
-    [_refreshControl addTarget:self action:@selector(refreshUsers) forControlEvents:UIControlEventValueChanged];
-    [_theTableView addSubview:_refreshControl];
-    
     if (_isFacebook) {
         _navBar.topItem.title = @"Facebook Friends";
         
-        self.savedFriendsDict = [Settings selectedFacebookFriends];
+        self.savedSelectedFriendsDict = [Settings selectedFacebookFriends];
         
         NSMutableArray *orderedFacebookUIDsTemp = [NSMutableArray array];
         self.facebookFriends = [Cache.shared facebookFriendsFromCache:&orderedFacebookUIDsTemp];
-        self.orderedFacebookUIDs = orderedFacebookUIDsTemp.mutableCopy;
+        self.orderedFacebookUIDs = [NSMutableArray array];
+        [_orderedFacebookUIDs addObjectsFromArray:orderedFacebookUIDsTemp];
         
         if (_facebookFriends.count == 0) {
             if (FHSFacebook.shared.isSessionValid) {
-                [Settings showHUDWithTitle:@"Loading..."];
+                [self disableButtons];
                 [self loadFacebookFriends];
             }
         }
@@ -127,7 +123,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         if (Cache.shared.twitterFriends.count == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [Settings showHUDWithTitle:@"Loading..."];
+                [self disableButtons];
                 [self fetchFriends];
             }
         }
@@ -138,12 +134,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 // Facebook Stuff
 
-- (void)clearFriends {
-    [_facebookFriends removeAllObjects];
-    [Cache.shared cacheFacebookDicts:nil];
-    [Settings removeFacebookFromTimeline];
-}
-
 - (void)loadFacebookFriends {
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/me/fql?access_token=%@&q=%@",FHSFacebook.shared.accessToken, fqlFriendsOrdered.fhs_URLEncode]];
     
@@ -151,30 +141,31 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [req setHTTPMethod:@"GET"];
     
     [NSURLConnection sendAsynchronousRequest:req queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-        
         [self enableButtons];
 
         if (error) {
-            NSString *FBerr = [error localizedDescription];
+            NSString *FBerr = error.localizedDescription;
             NSString *message = (FBerr.length == 0)?@"Confirm that you are logged in correctly and try again.":FBerr;
             qAlert(@"Facebook Error", message);
         } else {
             id parsedJSONResponse = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
 
             if ([parsedJSONResponse isKindOfClass:[NSError class]]) {
-                // show an error
+                NSString *FBerr = [parsedJSONResponse localizedDescription];
+                NSString *message = (FBerr.length == 0)?@"Confirm that you are logged in correctly and try again.":FBerr;
+                qAlert(@"Facebook Error", message);
             } else if ([parsedJSONResponse isKindOfClass:[NSDictionary class]]) {
-                [self clearFriends];
-                
                 NSArray *data = ((NSDictionary *)parsedJSONResponse)[@"data"];
-                
+                [_orderedFacebookUIDs removeAllObjects];
+                [_facebookFriends removeAllObjects];
+
                 for (NSDictionary *dict in data) {
-                    NSString *identifier = dict[@"uid"];
-                    NSString *name = dict[@"name"];
-                    _facebookFriends[identifier] = name;
+                    NSString *identifier = [NSString stringWithFormat:@"%@",dict[@"uid"]];
+                    _facebookFriends[identifier] = dict[@"name"];
                     [_orderedFacebookUIDs addObject:identifier];
                 }
                 
+
                 [Cache.shared cacheFacebookDicts:data];
                 
                 [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
@@ -254,9 +245,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         return;
     }
     
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    _navBar.topItem.leftBarButtonItem.enabled = NO;
-    _navBar.topItem.rightBarButtonItem.enabled = NO;
+    [self disableButtons];
     
     if (_isFacebook) {
         [self loadFacebookFriends];
@@ -319,7 +308,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = _isFacebook?_facebookFriends.count:Cache.shared.twitterFriends.count;
-    return (count > 0)?count:1;
+    return (count > 0)?count:(_refreshControl.isRefreshing?0:1);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -336,12 +325,10 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             cell.textLabel.text = @"No friends loaded...";
             return cell;
         }
-        
-        NSDictionary *selectedDictionary = [Settings selectedFacebookFriends];
-        
+
         cell.user_id = _orderedFacebookUIDs[indexPath.row];
         cell.username = _facebookFriends[cell.user_id];
-        cell.accessoryType = (selectedDictionary[cell.user_id])?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
+        cell.accessoryType = (Settings.selectedFacebookFriends[cell.user_id] != nil)?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
         cell.textLabel.text = cell.username;
     } else {
         if (Cache.shared.twitterFriends.count == 0) {
@@ -355,7 +342,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         cell.accessoryType = [Settings.selectedTwitterUsernames containsObject:cell.username]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
         cell.textLabel.text = [@"@" stringByAppendingString:cell.username];
     }
-    
     return cell;
 }
 
@@ -391,7 +377,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 [self flashLabelWithDelay:0.0f];
             }
         } else {
-            if (_savedFriendsDict[identifier]) {
+            if (_savedSelectedFriendsDict[identifier]) {
                 deletedDictionary[identifier] = selectedDictionary[identifier];
                 [[NSUserDefaults standardUserDefaults]setObject:deletedDictionary forKey:kDBSyncDeletedFBDictKey];
             }
@@ -447,8 +433,16 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [self updateCounter];
 }
 
+- (void)disableButtons {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    _navBar.topItem.leftBarButtonItem.enabled = NO;
+    _navBar.topItem.rightBarButtonItem.enabled = NO;
+    [_refreshControl beginRefreshing];
+    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+}
+
 - (void)enableButtons {
-    [Settings hideHUD];
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     _navBar.topItem.leftBarButtonItem.enabled = YES;
     _navBar.topItem.rightBarButtonItem.enabled = YES;
     [_refreshControl endRefreshing];

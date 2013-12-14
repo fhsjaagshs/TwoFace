@@ -8,6 +8,12 @@
 
 #import "IntermediateUserSelectorViewController.h"
 
+@interface IntermediateUserSelectorViewController () <UITableViewDelegate, UITableViewDataSource>
+
+@property (strong, nonatomic) UITableView *theTableView;
+
+@end
+
 @implementation IntermediateUserSelectorViewController
 
 - (void)loadView {
@@ -69,24 +75,24 @@
     if (indexPath.row == 0) {
         if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:NO];
-            [self presentModalViewController:userSelector animated:YES];
+            [self presentViewController:userSelector animated:YES completion:nil];
         }
     } else if (indexPath.row == 1) {
         if (FHSFacebook.shared.isSessionValid) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:YES];
-            [self presentModalViewController:userSelector animated:YES];
+            [self presentViewController:userSelector animated:YES completion:nil];
         }
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [self.theTableView reloadData];
+    [_theTableView reloadData];
 }
 
 @end

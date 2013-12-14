@@ -53,7 +53,9 @@
 		F18042C7175A880C008D191D /* Status.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C6175A880C008D191D /* Status.m */; };
 		F18042CA175A893C008D191D /* TwitterUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C9175A893C008D191D /* TwitterUser.m */; };
 		F18042CD175A896C008D191D /* FacebookUser.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042CC175A896C008D191D /* FacebookUser.m */; };
-		F1937FA3169F137400C66668 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1937FA2169F137400C66668 /* DropboxSDK.framework */; };
+		F1860BC1185BC3C60072985E /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1937FA2169F137400C66668 /* DropboxSDK.framework */; };
+		F1860BC4185BC6AB0072985E /* dropbox-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = F1860BC2185BC6AB0072985E /* dropbox-icon.png */; };
+		F1860BC5185BC6AB0072985E /* dropbox-icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F1860BC3185BC6AB0072985E /* dropbox-icon@2x.png */; };
 		F19D0A45184919A700891122 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F19D0A44184919A700891122 /* FHSTwitterEngine.m */; };
 		F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE60183BF54100DD2544 /* Keychain.m */; };
 		F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */; };
@@ -147,6 +149,8 @@
 		F18042C9175A893C008D191D /* TwitterUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TwitterUser.m; sourceTree = "<group>"; };
 		F18042CB175A896C008D191D /* FacebookUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FacebookUser.h; sourceTree = "<group>"; };
 		F18042CC175A896C008D191D /* FacebookUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FacebookUser.m; sourceTree = "<group>"; };
+		F1860BC2185BC6AB0072985E /* dropbox-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropbox-icon.png"; path = "../dropbox-icon.png"; sourceTree = "<group>"; };
+		F1860BC3185BC6AB0072985E /* dropbox-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dropbox-icon@2x.png"; path = "../dropbox-icon@2x.png"; sourceTree = "<group>"; };
 		F1937FA2169F137400C66668 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DropboxSDK.framework; path = Frameworks/DropboxSDK.framework; sourceTree = "<group>"; };
 		F19D0A43184919A700891122 /* FHSTwitterEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSTwitterEngine.h; sourceTree = "<group>"; };
 		F19D0A44184919A700891122 /* FHSTwitterEngine.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSTwitterEngine.m; sourceTree = "<group>"; };
@@ -176,7 +180,6 @@
 				F14F91CC185B9628009D0EDE /* libsqlite3.0.dylib in Frameworks */,
 				F15A011F1763CAFE001C668C /* CoreText.framework in Frameworks */,
 				9BBD602115D48F940078838C /* libz.1.2.5.dylib in Frameworks */,
-				F1937FA3169F137400C66668 /* DropboxSDK.framework in Frameworks */,
 				9BB6B24815CDED5300FA2836 /* SystemConfiguration.framework in Frameworks */,
 				9BBD602315D48FA80078838C /* MobileCoreServices.framework in Frameworks */,
 				9B298C6415B62E2F00A7C594 /* Security.framework in Frameworks */,
@@ -184,6 +187,7 @@
 				F129B65F157B8237005353EB /* UIKit.framework in Frameworks */,
 				F129B661157B8237005353EB /* Foundation.framework in Frameworks */,
 				F129B663157B8237005353EB /* CoreGraphics.framework in Frameworks */,
+				F1860BC1185BC3C60072985E /* DropboxSDK.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +373,8 @@
 				F167CF43185BC09D006E1EB5 /* assets.xcassets */,
 				9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */,
 				9BBC4CAD15DBED01006FA7DE /* Caution.png */,
+				F1860BC2185BC6AB0072985E /* dropbox-icon.png */,
+				F1860BC3185BC6AB0072985E /* dropbox-icon@2x.png */,
 				9BE3E7E11601738D00F64709 /* inner-shadow.png */,
 			);
 			name = Assets;
@@ -484,6 +490,8 @@
 				9BBC4CAE15DBED01006FA7DE /* Caution.png in Resources */,
 				9BE3E7E21601738D00F64709 /* inner-shadow.png in Resources */,
 				F167CF44185BC09D006E1EB5 /* assets.xcassets in Resources */,
+				F1860BC4185BC6AB0072985E /* dropbox-icon.png in Resources */,
+				F1860BC5185BC6AB0072985E /* dropbox-icon@2x.png in Resources */,
 				9B5DA1C9162CF6410034ABDC /* Checkmark@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -613,13 +621,16 @@
 		F129B67C157B8237005353EB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Frameworks\"",
+					"\\\"$(SRCROOT)/Frameworks\\\"",
+					/Users/nathaniel/Documents/Code/TwoFace/Frameworks,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwiceBook/TwoFace-Prefix.pch";
@@ -641,13 +652,16 @@
 		F129B67D157B8237005353EB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon-2";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "LaunchImage-2";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/Frameworks\"",
+					"\\\"$(SRCROOT)/Frameworks\\\"",
+					/Users/nathaniel/Documents/Code/TwoFace/Frameworks,
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwiceBook/TwoFace-Prefix.pch";

@@ -25,7 +25,7 @@
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Settings"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Sync" style:UIBarButtonItemStyleBordered target:self action:@selector(showSyncMenu)];
+    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithImage:[UIImage imageNamed:@"dropbox-icon"] style:UIBarButtonItemStylePlain target:self action:@selector(showSyncMenu)];
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
 }

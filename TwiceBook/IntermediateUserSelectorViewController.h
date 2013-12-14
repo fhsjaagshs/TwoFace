@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface IntermediateUserSelectorViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
-
-@property (strong, nonatomic) UITableView *theTableView;
+@interface IntermediateUserSelectorViewController : UIViewController
 
 @end

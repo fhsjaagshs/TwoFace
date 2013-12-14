@@ -136,7 +136,7 @@
 
 - (void)cacheFacebookDicts:(NSArray *)array {
     [_db open];
-    [_db executeUpdate:@"DELETE * FROM facebook_friends"];
+    [_db executeUpdate:@"DELETE FROM facebook_friends"];
     
     if (array.count > 0) {
         [_db beginTransaction];
