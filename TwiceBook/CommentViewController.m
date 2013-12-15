@@ -105,14 +105,14 @@
             [_commentField becomeFirstResponder];
             qAlert(@"Facebook Error", @"Failed to post comment, please try again at a later time.");
         } else {
-            [self dismissModalViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
             [[NSNotificationCenter defaultCenter]postNotificationName:@"commentsNotif" object:nil];
         }
     }];
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)dismissModalViewControllerAnimated:(BOOL)animated {

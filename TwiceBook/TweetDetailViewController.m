@@ -132,12 +132,12 @@
     
     if ([_tweet.user.screename isEqualToString:[[FHSTwitterEngine sharedEngine]authenticatedUsername]]) {
         ReplyViewController *d = [[ReplyViewController alloc]initWithTweet:_tweet];
-        [self presentModalViewController:d animated:YES];
+        [self presentViewController:d animated:YES completion:nil];
     } else {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
             if (buttonIndex == 0) {
                 ReplyViewController *d = [[ReplyViewController alloc]initWithTweet:_tweet];
-                [self presentModalViewController:d animated:YES];
+                [self presentViewController:d animated:YES completion:nil];
             } else if (buttonIndex == 1) {
                 [Settings showHUDWithTitle:@"Retweeting..."];
                 

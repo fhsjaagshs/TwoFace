@@ -56,10 +56,10 @@
     [t requireGestureRecognizerToFail:tt];
 }
 
-- (id)init {
-    if (self = [super init]) {
+- (instancetype)init {
+    self = [super init];
+    if (self) {
         self.shouldShowSaveButton = YES;
-        self.wantsFullScreenLayout = YES;
     }
     return self;
 }
@@ -142,7 +142,7 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
     [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
@@ -177,7 +177,7 @@
         [[UIApplication sharedApplication]setStatusBarHidden:NO];
         [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     }
-    [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
+    //[[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
     [_zoomingImageView setHidden:NO];
     [super viewWillAppear:animated];
 }

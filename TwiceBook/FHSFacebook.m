@@ -100,8 +100,8 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
 }
 
 - (void)authorizeWithPermissions:(NSArray *)permissions {
-    
-    NSMutableDictionary *params = @{@"client_id": @"",
+
+    NSMutableDictionary *params = @{@"client_id": _appID,
                                     @"type": @"user_agent",
                                     @"redirect_uri": @"fbconnect://success",
                                     @"display": @"touch",

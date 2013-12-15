@@ -123,7 +123,6 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     NSMutableArray *timeline = [[Cache shared]timeline];
     
     if (timeline.count > 0) {
@@ -141,8 +140,10 @@
         if (cellText.length > 140) {
             cellText = [[cellText substringToIndex:140]stringByAppendingString:@"..."];
         }
-
-        CGSize labelSize = [cellText sizeWithFont:[UIFont systemFontOfSize:17] constrainedToSize:CGSizeMake(280, 1000) lineBreakMode:UILineBreakModeWordWrap];
+        
+        NSAttributedString *attributedText = [[NSAttributedString alloc]initWithString:cellText attributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:17] }];
+        CGSize labelSize = [attributedText boundingRectWithSize:(CGSize){280, 1000} options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+     //   CGSize labelSize = [cellText sizeWithFont:[UIFont systemFontOfSize:17] constrainedToSize:CGSizeMake(280, 1000) lineBreakMode:UILineBreakModeWordWrap];
         return labelSize.height+35;
     }
     return 44;

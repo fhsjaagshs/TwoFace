@@ -26,8 +26,8 @@
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Compose Tweet"];
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Post" style:UIBarButtonItemStyleDone target:self action:@selector(sendReply)];
-    [self.navBar pushNavigationItem:topItem animated:NO];
-    [self.view addSubview:self.navBar];
+    [_navBar pushNavigationItem:topItem animated:NO];
+    [self.view addSubview:_navBar];
     
     self.replyZone = [[UITextView alloc]initWithFrame:CGRectMake(0, _navBar.frame.size.height, screenBounds.size.width, screenBounds.size.height-_navBar.frame.size.height)];
     _replyZone.backgroundColor = [UIColor whiteColor];
@@ -53,7 +53,7 @@
     if (!self.isFacebook) {
         self.charactersLeft = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 310, 44)];
         _charactersLeft.font = [UIFont boldSystemFontOfSize:20];
-        _charactersLeft.textAlignment = UITextAlignmentRight;
+        _charactersLeft.textAlignment = NSTextAlignmentRight;
         _charactersLeft.textColor = [UIColor blackColor];
         _charactersLeft.backgroundColor = [UIColor clearColor];
         [_bar addSubview:_charactersLeft];
