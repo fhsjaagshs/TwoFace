@@ -27,6 +27,8 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 @property (nonatomic, strong) UINavigationBar *navBar;
 @property (nonatomic, strong) UILabel *counter;
 
+@property (nonatomic, assign) BOOL isVisible;
+
 // Twitter
 @property (strong, nonatomic) NSMutableArray *savedSelectedArrayTwitter;
 
@@ -59,14 +61,16 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
+    self.view.backgroundColor = [UIColor whiteColor];
     self.theTableView = [[UITableView alloc]initWithFrame:screenBounds];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
+    _theTableView.clipsToBounds = NO;
     _theTableView.contentInset = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
     _theTableView.scrollIndicatorInsets = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
     [self.view addSubview:_theTableView];
     
-    self.refreshControl = [[UIRefreshControl alloc]init];
+    self.refreshControl = [[UIRefreshControl alloc]initWithFrame:CGRectMake(0, -64, 320, 64)];
     [_refreshControl addTarget:self action:@selector(refreshUsers) forControlEvents:UIControlEventValueChanged];
     [_theTableView addSubview:_refreshControl];
     
@@ -81,7 +85,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         UIToolbar *bottomBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, screenBounds.size.height-44, screenBounds.size.width, 44)];
         
         if (!_isFacebook) {
-            UIBarButtonItem *bbi = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:nil];
+            UIBarButtonItem *bbi = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(disableButtons)];
             bbi.style = UIBarButtonItemStyleBordered;
             bottomBar.items = @[[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil], bbi];
         }
@@ -125,6 +129,8 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [self disableButtons];
                 [self fetchFriends];
+              //  [self performSelector:@selector(disableButtons) withObject:nil afterDelay:0.1f];
+               // [self performSelector:@selector(fetchFriends) withObject:nil afterDelay:0.2f];
             }
         }
     }
@@ -295,11 +301,11 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)flashLabelWithDelay:(float)delay {
     [_counter performSelector:@selector(setTextColor:) withObject:[UIColor redColor] afterDelay:delay];
-    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor whiteColor] afterDelay:delay+0.1];
+    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor blackColor] afterDelay:delay+0.1];
     [_counter performSelector:@selector(setTextColor:) withObject:[UIColor redColor] afterDelay:delay+0.2];
-    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor whiteColor] afterDelay:delay+0.3];
+    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor blackColor] afterDelay:delay+0.3];
     [_counter performSelector:@selector(setTextColor:) withObject:[UIColor redColor] afterDelay:delay+0.4];
-    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor whiteColor] afterDelay:delay+0.5];
+    [_counter performSelector:@selector(setTextColor:) withObject:[UIColor blackColor] afterDelay:delay+0.5];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -433,12 +439,33 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     [self updateCounter];
 }
 
+- (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    self.isVisible = NO;
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    self.isVisible = YES;
+     NSLog(@"%f",_theTableView.contentInset.top);
+    if (_navBar.topItem.rightBarButtonItem.enabled == NO && !_refreshControl.isRefreshing) {
+        [_theTableView setContentOffset:CGPointMake(0, -64) animated:YES];
+        [_refreshControl beginRefreshing];
+        [_theTableView reloadData];
+    }
+}
+
 - (void)disableButtons {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     _navBar.topItem.leftBarButtonItem.enabled = NO;
     _navBar.topItem.rightBarButtonItem.enabled = NO;
-    [_refreshControl beginRefreshing];
-    [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    
+    if (_isVisible) {
+        [_theTableView setContentOffset:CGPointMake(0, -128) animated:YES];
+        [_refreshControl beginRefreshing];
+        [_theTableView reloadData];
+        [self performSelector:@selector(enableButtons) withObject:nil afterDelay:1.5f];
+    }
 }
 
 - (void)enableButtons {
@@ -446,6 +473,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     _navBar.topItem.leftBarButtonItem.enabled = YES;
     _navBar.topItem.rightBarButtonItem.enabled = YES;
     [_refreshControl endRefreshing];
+    [_theTableView setContentOffset:CGPointMake(0, -60) animated:YES];
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
 }
 
