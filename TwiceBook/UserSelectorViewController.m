@@ -129,8 +129,6 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [self disableButtons];
                 [self fetchFriends];
-              //  [self performSelector:@selector(disableButtons) withObject:nil afterDelay:0.1f];
-               // [self performSelector:@selector(fetchFriends) withObject:nil afterDelay:0.2f];
             }
         }
     }
@@ -171,9 +169,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                     [_orderedFacebookUIDs addObject:identifier];
                 }
                 
-
                 [Cache.shared cacheFacebookDicts:data];
-                
                 [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
             }
         }

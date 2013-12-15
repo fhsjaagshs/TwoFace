@@ -54,9 +54,10 @@
         if (FHSTwitterEngine.sharedEngine.authenticatedUsername.length > 0) {
             [usernames addObject:[NSString stringWithFormat:@"@%@",FHSTwitterEngine.sharedEngine.authenticatedUsername]];
         }
+        
         return [usernames componentsJoinedByString:@", "];
     } else if (section == 2) {
-        return [@"TwoFace v" stringByAppendingString:NSBundle.mainBundle.infoDictionary[@"CFBundleVersion"]];
+        return [NSString stringWithFormat:@"TwoFace v%@",NSBundle.mainBundle.infoDictionary[@"CFBundleVersion"]];
     }
     return nil;
 }
@@ -70,17 +71,15 @@
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     }
     
-    int section = indexPath.section;
-
-    if (section == 0) {
+    if (indexPath.section == 0) {
         if (indexPath.row == 0) {
             cell.textLabel.text = FHSTwitterEngine.sharedEngine.isAuthorized?@"Log out of Twitter":@"Sign into Twitter";
         } else {
             cell.textLabel.text = FHSFacebook.shared.isSessionValid?@"Log out of Facebook":@"Sign into Facebook";
         }
-    } else if (section == 1) {
+    } else if (indexPath.section == 1) {
         cell.textLabel.text = @"Select Users to Watch";
-    } else if (section == 2) {
+    } else if (indexPath.section == 2) {
         cell.textLabel.text = @"Show Caches Menu";
     }
 

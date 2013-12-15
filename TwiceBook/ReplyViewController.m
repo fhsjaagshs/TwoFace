@@ -75,9 +75,9 @@
 }
 
 - (void)scaleImageFromCameraRoll {
-    if (self.imageFromCameraRoll.size.width > 768 && self.imageFromCameraRoll.size.height > 768) {
-        float ratio = MIN(768/self.imageFromCameraRoll.size.width, 768/self.imageFromCameraRoll.size.height);
-        self.imageFromCameraRoll = [self.imageFromCameraRoll scaleToSize:CGSizeMake(ratio*self.imageFromCameraRoll.size.width, ratio*self.imageFromCameraRoll.size.height)];
+    if (_imageFromCameraRoll.size.width > 768 && _imageFromCameraRoll.size.height > 768) {
+        float ratio = MIN(768/_imageFromCameraRoll.size.width, 768/_imageFromCameraRoll.size.height);
+        _imageFromCameraRoll = [_imageFromCameraRoll scaleToSize:CGSizeMake(ratio*_imageFromCameraRoll.size.width, ratio*_imageFromCameraRoll.size.height)];
     }
 }
 
@@ -125,7 +125,7 @@
                 [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
                 [self presentViewController:imagePicker animated:YES completion:nil];
             } else {
-                [self.replyZone becomeFirstResponder];
+                [_replyZone becomeFirstResponder];
             }
             
         } cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take Photo", @"Choose from Library...", nil];
@@ -142,28 +142,24 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:nil];
-   // [self dismissViewControllerAnimated:YES completion:nil];
-    
+
     self.imageFromCameraRoll = info[UIImagePickerControllerOriginalImage];
     [self scaleImageFromCameraRoll];
     
-    NSMutableArray *toolbarItems = [self.bar.items mutableCopy];
+    NSMutableArray *toolbarItems = _bar.items.mutableCopy;
     
-    for (UIBarButtonItem *item in [toolbarItems mutableCopy]) {
+    for (UIBarButtonItem *item in toolbarItems.mutableCopy) {
         if (item.customView) {
-            if ([toolbarItems containsObject:item]) {
-                [toolbarItems removeObject:item];
-            }
+            [toolbarItems removeObject:item];
         }
     }
-    self.bar.items = toolbarItems;
+    _bar.items = toolbarItems;
     
     [self addImageToolbarItems];
-    [self.replyZone becomeFirstResponder];
+    [_replyZone becomeFirstResponder];
 }
 
 - (void)imageTouched {
-    
     [self.replyZone resignFirstResponder];
     
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
@@ -178,7 +174,7 @@
         if (buttonIndex == 0) {
             self.imageFromCameraRoll = nil;
 
-            NSMutableArray *toolbarItems = [self.bar.items mutableCopy];
+            NSMutableArray *toolbarItems = _bar.items.mutableCopy;
             [toolbarItems removeLastObject];
             [toolbarItems removeLastObject];
             self.bar.items = toolbarItems;
@@ -217,7 +213,7 @@
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self dismissViewControllerAnimated:YES completion:nil];
+    [picker dismissViewControllerAnimated:YES completion:nil];
     [self.replyZone becomeFirstResponder];
 }
 
@@ -294,7 +290,6 @@
 - (void)dismissModalViewControllerAnimated:(BOOL)animated {
     [self purgeDraftImages];
     [Settings hideHUD];
-    [self removeObservers];
     [super dismissModalViewControllerAnimated:animated];
 }
 
@@ -503,7 +498,6 @@
 }
 
 - (void)showDraftsBrowser {
-    
     [self.replyZone resignFirstResponder];
     
     void (^completionHandler)(NSUInteger, UIActionSheet *) = ^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
@@ -525,7 +519,7 @@
     
     UIActionSheet *as = nil;
     
-    if (self.isFacebook) {
+    if (_isFacebook) {
         as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:completionHandler cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Load Draft...", @"Post on Friend's Wall", nil];
     } else {
         as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:completionHandler cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Load Draft...", nil];
@@ -535,24 +529,17 @@
     [as showInView:self.view];
 }
 
-- (void)removeObservers {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:UIKeyboardWillHideNotification object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"draft" object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"passFriendID" object:nil];
-}
-
 - (void)close {
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     
-    if (self.isLoadedDraft && [[Settings drafts]containsObject:_loadedDraft]) {
+    if (_isLoadedDraft && [[Settings drafts]containsObject:_loadedDraft]) {
         [self dismissViewControllerAnimated:YES completion:nil];
         return;
     }
 
     BOOL isJustMention = ([self.replyZone.text componentsSeparatedByString:@" "].count == 1) && (self.replyZone.text.length > 0)?[[self.replyZone.text substringToIndex:1]isEqualToString:@"@"]:NO;
     
-    if (any(self.imageFromCameraRoll != nil, (self.replyZone.text.length > 0 && !isJustMention))) {
+    if (any(_imageFromCameraRoll != nil, (_replyZone.text.length > 0 && !isJustMention))) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
             
             if (buttonIndex == 1) {
@@ -561,7 +548,7 @@
             } else if (buttonIndex == 0) {
                 [self dismissViewControllerAnimated:YES completion:nil];
             } else {
-                [self.replyZone becomeFirstResponder];
+                [_replyZone becomeFirstResponder];
             }
                              
         } cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Save as Draft", nil];
@@ -570,6 +557,10 @@
     } else {
         [self dismissViewControllerAnimated:YES completion:nil];
     }
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end

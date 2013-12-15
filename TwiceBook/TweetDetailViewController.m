@@ -12,6 +12,14 @@
 
 @implementation TweetDetailViewController
 
+- (instancetype)initWithTweet:(Tweet *)aTweet {
+    self = [super init];
+    if (self) {
+        self.tweet = aTweet;
+    }
+    return self;
+}
+
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
@@ -119,14 +127,6 @@
     }
 }
 
-- (id)initWithTweet:(Tweet *)aTweet {
-    self = [super init];
-    if (self) {
-        self.tweet = aTweet;
-    }
-    return self;
-}
-
 - (void)replyOrRetweet {
     __block BOOL isFavorite = _tweet.isFavorited;
     
@@ -200,32 +200,30 @@
                     }
                 });
                 imageData = [NSURLConnection sendSynchronousRequest:[NSURLRequest requestWithURL:notif.object] returningResponse:nil error:nil];
+                
+                if (imageData.length > 0) {
+                    [imageData writeToFile:cachePath atomically:YES];
+                }
             }
-            
-            [Settings hideHUD];
-            
-            if (imageData.length == 0) {
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    @autoreleasepool {
-                        [Settings showSelfHidingHudWithTitle:@"Error Loading Image"];
-                    }
-                });
-            } else {
-                [imageData writeToFile:cachePath atomically:YES];
-                dispatch_sync(dispatch_get_main_queue(), ^{
-                    @autoreleasepool {
+
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                @autoreleasepool {
+                    [Settings hideHUD];
+                    if (imageData.length > 0) {
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageData];
                         [self presentViewController:vc animated:YES completion:nil];
+                    } else {
+                        [Settings showSelfHidingHudWithTitle:@"Error Loading Image"];
                     }
-                });
-            }
+                }
+            });
         }
     });
 }
 
 - (void)setTitleText {
     NSString *timestamp = [_tweet.createdAt timeElapsedSinceCurrentDate];
-    self.navBar.topItem.title = [@"Tweet" stringByAppendingFormat:@" - %@ Ago",timestamp];
+    _navBar.topItem.title = [NSString stringWithFormat:@"Tweet - %@ Ago",timestamp];
     [self performSelector:@selector(setTitleText) withObject:nil afterDelay:5.0f];
 }
 
@@ -234,7 +232,7 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"imageOpen" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end

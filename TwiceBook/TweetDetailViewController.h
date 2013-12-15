@@ -17,7 +17,7 @@
 @property (strong, nonatomic) UINavigationBar *navBar;
 @property (strong, nonatomic) Tweet *tweet;
 
-- (id)initWithTweet:(Tweet *)aTweet;
+- (instancetype)initWithTweet:(Tweet *)aTweet;
 - (void)getProfileImage;
 
 @end
