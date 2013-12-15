@@ -92,6 +92,7 @@
                 }
 
                 [[Cache shared]sortTimeline];
+                [[Cache shared]cache];
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
@@ -151,7 +152,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count = Cache.shared.timeline.count;
-    return (count == 0)?1:count;
+    return (count == 0)?_refreshControl.isRefreshing?0:1:count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

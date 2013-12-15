@@ -42,7 +42,6 @@
 - (void)loadCaches {
     [_db open];
 
-    //self.facebookFriends = [NSMutableDictionary dictionary];
     self.twitterFriends = [NSMutableDictionary dictionary];
     
     FMResultSet *tw = [_db executeQuery:@"SELECT * FROM twitter_friends"];
@@ -50,13 +49,8 @@
         _twitterFriends[[tw stringForColumn:@"user_id"]] = [tw stringForColumn:@"usernames"];
     }
     [tw close];
+    [_db close];
     
-    /*FMResultSet *fb = [_db executeQuery:@"SELECT * FROM facebook_friends ORDER BY last_name"];
-    while ([fb next]) {
-        _facebookFriends[[fb stringForColumn:@"uid"]] = [fb stringForColumn:@"name"];
-    }
-    [fb close];*/
-
     self.timeline = [NSMutableArray array];
     
     NSString *cd = [Settings cachesDirectory];
@@ -77,22 +71,32 @@
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
         [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
     }
-    [_db close];
+    
 }
 
 - (void)cache {
-    NSString *cd = [Settings cachesDirectory];
-   // [_facebookFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedFacebookFriends.plist"] atomically:YES];
-    [_twitterFriends writeToFile:[cd stringByAppendingPathComponent:@"fetchedTwitterUsernames.plist"] atomically:YES];
-  //  [_twitterIdToUsername writeToFile:[cd stringByAppendingPathComponent:@"twitter_username_lookup_dict.plist"] atomically:YES];
+    [_db open];
+    [_db executeUpdate:@"DELETE FROM facebook_friends"];
     
+    if (_twitterFriends.count > 0) {
+        [_db beginTransaction];
+        
+        for (NSString *user_id in _twitterFriends.allKeys) {
+            [_db executeUpdate:@"INSERT into twitter_friends (username, user_id) values(?,?)",_twitterFriends[user_id],user_id];
+        }
+        
+        [_db commit];
+    }
+    
+    [_db close];
+
     NSMutableArray *timelineTemp = [NSMutableArray array];
     
     for (id obj in _timeline) {
         [timelineTemp addObject:[obj dictionaryValue]];
     }
 
-    [timelineTemp writeToFile:[cd stringByAppendingPathComponent:@"timelinecache.plist"] atomically:YES];
+    [timelineTemp writeToFile:[Settings.cachesDirectory stringByAppendingPathComponent:@"timelinecache.plist"] atomically:YES];
     
     NSMutableArray *nonTimelineTweetsTemp = [NSMutableArray array];
     
@@ -100,7 +104,7 @@
         [nonTimelineTweetsTemp addObject:tweet.dictionaryValue];
     }
     
-    [nonTimelineTweetsTemp writeToFile:[cd stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
+    [nonTimelineTweetsTemp writeToFile:[Settings.cachesDirectory stringByAppendingPathComponent:@"cached_context_tweets.plist"] atomically:YES];
 }
 
 - (NSString *)nameForFacebookID:(NSString *)uid {
