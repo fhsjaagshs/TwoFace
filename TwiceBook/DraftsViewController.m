@@ -14,7 +14,7 @@
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor underPageBackgroundColor]];
+    self.view.backgroundColor = [UIColor lightGrayColor];
     self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-64) style:UITableViewStyleGrouped];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
@@ -109,7 +109,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[Settings drafts][indexPath.row]];
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)startReloadLoop {
@@ -130,7 +130,7 @@
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

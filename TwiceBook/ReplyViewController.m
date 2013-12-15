@@ -96,7 +96,7 @@
             
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                [self dismissModalViewControllerAnimated:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
                 
                 if (error) {
                     qAlert([NSString stringWithFormat:@"Error %d",error.code], error.domain);
@@ -120,10 +120,10 @@
             
             if (buttonIndex == 0) {
                 [imagePicker setSourceType:UIImagePickerControllerSourceTypeCamera];
-                [self presentModalViewController:imagePicker animated:YES];
+                [self presentViewController:imagePicker animated:YES completion:nil];
             } else if (buttonIndex == 1) {
                 [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
-                [self presentModalViewController:imagePicker animated:YES];
+                [self presentViewController:imagePicker animated:YES completion:nil];
             } else {
                 [self.replyZone becomeFirstResponder];
             }
@@ -136,13 +136,13 @@
         [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
         imagePicker.delegate = self;
         [self.replyZone resignFirstResponder];
-        [self presentModalViewController:imagePicker animated:YES];
+        [self presentViewController:imagePicker animated:YES completion:nil];
     }
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    
-    [self dismissModalViewControllerAnimated:YES];
+    [picker dismissViewControllerAnimated:YES completion:nil];
+   // [self dismissViewControllerAnimated:YES completion:nil];
     
     self.imageFromCameraRoll = info[UIImagePickerControllerOriginalImage];
     [self scaleImageFromCameraRoll];
@@ -170,7 +170,7 @@
         if (buttonIndex == 1) {
             ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:self.imageFromCameraRoll];
             idvc.shouldShowSaveButton = NO;
-            [self presentModalViewController:idvc animated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
         } else {
             [self.replyZone becomeFirstResponder];
         }
@@ -217,7 +217,7 @@
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
     [self.replyZone becomeFirstResponder];
 }
 
@@ -459,7 +459,7 @@
         NSMutableURLRequest *request = [FHSFacebook.shared generateRequestWithURL:graphURL params:params HTTPMethod:@"POST"];
         
         [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-            [self dismissModalViewControllerAnimated:YES];
+            [self dismissViewControllerAnimated:YES completion:nil];
             
             if (error) {
                 qAlert(@"Status Update Error", (error.localizedDescription.length == 0)?@"Confirm that you are logged in correctly and try again.":error.localizedDescription);
@@ -510,11 +510,11 @@
         
         if (buttonIndex == 0) {
             DraftsViewController *vc = [[DraftsViewController alloc]init];
-            [self presentModalViewController:vc animated:YES];
+            [self presentViewController:vc animated:YES completion:nil];
         } else if (buttonIndex == 1) {
             if (self.isFacebook) {
                 UserSelectorViewController *vc = [[UserSelectorViewController alloc]initWithIsFacebook:YES isImmediateSelection:YES];
-                [self presentModalViewController:vc animated:YES];
+                [self presentViewController:vc animated:YES completion:nil];
             } else {
                 [self.replyZone becomeFirstResponder];
             }
@@ -546,7 +546,7 @@
     [self.replyZone resignFirstResponder];
     
     if (self.isLoadedDraft && [[Settings drafts]containsObject:_loadedDraft]) {
-        [self dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
         return;
     }
 
@@ -557,9 +557,9 @@
             
             if (buttonIndex == 1) {
                 [self saveDraft];
-                [self dismissModalViewControllerAnimated:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
             } else if (buttonIndex == 0) {
-                [self dismissModalViewControllerAnimated:YES];
+                [self dismissViewControllerAnimated:YES completion:nil];
             } else {
                 [self.replyZone becomeFirstResponder];
             }
@@ -568,7 +568,7 @@
         as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
         [as showInView:self.view];
     } else {
-        [self dismissModalViewControllerAnimated:YES];
+        [self dismissViewControllerAnimated:YES completion:nil];
     }
 }
 

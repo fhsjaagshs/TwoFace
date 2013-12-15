@@ -215,7 +215,7 @@
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageData];
-                        [self presentModalViewController:vc animated:YES];
+                        [self presentViewController:vc animated:YES completion:nil];
                     }
                 });
             }
@@ -230,7 +230,7 @@
 }
 
 - (void)close {
-    [self dismissModalViewControllerAnimated:YES];
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)dealloc {

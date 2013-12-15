@@ -490,7 +490,7 @@
                         [Settings hideHUD];
                         ImageDetailViewController *vc = [[ImageDetailViewController alloc]initWithData:imageDataD];
                         vc.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
-                        [self presentModalViewController:vc animated:YES];
+                        [self presentViewController:vc animated:YES completion:nil];
                     }
                 });
             }

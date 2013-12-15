@@ -163,7 +163,7 @@
         cell.textLabel.highlightedTextColor = [UIColor blackColor];
         cell.detailTextLabel.highlightedTextColor = [UIColor blackColor];
         
-        cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
+       // cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
         cell.detailTextLabel.numberOfLines = 0;
     }
  
