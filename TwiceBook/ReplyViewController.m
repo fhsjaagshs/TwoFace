@@ -11,9 +11,22 @@
 
 @implementation ReplyViewController
 
-- (void)saveToID:(NSNotification *)notif {
-    self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[[Core.shared nameForFacebookID:_toID]componentsSeparatedByString:@" "]firstObject]];
+- (instancetype)initWithToID:(NSString *)toId {
+    self = [super init];
+    if (self) {
+        self.toID = toId;
+        self.isFacebook = YES;
+    }
+    return self;
+}
+
+- (id)initWithTweet:(Tweet *)aTweet {
+    self = [super init];
+    if (self) {
+        self.isFacebook = NO;
+        self.tweet = aTweet;
+    }
+    return self;
 }
 
 - (void)loadView {
@@ -36,11 +49,6 @@
     topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Post" style:UIBarButtonItemStyleDone target:self action:@selector(sendReply)];
     [_navBar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:_navBar];
-
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadDraft:) name:@"draft" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(saveToID:) name:@"passFriendID" object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     self.bar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
     
@@ -69,6 +77,16 @@
     
     [_replyZone becomeFirstResponder];
     [self refreshCounter];
+    
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadDraft:) name:@"draft" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(saveToID:) name:@"passFriendID" object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)saveToID:(NSNotification *)notif {
+    self.toID = notif.object;
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[[Core.shared nameForFacebookID:_toID]componentsSeparatedByString:@" "]firstObject]];
 }
 
 - (void)scaleImageFromCameraRoll {
@@ -213,24 +231,6 @@
     [self.replyZone becomeFirstResponder];
 }
 
-- (instancetype)initWithToID:(NSString *)toId {
-    self = [super init];
-    if (self) {
-        self.toID = toId;
-        self.isFacebook = YES;
-    }
-    return self;
-}
-
-- (id)initWithTweet:(Tweet *)aTweet {
-    self = [super init];
-    if (self) {
-        self.isFacebook = NO;
-        self.tweet = aTweet;
-    }
-    return self;
-}
-
 - (void)refreshCounter {
     int charsLeft = 140-(self.imageFromCameraRoll?self.replyZone.text.length+20:self.replyZone.text.length);
     
@@ -242,7 +242,7 @@
     } else if (charsLeft == 140) {
         self.navBar.topItem.rightBarButtonItem.enabled = NO;
     } else {
-        self.charactersLeft.textColor = [UIColor whiteColor];
+        self.charactersLeft.textColor = [UIColor blackColor];
         self.navBar.topItem.rightBarButtonItem.enabled = YES;
     }
 }
@@ -294,34 +294,22 @@
 }
 
 - (void)deletePostedDraft {
-    NSMutableArray *drafts = [Settings drafts];
-    
-    if ([drafts containsObject:_loadedDraft]) {
-        [[NSFileManager defaultManager]removeItemAtPath:_loadedDraft[@"thumbnailImagePath"] error:nil];
-        [[NSFileManager defaultManager]removeItemAtPath:_loadedDraft[@"imagePath"] error:nil];
-        [drafts removeObject:_loadedDraft];
-        [drafts writeToFile:[Settings draftsPath] atomically:YES];
-    }
+    [Core.shared deleteDraft:_loadedDraft];
 }
 
 - (void)purgeDraftImages {
-    NSString *imageDir = [[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"];
-    NSMutableArray *drafts = [Settings drafts];
+    NSString *imageDir = [[Settings documentsDirectory]stringByAppendingPathComponent:@"draft_images"];
+    //NSMutableArray *drafts = [Settings drafts];
     
     NSMutableArray *imagesToKeep = [NSMutableArray array];
     NSMutableArray *allFiles = [NSMutableArray arrayWithArray:[[NSFileManager defaultManager]contentsOfDirectoryAtPath:imageDir error:nil]];
     
-    for (NSDictionary *dict in drafts) {
+    for (NSDictionary *dict in [Core.shared loadDrafts]) {
         
         NSString *imageName = [dict[@"imagePath"]lastPathComponent];
-        NSString *thumbnailImageName = [dict[@"thumbnailImagePath"]lastPathComponent];
 
         if (imageName.length > 0) {
             [imagesToKeep addObject:imageName];
-        }
-        
-        if (thumbnailImageName.length > 0) {
-            [imagesToKeep addObject:thumbnailImageName];
         }
     }
     
@@ -334,12 +322,6 @@
 }
 
 - (void)saveDraft {
-    NSMutableArray *drafts = [Settings drafts];
-    
-    if (drafts == nil) {
-        drafts = [NSMutableArray array];
-    }
-    
     NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
     
     NSString *thetoID = _isFacebook?_toID:_loadedDraft[@"toID"];
@@ -382,8 +364,7 @@
     
     dict[@"time"] = [NSDate date];
     
-    [drafts addObject:dict];
-    [drafts writeToFile:[Settings draftsPath] atomically:YES];
+    [Core.shared saveDraft:dict];
 }
 
 - (void)loadDraft:(NSNotification *)notif {
@@ -521,16 +502,15 @@
 - (void)close {
     [_replyZone resignFirstResponder];
     
-    if (_isLoadedDraft && [[Settings drafts]containsObject:_loadedDraft]) {
+    if (_isLoadedDraft && [Core.shared draftExists:_loadedDraft]) {
         [self dismissViewControllerAnimated:YES completion:nil];
         return;
     }
 
-    BOOL isJustMention = ([self.replyZone.text componentsSeparatedByString:@" "].count == 1) && (self.replyZone.text.length > 0)?[[self.replyZone.text substringToIndex:1]isEqualToString:@"@"]:NO;
+    BOOL isJustMention = ([_replyZone.text componentsSeparatedByString:@" "].count == 1) && (_replyZone.text.length > 0)?[[_replyZone.text substringToIndex:1]isEqualToString:@"@"]:NO;
     
     if (any(_imageFromCameraRoll != nil, (_replyZone.text.length > 0 && !isJustMention))) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
-            
             if (buttonIndex == 1) {
                 [self saveDraft];
                 [self dismissViewControllerAnimated:YES completion:nil];
@@ -539,7 +519,6 @@
             } else {
                 [_replyZone becomeFirstResponder];
             }
-                             
         } cancelButtonTitle:@"Cancel" destructiveButtonTitle:@"Delete" otherButtonTitles:@"Save as Draft", nil];
         as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
         [as showInView:self.view];

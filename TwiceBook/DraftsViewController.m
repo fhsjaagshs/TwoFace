@@ -8,6 +8,12 @@
 
 #import "DraftsViewController.h"
 
+@interface DraftsViewController ()
+
+@property (nonatomic, strong) NSMutableArray *drafts;
+
+@end
+
 @implementation DraftsViewController
 
 - (void)loadView {
@@ -25,6 +31,8 @@
     topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
+    
+    self.drafts = [Core.shared loadDrafts];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -36,12 +44,12 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    int count = [[Settings drafts]count];
+    int count = _drafts.count;
     return (count == 0)?@"There are no saved drafts.":[NSString stringWithFormat:@"There %@ %d draft%@.",(count == 1)?@"is":@"are",count,(count == 1)?@"":@"s"];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [[Settings drafts]count];
+    return _drafts.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -53,19 +61,16 @@
     if (!cell) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
         UIImageView *imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, 35, 35)];
-        imageView.layer.cornerRadius = 4;
+        imageView.layer.cornerRadius = 17.5;
         imageView.layer.masksToBounds = YES;
-        imageView.layer.borderColor = [UIColor blackColor].CGColor;
+        imageView.layer.borderColor = [UIColor darkGrayColor].CGColor;
         imageView.layer.borderWidth = 1;
-        imageView.layer.cornerRadius = 5;
         imageView.clipsToBounds = YES;
         cell.accessoryView = imageView;
     }
 
-    NSDictionary *draft = [Settings drafts][indexPath.row];
-    NSString *thumbnailImagePath = (NSString *)draft[@"thumbnailImagePath"];
-    
-    UIImage *image = [UIImage imageWithContentsOfFile:thumbnailImagePath.length?thumbnailImagePath:draft[@"imagePath"]];
+    NSDictionary *draft = _drafts[indexPath.row];
+    UIImage *image = [UIImage imageWithContentsOfFile:draft[@"imagePath"]];
     
     if (image) {
         cell.accessoryView.hidden = NO;
@@ -85,10 +90,10 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSMutableArray *draftsArray = [Settings drafts];
-    [draftsArray removeObjectAtIndex:indexPath.row];
-    [draftsArray writeToFile:[Settings draftsPath] atomically:YES];
-    
+    NSDictionary *draft = _drafts[indexPath.row];
+    [Core.shared deleteDraft:draft];
+    [_drafts removeObjectAtIndex:indexPath.row];
+
     [tableView beginUpdates];
     [tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section]] withRowAnimation:UITableViewRowAnimationLeft];
     [tableView endUpdates];
@@ -100,7 +105,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:[Settings drafts][indexPath.row]];
+    [[NSNotificationCenter defaultCenter]postNotificationName:@"draft" object:_drafts[indexPath.row]];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

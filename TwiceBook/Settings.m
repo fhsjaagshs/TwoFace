@@ -35,25 +35,11 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
     return [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
 }
 
-+ (NSString *)draftsPath {
-    return [[Settings documentsDirectory]stringByAppendingPathComponent:@"drafts.plist"];
-}
-
-+ (NSMutableArray *)drafts {
-    NSMutableArray *loaded = [NSMutableArray arrayWithContentsOfFile:[Settings draftsPath]];
-    return (loaded.count == 0)?@[].mutableCopy:loaded;
-}
-
 + (NSMutableArray *)selectedTwitterUsernames {
     NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kSelectedUsernamesListKey];
     return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
 
-/*+ (NSMutableArray *)addedTwitterUsernames {
-    NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kAddedUsernamesListKey];
-    return ((loaded.count == 0)?@[]:loaded).mutableCopy;
-}
-*/
 + (NSMutableDictionary *)selectedFacebookFriends {
     NSDictionary *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kSelectedFriendsDictionaryKey];
     return ((loaded.count == 0)?@{}:loaded).mutableCopy;
@@ -102,7 +88,6 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
 }
 
 + (void)hideHUD {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [MBProgressHUD hideAllHUDsForView:Settings.appDelegate.window animated:YES];
 }
 

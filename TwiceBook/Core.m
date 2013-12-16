@@ -37,7 +37,7 @@
 - (void)setup {
     self.db = [FMDatabase databaseWithPath:[Settings.documentsDirectory stringByAppendingPathComponent:@"data.db"]];
     [_db open];
-    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS drafts (text varchar(1000), time varchar(100), image_path varchar(255), type varchar(2), guid varchar(64)"];
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS drafts (text varchar(1000), time varchar(100), image_path varchar(255), type varchar(2), guid varchar(64), to_id varchar(255))"];
     [_db close];
     
     /*
@@ -81,26 +81,6 @@
  User generated content
  */
 
-- (void)saveDraft:(NSDictionary *)dict {
-    
-}
-
-- (void)createDraft:(NSDictionary *)dict {
-    [_db open];
-
-    if (dict.count > 0) {
-        [_db beginTransaction];
-        
-        for (NSString *key in dict) {
-            [_db executeUpdate:@"INSERT or REPLACE INTO twitter_img_urls (text, date, type, imagePath, guid) VALUES(?,?,?,?,?)",dict[@"text"],dict[@"date"],dict[@"type"],dict[@"imagePath"],[[NSUUID UUID]UUIDString]];
-        }
-        
-        [_db commit];
-    }
-    
-    [_db close];
-}
-
 - (NSMutableArray *)loadDrafts {
     [_db open];
     
@@ -112,7 +92,8 @@
         [a addObject:@{@"text": [s stringForColumn:@"text"],
                        @"date": [NSDate dateWithTimeIntervalSince1970:[s intForColumn:@"date"]],
                        @"type": [s stringForColumn:@"type"],
-                       @"imagePath": [s stringForColumn:@"imagePath"]}];
+                       @"imagePath": [s stringForColumn:@"imagePath"],
+                       @"to_id": [s stringForColumn:@"to_id"]}];
     }
     
     [s close];
@@ -120,9 +101,34 @@
     return a;
 }
 
+- (BOOL)draftExists:(NSDictionary *)draft {
+    [_db open];
+    BOOL exists = [_db executeQuery:@"SELECT guid FROM drafts WHERE guid=?",draft[@"guid"]].next;
+    [_db close];
+    return exists;
+}
+
 - (void)deleteDraft:(NSDictionary *)draft {
     [_db open];
+    [[NSFileManager defaultManager]removeItemAtPath:draft[@"imagePath"] error:nil];
     [_db executeUpdate:@"DELETE FROM drafts where guid=?",draft[@"guid"]];
+    [_db close];
+}
+
+- (void)saveDraft:(NSDictionary *)dict {
+    [_db open];
+    
+    if (dict.count > 0) {
+        NSString *guid = dict[@"guid"];
+        
+        if (guid.length > 0) {
+            [_db executeUpdate:@"DELETE FROM drafts WHERE guid=?",dict[@"guid"]];
+        } else {
+            guid = [[NSUUID UUID]UUIDString];
+        }
+        [_db executeUpdate:@"INSERT INTO drafts (text, date, type, imagePath, guid, to_id) VALUES(?,?,?,?,?)",dict[@"text"],dict[@"date"],dict[@"type"],dict[@"imagePath"],guid, dict[@"to_id"]];
+    }
+    
     [_db close];
 }
 

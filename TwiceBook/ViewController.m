@@ -182,8 +182,6 @@
                 if (!_refreshControl.isRefreshing) {
                     cell.textLabel.text = @"No Data";
                     cell.detailTextLabel.text = @"Please pull down to refresh.";
-                } else {
-                    cell.textLabel.text = @"Loading...";
                 }
             } else {
                 cell.textLabel.text = @"No Users Selected";
