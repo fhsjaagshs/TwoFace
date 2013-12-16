@@ -70,7 +70,7 @@
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         [_refreshControl endRefreshing];
     } else {
-        [[[Cache shared]timeline]removeAllObjects];
+        [Core.shared.timeline removeAllObjects];
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
@@ -91,8 +91,8 @@
                     }
                 }
 
-                [[Cache shared]sortTimeline];
-                [[Cache shared]cache];
+                [Core.shared sortTimeline];
+                [Core.shared cache];
                 
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
@@ -111,11 +111,11 @@
 }
 
 - (void)clearImageCachesIfNecessary {
-    double time = [[NSDate date]timeIntervalSince1970];
+    double time = NSDate.date.timeIntervalSince1970;
     double previousTime = [[NSUserDefaults standardUserDefaults]doubleForKey:@"previousClearTime"];
     if (time-previousTime > 172800) { // 2 days (172800 seconds)
         [[NSUserDefaults standardUserDefaults]setDouble:time forKey:@"previousClearTime"];
-        [Cache clearImageCache];
+        [Core clearImageCache];
     }
 }
 
@@ -124,7 +124,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSMutableArray *timeline = [[Cache shared]timeline];
+    NSMutableArray *timeline = Core.shared.timeline;
     
     if (timeline.count > 0) {
         
@@ -148,7 +148,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = Cache.shared.timeline.count;
+    int count = Core.shared.timeline.count;
     return (count == 0)?_refreshControl.isRefreshing?0:1:count;
 }
 
@@ -160,12 +160,10 @@
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:CellIdentifier];
         cell.textLabel.highlightedTextColor = [UIColor blackColor];
         cell.detailTextLabel.highlightedTextColor = [UIColor blackColor];
-        
-       // cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
         cell.detailTextLabel.numberOfLines = 0;
     }
  
-    NSMutableArray *timeline = [[Cache shared]timeline];
+    NSMutableArray *timeline = Core.shared.timeline;
     
     if (any(_refreshControl.isRefreshing, timeline.count == 0)) {
         cell.textLabel.textColor = [UIColor blackColor];
@@ -227,7 +225,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSMutableArray *timeline = [[Cache shared]timeline];
+    NSMutableArray *timeline = Core.shared.timeline;
     
     if (timeline.count == 0) {
         return;
@@ -253,7 +251,7 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    if (Cache.shared.timeline.count == 0) {
+    if (Core.shared.timeline.count == 0) {
         [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
     }
 }

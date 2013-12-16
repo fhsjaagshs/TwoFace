@@ -75,7 +75,7 @@
                 }
             }
         }
-        [Cache.shared.timeline addObjectsFromArray:parsedPosts];
+        [Core.shared.timeline addObjectsFromArray:parsedPosts];
     }
     return returnValue;
 }
@@ -84,7 +84,7 @@
     BOOL returnValue = YES;
     
     NSMutableArray *tweets = [NSMutableArray array];
-    NSMutableArray *nonTimelineTweets = [[Cache shared]nonTimelineTweets];
+    NSMutableArray *nonTimelineTweets = Core.shared.nonTimelineTweets;
     
     NSMutableArray *invalidUsers = [NSMutableArray array];
     
@@ -118,7 +118,7 @@
                     
                     if ([retrievedTweet isKindOfClass:[NSDictionary class]]) {
                         Tweet *irt = [Tweet tweetWithDictionary:retrievedTweet];
-                        [[[Cache shared]nonTimelineTweets]addObject:irt];
+                        [Core.shared.nonTimelineTweets addObject:irt];
                         [tweets addObject:irt];
                     } else if ([retrievedTweet isKindOfClass:[Tweet class]]) {
                         [tweets addObject:retrievedTweet];
@@ -138,7 +138,7 @@
         [[NSUserDefaults standardUserDefaults]setObject:selectedUsers forKey:kSelectedUsernamesListKey];
     }
     
-    [[[Cache shared]timeline]addObjectsFromArray:[[NSSet setWithArray:tweets]allObjects]];
+    [Core.shared.timeline addObjectsFromArray:[NSSet setWithArray:tweets].allObjects];
     return YES;
 }
 

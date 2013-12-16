@@ -13,6 +13,6 @@
 - (NSString *)timeElapsedSinceCurrentDate;
 - (NSString *)stringDaysAgo;
 
-+ (NSDateFormatter *)twoface_formatter;
++ (NSDateFormatter *)formatterWithFormat:(NSString *)format;
 
 @end

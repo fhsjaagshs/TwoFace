@@ -6,21 +6,21 @@
 //  Copyright (c) 2013 Nathaniel Symer. All rights reserved.
 //
 
-#import "Cache.h"
+#import "Core.h"
 
-@interface Cache ()
+@interface Core ()
 
 @property (nonatomic, strong) FMDatabase *db;
 
 @end
 
-@implementation Cache
+@implementation Core
 
-+ (Cache *)shared {
-    static Cache *sharedCache;
++ (Core *)shared {
+    static Core *sharedCache;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        sharedCache = [[Cache alloc]init];
+        sharedCache = [[Core alloc]init];
     });
     return sharedCache;
 }

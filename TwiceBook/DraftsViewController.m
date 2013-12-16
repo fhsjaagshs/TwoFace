@@ -13,25 +13,18 @@
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
-    self.view = [[UIView alloc]initWithFrame:screenBounds];
-    self.view.backgroundColor = [UIColor lightGrayColor];
-    self.theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 44, screenBounds.size.width, screenBounds.size.height-64) style:UITableViewStyleGrouped];
+    self.theTableView = [[UITableView alloc]initWithFrame:screenBounds style:UITableViewStyleGrouped];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
-    _theTableView.backgroundColor = [UIColor clearColor];
-    UIView *bgView = [[UIView alloc]initWithFrame:_theTableView.frame];
-    bgView.backgroundColor = [UIColor clearColor];
-    [_theTableView setBackgroundView:bgView];
+    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
-    [self.view bringSubviewToFront:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
+    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select a Draft"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
-    
     [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

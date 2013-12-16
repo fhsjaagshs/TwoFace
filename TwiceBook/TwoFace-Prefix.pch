@@ -34,7 +34,7 @@
     #import "UIImage+NSCoder.h"
 
     #import "Settings.h"
-    #import "Cache.h"
+    #import "Core.h"
     #import "Keychain.h"
     #import "PostsClient.h"
 

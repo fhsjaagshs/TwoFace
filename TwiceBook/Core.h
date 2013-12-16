@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Cache : NSObject
+@interface Core : NSObject
 
 @property (nonatomic, strong) NSMutableArray *timeline;
 @property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
@@ -17,7 +17,7 @@
 
 - (void)sortTimeline;
 
-+ (Cache *)shared;
++ (Core *)shared;
 
 + (void)clearImageCache;
 + (UIImage *)imageFromCache:(NSString *)imageName;

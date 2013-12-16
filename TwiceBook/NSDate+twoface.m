@@ -10,23 +10,28 @@
 
 @implementation NSDate (twoface)
 
-+ (NSDateFormatter *)twoface_formatter {
-    static NSDateFormatter *formatter = nil;
++ (NSDateFormatter *)formatterWithFormat:(NSString *)format {
+    static NSMutableDictionary *formatters = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        formatter = [[NSDateFormatter alloc]init];
+        formatters = [NSMutableDictionary dictionary];
     });
-    return formatter;
+    
+    NSDateFormatter *ret = formatters[format];
+    
+    if (!ret) {
+        ret = [[NSDateFormatter alloc]init];
+        ret.dateFormat = format;
+        formatters[format] = ret;
+    }
+    
+    return ret;
 }
 
-/*- (NSUInteger)daysAgo {
-    return [[NSCalendar currentCalendar]components:(NSDayCalendarUnit) fromDate:self toDate:[NSDate date] options:0].day;
-}*/
-
 - (NSString *)stringDaysAgo {
-    NSDate.twoface_formatter.dateFormat = @"yyyy-MM-dd";
-    
-	NSDate *midnight = [NSDate.twoface_formatter dateFromString:[NSDate.twoface_formatter stringFromDate:self]];
+    NSDateFormatter *formatter = [NSDate formatterWithFormat:@"yyyy-MM-dd"];
+
+	NSDate *midnight = [formatter dateFromString:[formatter stringFromDate:self]];
 	
 	NSUInteger daysAgo = (int)[midnight timeIntervalSinceNow]/(60*60*24)*-1;
 	

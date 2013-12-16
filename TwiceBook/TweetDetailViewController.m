@@ -169,10 +169,10 @@
                                 if ([returnValue isKindOfClass:[NSError class]]) {
                                     [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",[returnValue code]]];
                                 } else {
-                                    int index = [[[Cache shared]timeline]indexOfObject:_tweet];
+                                    int index = [Core.shared.timeline indexOfObject:_tweet];
                                     if (index != INT_MAX) {
                                         [_tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
-                                        [[Cache shared]timeline][index] = _tweet;
+                                        Core.shared.timeline[index] = _tweet;
                                     }
                                 }
                             }

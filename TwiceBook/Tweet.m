@@ -111,7 +111,7 @@
             if (picTwitterComImageLink.length > 0) {
                 picTwitterComLink = [picTwitterComLink stringByReplacingOccurrencesOfString:@"http://" withString:@""];
                 self.text = [_text stringByReplacingOccurrencesOfString:picTwitterURLtoReplace withString:picTwitterComLink];
-                [Cache.shared setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
+                [Core.shared setImageURL:picTwitterComImageLink forLinkURL:picTwitterComLink];
             }
         }
         

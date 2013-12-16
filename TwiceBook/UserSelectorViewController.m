@@ -99,7 +99,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         self.savedSelectedFriendsDict = [Settings selectedFacebookFriends];
         
         NSMutableArray *orderedFacebookUIDsTemp = [NSMutableArray array];
-        self.facebookFriends = [Cache.shared facebookFriendsFromCache:&orderedFacebookUIDsTemp];
+        self.facebookFriends = [Core.shared facebookFriendsFromCache:&orderedFacebookUIDsTemp];
         self.orderedFacebookUIDs = [NSMutableArray array];
         [_orderedFacebookUIDs addObjectsFromArray:orderedFacebookUIDsTemp];
         
@@ -118,7 +118,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         self.savedSelectedArrayTwitter = [Settings selectedTwitterUsernames];
         
-        self.twitterFriends = [Cache.shared twitterFriendsFromCache];
+        self.twitterFriends = [Core.shared twitterFriendsFromCache];
         
         if (_twitterFriends.count == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
@@ -164,7 +164,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                     [_orderedFacebookUIDs addObject:identifier];
                 }
                 
-                [Cache.shared cacheFacebookDicts:data];
+                [Core.shared cacheFacebookDicts:data];
                 [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
             }
         }
@@ -213,7 +213,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                                 NSString *user_id = dict[@"id_str"];
                                 _twitterFriends[user_id] = screen_name;
                             }
-                            [Cache.shared cacheTwitterFriendsDict:_twitterFriends];
+                            [Core.shared cacheTwitterFriendsDict:_twitterFriends];
                         }
                     }
                 }

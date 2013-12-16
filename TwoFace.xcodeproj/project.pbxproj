@@ -42,7 +42,7 @@
 		F129B66F157B8237005353EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B66E157B8237005353EB /* AppDelegate.m */; };
 		F129B672157B8237005353EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B671157B8237005353EB /* ViewController.m */; };
 		F13964F5175EB9710073EE5E /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = F13964F4175EB9710073EE5E /* Settings.m */; };
-		F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B26175FDC3E00CC9EDA /* Cache.m */; };
+		F1397B27175FDC3E00CC9EDA /* Core.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B26175FDC3E00CC9EDA /* Core.m */; };
 		F14F91CA185B566B009D0EDE /* UserSelectorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F14F91C9185B566B009D0EDE /* UserSelectorCell.m */; };
 		F14F91CC185B9628009D0EDE /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F14F91CB185B9628009D0EDE /* libsqlite3.0.dylib */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
@@ -130,8 +130,8 @@
 		F129B671157B8237005353EB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		F13964F3175EB9710073EE5E /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		F13964F4175EB9710073EE5E /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
-		F1397B25175FDC3E00CC9EDA /* Cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cache.h; sourceTree = "<group>"; };
-		F1397B26175FDC3E00CC9EDA /* Cache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Cache.m; sourceTree = "<group>"; };
+		F1397B25175FDC3E00CC9EDA /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
+		F1397B26175FDC3E00CC9EDA /* Core.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Core.m; sourceTree = "<group>"; };
 		F14F91C8185B566B009D0EDE /* UserSelectorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSelectorCell.h; sourceTree = "<group>"; };
 		F14F91C9185B566B009D0EDE /* UserSelectorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UserSelectorCell.m; sourceTree = "<group>"; };
 		F14F91CB185B9628009D0EDE /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
@@ -357,8 +357,8 @@
 		F13964F2175EB95C0073EE5E /* General */ = {
 			isa = PBXGroup;
 			children = (
-				F1397B25175FDC3E00CC9EDA /* Cache.h */,
-				F1397B26175FDC3E00CC9EDA /* Cache.m */,
+				F1397B25175FDC3E00CC9EDA /* Core.h */,
+				F1397B26175FDC3E00CC9EDA /* Core.m */,
 				F13964F3175EB9710073EE5E /* Settings.h */,
 				F13964F4175EB9710073EE5E /* Settings.m */,
 				F1C8CE5F183BF54100DD2544 /* Keychain.h */,
@@ -540,7 +540,7 @@
 				F18042CA175A893C008D191D /* TwitterUser.m in Sources */,
 				F18042CD175A896C008D191D /* FacebookUser.m in Sources */,
 				F13964F5175EB9710073EE5E /* Settings.m in Sources */,
-				F1397B27175FDC3E00CC9EDA /* Cache.m in Sources */,
+				F1397B27175FDC3E00CC9EDA /* Core.m in Sources */,
 				F1E3DDBD185A036900DED240 /* FMResultSet.m in Sources */,
 				F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */,
 				F1E3DDBC185A036900DED240 /* FMDatabaseAdditions.m in Sources */,
@@ -629,8 +629,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/Frameworks\\\"",
-					/Users/nathaniel/Documents/Code/TwoFace/Frameworks,
+					"$(SRCROOT)/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwiceBook/TwoFace-Prefix.pch";
@@ -660,8 +659,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"\\\"$(SRCROOT)/Frameworks\\\"",
-					/Users/nathaniel/Documents/Code/TwoFace/Frameworks,
+					"$(SRCROOT)/Frameworks",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "TwiceBook/TwoFace-Prefix.pch";

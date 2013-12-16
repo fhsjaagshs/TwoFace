@@ -293,18 +293,16 @@
         }
         
         if (!error) {
-            NSMutableArray *timeline = [[Cache shared]timeline];
+            NSMutableArray *timeline = Core.shared.timeline;
             
             id result = removeNull([NSJSONSerialization JSONObjectWithData:data options:NSJSONReadingMutableContainers error:nil]);
             
             NSArray *comments = ((NSDictionary *)result)[@"data"];
             
-            NSMutableArray *parsedComments = [[NSMutableArray alloc]init];
+            NSMutableArray *parsedComments = [NSMutableArray array];
             
-            NSDateFormatter *df = [[NSDateFormatter alloc]init];
-            [df setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
-            NSLocale *usLocale = [[NSLocale alloc]initWithLocaleIdentifier:@"en_US"];
-            [df setLocale:usLocale];
+            NSDateFormatter *formatter = [NSDate formatterWithFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZ"];
+            formatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US"];
             
             for (NSDictionary *rawComment in comments) {
                 
@@ -314,7 +312,7 @@
                 NSString *posterName = rawComment[@"from"][@"name"];
                 NSString *posterID = rawComment[@"from"][@"id"];
                 NSString *message = rawComment[@"message"];
-                NSDate *created_time = [df dateFromString:rawComment[@"created_time"]];
+                NSDate *created_time = [formatter dateFromString:rawComment[@"created_time"]];
                 
                 comment[@"created_time"] = created_time;
                 comment[@"post_id"] = postID;
@@ -336,7 +334,7 @@
                 
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;
-                    [[Cache shared]timeline][index] = _post;
+                    Core.shared.timeline[index] = _post;
                 }
             }
             

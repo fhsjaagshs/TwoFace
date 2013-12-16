@@ -49,11 +49,11 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
     return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
 
-+ (NSMutableArray *)addedTwitterUsernames {
+/*+ (NSMutableArray *)addedTwitterUsernames {
     NSArray *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kAddedUsernamesListKey];
     return ((loaded.count == 0)?@[]:loaded).mutableCopy;
 }
-
+*/
 + (NSMutableDictionary *)selectedFacebookFriends {
     NSDictionary *loaded = [[NSUserDefaults standardUserDefaults]objectForKey:kSelectedFriendsDictionaryKey];
     return ((loaded.count == 0)?@{}:loaded).mutableCopy;
@@ -74,11 +74,11 @@ NSString * const kTwitterAccessTokenKey = @"kTwitterAccessTokenKey";
 }
 
 + (void)removeFacebookFromTimeline {
-    [[[Cache shared]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
+    [Core.shared.timeline filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Status class]]];
 }
 
 + (void)removeTwitterFromTimeline {
-    [[[Cache shared]timeline]filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
+    [Core.shared.timeline filterUsingPredicate:[NSPredicate predicateWithFormat:@"class != %@",[Tweet class]]];
 }
 
 //

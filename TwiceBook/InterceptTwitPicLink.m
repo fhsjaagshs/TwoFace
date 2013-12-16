@@ -30,7 +30,7 @@
 
     if ([@[@"png", @"jpg", @"tif", @"jpe"] containsObject:extension]) {
         NSString *linkURL = [[urlString stringByReplacingOccurrencesOfString:@"http://" withString:@""]stringByReplacingOccurrencesOfString:@"https://" withString:@""];
-        NSString *newURL = [Cache.shared getImageURLForLinkURL:linkURL];
+        NSString *newURL = [Core.shared getImageURLForLinkURL:linkURL];
         if (newURL.length > 0) {
             url = [NSURL URLWithString:newURL];
         }

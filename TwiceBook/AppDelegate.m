@@ -35,7 +35,7 @@
 }
 
 - (void)logoutFacebook {
-    [Cache.shared cacheFacebookDicts:nil];
+    [Core.shared cacheFacebookDicts:nil];
     [FHSFacebook.shared invalidateSession];
 }
 
@@ -86,7 +86,7 @@
         [FHSTwitterEngine.sharedEngine loadAccessToken];
     }
     
-    if (Cache.shared.timeline.count > 0) {
+    if (Core.shared.timeline.count > 0) {
         if (!FHSFacebook.shared.isSessionValid) {
             [Settings removeFacebookFromTimeline];
         }
@@ -126,7 +126,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-    [[Cache shared]cache];
+    [Core.shared cache];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -135,7 +135,7 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-    [[Cache shared]cache];
+    [Core.shared cache];
 }
 
 @end

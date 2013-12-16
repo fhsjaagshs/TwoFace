@@ -91,7 +91,7 @@
     if (section == 0) {
         if (row == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
-                [Cache.shared cacheTwitterFriendsDict:nil];
+                [Core.shared cacheTwitterFriendsDict:nil];
                 [Settings removeTwitterFromTimeline];
                 [[FHSTwitterEngine sharedEngine]clearAccessToken];
             } else {

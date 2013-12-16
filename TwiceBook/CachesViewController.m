@@ -60,14 +60,14 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
 
     if (indexPath.section == 0) {
-        [Cache clearImageCache];
+        [Core clearImageCache];
     } else if (indexPath.section == 1) {
-        [Cache.shared.nonTimelineTweets removeAllObjects];
-        [Cache.shared cacheTwitterFriendsDict:nil];
+        [Core.shared.nonTimelineTweets removeAllObjects];
+        [Core.shared cacheTwitterFriendsDict:nil];
     } else if (indexPath.section == 2) {
-        [Cache.shared cacheFacebookDicts:nil];
+        [Core.shared cacheFacebookDicts:nil];
     } else if (indexPath.section == 3) {
-        [Cache.shared.timeline removeAllObjects];
+        [Core.shared.timeline removeAllObjects];
     }
 }
 
