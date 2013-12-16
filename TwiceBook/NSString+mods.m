@@ -10,6 +10,11 @@
 
 @implementation NSString (mods)
 
+- (CGSize)sizeWithMaxSize:(CGSize)size font:(UIFont *)font {
+    NSAttributedString *attributedText = [[NSAttributedString alloc]initWithString:self attributes:@{ NSFontAttributeName: font }];
+    return [attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
+}
+
 - (NSString *)stringByTrimmingWhitespace {
     return [self stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
 }

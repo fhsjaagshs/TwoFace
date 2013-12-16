@@ -142,10 +142,7 @@
             cellText = [[cellText substringToIndex:140]stringByAppendingString:@"..."];
         }
         
-        NSAttributedString *attributedText = [[NSAttributedString alloc]initWithString:cellText attributes:@{ NSFontAttributeName: [UIFont systemFontOfSize:17] }];
-        CGSize labelSize = [attributedText boundingRectWithSize:(CGSize){280, 1000} options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;
-     //   CGSize labelSize = [cellText sizeWithFont:[UIFont systemFontOfSize:17] constrainedToSize:CGSizeMake(280, 1000) lineBreakMode:UILineBreakModeWordWrap];
-        return labelSize.height+35;
+        return [cellText sizeWithMaxSize:(CGSize){280, 1000} font:[UIFont systemFontOfSize:17]].height+35;
     }
     return 44;
 }

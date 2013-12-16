@@ -10,6 +10,7 @@
 
 @interface NSString (mods)
 
+- (CGSize)sizeWithMaxSize:(CGSize)size font:(UIFont *)font;
 - (NSString *)stringByRemovingHTMLEntities;
 - (NSString *)stringByCapitalizingFirstLetter;
 - (int)occurencesOfString:(NSString *)string;

@@ -180,9 +180,9 @@
 }
 
 - (CGRect)getTextRect {
-    CGSize constrainedRect = CGSizeMake(_messageView.frame.size.width, MAXFLOAT);
-    CGSize textSize = [_messageView.text sizeWithFont:_messageView.font constrainedToSize:constrainedRect lineBreakMode:UILineBreakModeWordWrap];
-    return CGRectMake(_messageView.frame.origin.x, _messageView.frame.origin.y, textSize.width, textSize.height);
+    CGRect ret = _messageView.frame;
+    ret.size = [_messageView.text sizeWithMaxSize:(CGSize){_messageView.frame.size.width, MAXFLOAT} font:_messageView.font];
+    return ret;
 }
 
 - (NSString *)imageInCachesDir {
@@ -405,11 +405,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSString *cellText = (_post.comments)[indexPath.row][@"message"];
-    UIFont *cellFont = [UIFont fontWithName:@"Helvetica" size:17.0];
-    CGSize constraintSize = CGSizeMake(300.0f, MAXFLOAT);
-    CGSize labelSize = [cellText sizeWithFont:cellFont constrainedToSize:constraintSize lineBreakMode:UILineBreakModeWordWrap];
-    return labelSize.height+35;
+    return [_post.comments[indexPath.row][@"message"] sizeWithMaxSize:(CGSize){300, MAXFLOAT} font:[UIFont systemFontOfSize:17]].height+35;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -422,17 +418,19 @@
     
     if (cell == nil) {
         cell = [[UITableViewCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"Cell"];
+        cell.backgroundColor = [UIColor whiteColor];
+        cell.textLabel.textColor = [UIColor blackColor];
+        cell.detailTextLabel.textColor = [UIColor blackColor];
+      //  cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
+        cell.detailTextLabel.numberOfLines = 0;
+        cell.detailTextLabel.font = [UIFont systemFontOfSize:17];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    cell.backgroundColor = [UIColor whiteColor];
-    cell.textLabel.textColor = [UIColor blackColor];
-    cell.detailTextLabel.textColor = [UIColor blackColor];
-    cell.detailTextLabel.lineBreakMode = UILineBreakModeWordWrap;
-    cell.detailTextLabel.numberOfLines = 0;
-    cell.detailTextLabel.font = [UIFont fontWithName:@"Helvetica" size:17.0];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
-    cell.textLabel.text = (_post.comments)[indexPath.row][@"poster_name"];
-    cell.detailTextLabel.text = (_post.comments)[indexPath.row][@"message"];
+    NSDictionary *comment = (_post.comments)[indexPath.row];
+    
+    cell.textLabel.text = comment[@"poster_name"];
+    cell.detailTextLabel.text = comment[@"message"];
     return cell;
 }
 
@@ -634,7 +632,7 @@
 }
 
 - (float)getTextHeight {
-    return [_messageView.text sizeWithFont:_messageView.font constrainedToSize:CGSizeMake(_messageView.frame.size.width-50, 999.0f) lineBreakMode:UILineBreakModeTailTruncation].height+10;
+    return [_messageView.text sizeWithMaxSize:(CGSize){_messageView.frame.size.width-50, 1000} font:_messageView.font].height+10;
 }
 
 - (void)layoutViews {
