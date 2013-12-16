@@ -28,25 +28,23 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        self.db = [FMDatabase databaseWithPath:[Settings.cachesDirectory stringByAppendingPathComponent:@"caches.db"]];
-        [_db open];
-        [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_friends (username varchar(255), user_id varchar(255))"];
-        [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS facebook_friends (name varchar(255), last_name varchar(255), uid varchar(255))"];
-        [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_img_urls (link_url varchar(255), img_url varchar(255))"];
-        [_db close];
-        [self loadCaches];
+        [self setup];
     }
     return self;
 }
 
-- (void)loadCaches {
+- (void)setup {
+    self.db = [FMDatabase databaseWithPath:[Settings.cachesDirectory stringByAppendingPathComponent:@"caches.db"]];
     [_db open];
-
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_friends (username varchar(255), user_id varchar(255))"];
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS facebook_friends (name varchar(255), last_name varchar(255), uid varchar(255))"];
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_img_urls (link_url varchar(255), img_url varchar(255))"];
+    
     self.twitterFriends = [NSMutableDictionary dictionary];
     
     FMResultSet *tw = [_db executeQuery:@"SELECT * FROM twitter_friends"];
     while ([tw next]) {
-        _twitterFriends[[tw stringForColumn:@"user_id"]] = [tw stringForColumn:@"usernames"];
+        _twitterFriends[[tw stringForColumn:@"user_id"]] = [tw stringForColumn:@"username"];
     }
     [tw close];
     [_db close];
@@ -72,6 +70,7 @@
         [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
     }
     
+    [_db close];
 }
 
 - (void)cache {

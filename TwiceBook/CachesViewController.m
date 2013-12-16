@@ -12,21 +12,12 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]bounds];
-    UITableView *theTableView = [[UITableView alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, screenBounds.size.height) style:UITableViewStyleGrouped];
+    UITableView *theTableView = [[UITableView alloc]initWithFrame:UIScreen.mainScreen.bounds style:UITableViewStyleGrouped];
     theTableView.delegate = self;
     theTableView.dataSource = self;
-    theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
-    theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
-    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Caches"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    [bar pushNavigationItem:topItem animated:NO];
-    
-    [self.view addSubview:bar];
-    [self.view bringSubviewToFront:bar];
+    self.navigationItem.title = @"Caches";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -78,10 +69,6 @@
     } else if (indexPath.section == 3) {
         [[[Cache shared]timeline]removeAllObjects];
     }
-}
-
-- (void)close {
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

@@ -8,7 +8,7 @@
 
 #import "IntermediateUserSelectorViewController.h"
 
-@interface IntermediateUserSelectorViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface IntermediateUserSelectorViewController () <UITableViewDelegate, UITableViewDataSource, UINavigationControllerDelegate>
 
 @property (strong, nonatomic) UITableView *theTableView;
 
@@ -20,18 +20,12 @@
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
     self.view = [[UIView alloc]initWithFrame:screenBounds];
-    _theTableView = [[UITableView alloc]initWithFrame:screenBounds style:UITableViewStyleGrouped];
+    _theTableView = [[UITableView alloc]initWithFrame:UIScreen.mainScreen.bounds style:UITableViewStyleGrouped];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
-    _theTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
-    _theTableView.scrollIndicatorInsets = UIEdgeInsetsMake(64, 0, 0, 0);
     [self.view addSubview:_theTableView];
     
-    UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
-    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Social Network"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    [bar pushNavigationItem:topItem animated:NO];
-    [self.view addSubview:bar];
+    self.navigationItem.title = @"Social Networks";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -75,19 +69,15 @@
     if (indexPath.row == 0) {
         if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:NO];
-            [self presentViewController:userSelector animated:YES completion:nil];
+            [self.navigationController pushViewController:userSelector animated:YES];
         }
     } else if (indexPath.row == 1) {
         if (FHSFacebook.shared.isSessionValid) {
             UserSelectorViewController *userSelector = [[UserSelectorViewController alloc]initWithIsFacebook:YES];
-            [self presentViewController:userSelector animated:YES completion:nil];
+            [self.navigationController pushViewController:userSelector animated:YES];
         }
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (void)close {
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

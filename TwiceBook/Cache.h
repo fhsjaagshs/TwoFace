@@ -16,7 +16,6 @@
 @property (nonatomic, strong) NSMutableArray *nonTimelineTweets;
 
 - (void)cache;
-- (void)loadCaches;
 
 - (void)sortTimeline;
 

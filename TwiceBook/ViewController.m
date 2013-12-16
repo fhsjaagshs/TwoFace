@@ -263,7 +263,8 @@
 
 - (void)showPrefs {
     PrefsViewController *p = [[PrefsViewController alloc]init];
-    [self presentViewController:p animated:YES completion:nil];
+    UINavigationController *controller = [[UINavigationController alloc]initWithRootViewController:p];
+    [self presentViewController:controller animated:YES completion:nil];
 }
 
 - (void)showCompose {

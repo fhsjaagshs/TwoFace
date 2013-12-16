@@ -24,7 +24,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) UITableView *theTableView;
-@property (nonatomic, strong) UINavigationBar *navBar;
+//@property (nonatomic, strong) UINavigationBar *navBar;
 @property (nonatomic, strong) UILabel *counter;
 
 @property (nonatomic, assign) BOOL isVisible;
@@ -60,26 +60,19 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 - (void)loadView {
     [super loadView];
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
-    self.view = [[UIView alloc]initWithFrame:screenBounds];
-    self.view.backgroundColor = [UIColor whiteColor];
-    self.theTableView = [[UITableView alloc]initWithFrame:screenBounds];
+    self.theTableView = [[UITableView alloc]initWithFrame:UIScreen.mainScreen.bounds];
     _theTableView.delegate = self;
     _theTableView.dataSource = self;
     _theTableView.clipsToBounds = NO;
-    _theTableView.contentInset = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
-    _theTableView.scrollIndicatorInsets = _isImmediateSelection?UIEdgeInsetsMake(64, 0, 0, 0):UIEdgeInsetsMake(64, 0, 44, 0);
+    _theTableView.contentInset = _isImmediateSelection?UIEdgeInsetsZero:UIEdgeInsetsMake(0, 0, 44, 0);
+    _theTableView.scrollIndicatorInsets = _isImmediateSelection?UIEdgeInsetsZero:UIEdgeInsetsMake(0, 0, 44, 0);
     [self.view addSubview:_theTableView];
     
     self.refreshControl = [[UIRefreshControl alloc]initWithFrame:CGRectMake(0, -64, 320, 64)];
     [_refreshControl addTarget:self action:@selector(refreshUsers) forControlEvents:UIControlEventValueChanged];
     [_theTableView addSubview:_refreshControl];
     
-    self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
-    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Select Users"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(back)];
-    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Reset" style:UIBarButtonItemStyleBordered target:self action:@selector(resetSelectedUsers)];
-    [_navBar pushNavigationItem:topItem animated:NO];
-    [self.view addSubview:_navBar];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Reset" style:UIBarButtonItemStyleBordered target:self action:@selector(resetSelectedUsers)];
     
     if (!_isImmediateSelection) {
         UIToolbar *bottomBar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, screenBounds.size.height-44, screenBounds.size.width, 44)];
@@ -101,7 +94,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
     }
     
     if (_isFacebook) {
-        _navBar.topItem.title = @"Facebook Friends";
+        self.navigationItem.title = @"Facebook Friends";
         
         self.savedSelectedFriendsDict = [Settings selectedFacebookFriends];
         
@@ -117,7 +110,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
             }
         }
     } else {
-        _navBar.topItem.title = @"Twitter Friends";
+        self.navigationItem.title = @"Twitter Friends";
         
         if (![[FHSTwitterEngine sharedEngine]isAuthorized]) {
             [[FHSTwitterEngine sharedEngine]loadAccessToken];
@@ -443,8 +436,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     self.isVisible = YES;
-     NSLog(@"%f",_theTableView.contentInset.top);
-    if (_navBar.topItem.rightBarButtonItem.enabled == NO && !_refreshControl.isRefreshing) {
+    if (self.navigationItem.rightBarButtonItem.enabled == NO && !_refreshControl.isRefreshing) {
         [_theTableView setContentOffset:CGPointMake(0, -64) animated:YES];
         [_refreshControl beginRefreshing];
         [_theTableView reloadData];
@@ -453,8 +445,9 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)disableButtons {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    _navBar.topItem.leftBarButtonItem.enabled = NO;
-    _navBar.topItem.rightBarButtonItem.enabled = NO;
+    self.navigationItem.leftBarButtonItem.enabled = NO;
+    self.navigationItem.rightBarButtonItem.enabled = NO;
+    self.navigationItem.hidesBackButton = YES;
     
     if (_isVisible) {
         [_theTableView setContentOffset:CGPointMake(0, -128) animated:YES];
@@ -466,15 +459,12 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 - (void)enableButtons {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    _navBar.topItem.leftBarButtonItem.enabled = YES;
-    _navBar.topItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.leftBarButtonItem.enabled = YES;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+    self.navigationItem.hidesBackButton = NO;
     [_refreshControl endRefreshing];
     [_theTableView setContentOffset:CGPointMake(0, -60) animated:YES];
     [_theTableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
-}
-
-- (void)back {
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end
