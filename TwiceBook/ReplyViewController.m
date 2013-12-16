@@ -18,45 +18,46 @@
 
 - (void)loadView {
     [super loadView];
-    CGRect screenBounds = [[UIScreen mainScreen]applicationFrame];
-    self.view = [[UIView alloc]initWithFrame:screenBounds];
-    [self.view setBackgroundColor:[UIColor whiteColor]];
-    
-    self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 44)];
-    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Compose Tweet"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Post" style:UIBarButtonItemStyleDone target:self action:@selector(sendReply)];
-    [_navBar pushNavigationItem:topItem animated:NO];
-    [self.view addSubview:_navBar];
-    
-    self.replyZone = [[UITextView alloc]initWithFrame:CGRectMake(0, _navBar.frame.size.height, screenBounds.size.width, screenBounds.size.height-_navBar.frame.size.height)];
+    CGRect screenBounds = [[UIScreen mainScreen]bounds];
+
+    self.replyZone = [[UITextView alloc]initWithFrame:screenBounds];
     _replyZone.backgroundColor = [UIColor whiteColor];
     _replyZone.editable = YES;
     _replyZone.clipsToBounds = NO;
     _replyZone.font = [UIFont systemFontOfSize:14];
     _replyZone.delegate = self;
-    _replyZone.text = @"";
+    _replyZone.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    _replyZone.scrollIndicatorInsets = _replyZone.contentInset;
     [self.view addSubview:_replyZone];
     
+    self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
+    UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Compose Tweet"];
+    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Cancel" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    topItem.rightBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Post" style:UIBarButtonItemStyleDone target:self action:@selector(sendReply)];
+    [_navBar pushNavigationItem:topItem animated:NO];
+    [self.view addSubview:_navBar];
+
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadDraft:) name:@"draft" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(saveToID:) name:@"passFriendID" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
     self.bar = [[UIToolbar alloc]initWithFrame:CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, 44)];
     
     UIBarButtonItem *space = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     space.width = 5;
     
-    self.bar.items = @[[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showImageSelector)], space, [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(showDraftsBrowser)]];
+    _bar.items = @[[[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(showImageSelector)], space, [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemReply target:self action:@selector(showDraftsBrowser)]];
     
-    if (!self.isFacebook) {
+    if (!_isFacebook) {
         self.charactersLeft = [[UILabel alloc]initWithFrame:CGRectMake(0, 0, 310, 44)];
         _charactersLeft.font = [UIFont boldSystemFontOfSize:20];
         _charactersLeft.textAlignment = NSTextAlignmentRight;
         _charactersLeft.textColor = [UIColor blackColor];
         _charactersLeft.backgroundColor = [UIColor clearColor];
         [_bar addSubview:_charactersLeft];
+        
+        _navBar.topItem.title = @"Compose Status";
     }
     
     _replyZone.inputAccessoryView = _bar;
@@ -64,10 +65,6 @@
     if (_tweet) {
         _replyZone.text = [NSString stringWithFormat:@"@%@ ",_tweet.user.screename];
         _navBar.topItem.title = @"Reply";
-    }
-    
-    if (_isFacebook) {
-        _navBar.topItem.title = @"Compose Status";
     }
     
     [_replyZone becomeFirstResponder];
@@ -82,24 +79,23 @@
 }
 
 - (void)kickoffTweetPost {
-    NSString *messageBody = [_replyZone.text stringByTrimmingWhitespace];
     [Settings showHUDWithTitle:@"Tweeting..."];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
-            NSError *error = nil;
+            id ret = nil;
             
-            if (self.tweet) {
-                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody inReplyTo:_tweet.identifier];
+            if (_tweet) {
+                ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace inReplyTo:_tweet.identifier];
             } else {
-                error = [[FHSTwitterEngine sharedEngine]postTweet:messageBody];
+                ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace];
             }
             
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 [self dismissViewControllerAnimated:YES completion:nil];
                 
-                if (error) {
-                    qAlert([NSString stringWithFormat:@"Error %d",error.code], error.domain);
+                if ([ret isKindOfClass:[NSError class]]) {
+                    qAlert([NSString stringWithFormat:@"Error %d",[ret code]], [ret localizedDescription]);
                     [self saveDraft];
                 } else {
                     [self deletePostedDraft];
@@ -110,7 +106,7 @@
 }
 
 - (void)showImageSelector {
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
@@ -267,22 +263,16 @@
 - (void)moveTextViewForKeyboard:(NSNotification *)notification up:(BOOL)up {
     UIViewAnimationCurve animationCurve;
 
-    [[notification userInfo][UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
+    [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
     NSTimeInterval animationDuration = [[notification userInfo][UIKeyboardAnimationDurationUserInfoKey] doubleValue];
     CGRect keyboardRect = [self.view convertRect:[[notification userInfo][UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
     
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
-    
-    if (up) {
-        CGRect newTextViewFrame = self.replyZone.frame;
-        self.originalTextViewFrame = self.replyZone.frame;
-        newTextViewFrame.size.height = keyboardRect.origin.y-self.replyZone.frame.origin.y;
-        self.replyZone.frame = newTextViewFrame;
-    } else {
-        self.replyZone.frame = self.originalTextViewFrame;
-    }
+
+    _replyZone.contentInset = UIEdgeInsetsMake(64, 0, up?keyboardRect.size.height:0, 0);
+    _replyZone.scrollIndicatorInsets = _replyZone.contentInset;
     
     [UIView commitAnimations];
 }

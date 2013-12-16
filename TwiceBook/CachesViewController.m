@@ -62,12 +62,12 @@
     if (indexPath.section == 0) {
         [Cache clearImageCache];
     } else if (indexPath.section == 1) {
-        [[[Cache shared]nonTimelineTweets]removeAllObjects];
-        [[[Cache shared]twitterFriends]removeAllObjects];
+        [Cache.shared.nonTimelineTweets removeAllObjects];
+        [Cache.shared cacheTwitterFriendsDict:nil];
     } else if (indexPath.section == 2) {
         [Cache.shared cacheFacebookDicts:nil];
     } else if (indexPath.section == 3) {
-        [[[Cache shared]timeline]removeAllObjects];
+        [Cache.shared.timeline removeAllObjects];
     }
 }
 

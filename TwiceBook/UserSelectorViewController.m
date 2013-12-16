@@ -24,16 +24,16 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) UITableView *theTableView;
-//@property (nonatomic, strong) UINavigationBar *navBar;
 @property (nonatomic, strong) UILabel *counter;
 
 @property (nonatomic, assign) BOOL isVisible;
 
 // Twitter
-@property (strong, nonatomic) NSMutableArray *savedSelectedArrayTwitter;
+@property (nonatomic, strong) NSMutableArray *savedSelectedArrayTwitter;
+@property (nonatomic, strong) NSMutableDictionary *twitterFriends;
 
 // Facebook
-@property (strong, nonatomic) NSMutableDictionary *savedSelectedFriendsDict;
+@property (nonatomic, strong) NSMutableDictionary *savedSelectedFriendsDict;
 @property (nonatomic, strong) NSMutableDictionary *facebookFriends;
 @property (nonatomic, strong) NSMutableArray *orderedFacebookUIDs;
 
@@ -118,7 +118,9 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         
         self.savedSelectedArrayTwitter = [Settings selectedTwitterUsernames];
         
-        if (Cache.shared.twitterFriends.count == 0) {
+        self.twitterFriends = [Cache.shared twitterFriendsFromCache];
+        
+        if (_twitterFriends.count == 0) {
             if ([[FHSTwitterEngine sharedEngine]isAuthorized]) {
                 [self disableButtons];
                 [self fetchFriends];
@@ -185,7 +187,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 NSMutableArray *idsToLookUp = [NSMutableArray array];
                 
                 for (NSString *identifier in ids) {
-                    if (!Cache.shared.twitterFriends[identifier]) {
+                    if (!_twitterFriends[identifier]) {
                         [idsToLookUp addObject:identifier];
                     }
                 }
@@ -209,8 +211,9 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                             for (NSDictionary *dict in userDicts) {
                                 NSString *screen_name = dict[@"screen_name"];
                                 NSString *user_id = dict[@"id_str"];
-                                Cache.shared.twitterFriends[user_id] = screen_name;
+                                _twitterFriends[user_id] = screen_name;
                             }
+                            [Cache.shared cacheTwitterFriendsDict:_twitterFriends];
                         }
                     }
                 }
@@ -302,7 +305,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = _isFacebook?_facebookFriends.count:Cache.shared.twitterFriends.count;
+    int count = _isFacebook?_facebookFriends.count:_twitterFriends.count;
     return (count > 0)?count:(_refreshControl.isRefreshing?0:1);
 }
 
@@ -326,14 +329,14 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
         cell.accessoryType = (Settings.selectedFacebookFriends[cell.user_id] != nil)?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
         cell.textLabel.text = cell.username;
     } else {
-        if (Cache.shared.twitterFriends.count == 0) {
+        if (_twitterFriends.count == 0) {
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.textLabel.text = @"No usernames loaded...";
             return cell;
         }
         
-        cell.user_id = Cache.shared.twitterFriends.allKeys[indexPath.row];
-        cell.username = Cache.shared.twitterFriends[cell.user_id];
+        cell.user_id = _twitterFriends.allKeys[indexPath.row];
+        cell.username = _twitterFriends[cell.user_id];
         cell.accessoryType = [Settings.selectedTwitterUsernames containsObject:cell.username]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
         cell.textLabel.text = [@"@" stringByAppendingString:cell.username];
     }
