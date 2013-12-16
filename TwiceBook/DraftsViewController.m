@@ -85,7 +85,6 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    
     NSMutableArray *draftsArray = [Settings drafts];
     [draftsArray removeObjectAtIndex:indexPath.row];
     [draftsArray writeToFile:[Settings draftsPath] atomically:YES];

@@ -50,11 +50,11 @@
 //
 
 - (NSString *)loadAccessToken {
-    return [Keychain objectForKey:kTwitterAccessTokenKey];
+    return Keychain.shared[kTwitterAccessTokenKey];
 }
 
 - (void)storeAccessToken:(NSString *)accessToken {
-    [Keychain setObject:accessToken forKey:kTwitterAccessTokenKey];
+    Keychain.shared[kTwitterAccessTokenKey] = accessToken;
 }
 
 //

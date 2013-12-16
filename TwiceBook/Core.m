@@ -10,6 +10,7 @@
 
 @interface Core ()
 
+@property (nonatomic, strong) FMDatabase *db_cache;
 @property (nonatomic, strong) FMDatabase *db;
 
 @end
@@ -34,12 +35,25 @@
 }
 
 - (void)setup {
-    self.db = [FMDatabase databaseWithPath:[Settings.cachesDirectory stringByAppendingPathComponent:@"caches.db"]];
+    self.db = [FMDatabase databaseWithPath:[Settings.documentsDirectory stringByAppendingPathComponent:@"data.db"]];
     [_db open];
-    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_friends (username varchar(255), user_id varchar(255))"];
-    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS facebook_friends (name varchar(255), last_name varchar(255), uid varchar(255))"];
-    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_img_urls (link_url varchar(255), img_url varchar(255))"];
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS drafts (text varchar(1000), time varchar(100), image_path varchar(255), type varchar(2), guid varchar(64)"];
     [_db close];
+    
+    /*
+     Setup cache database
+     */
+    
+    self.db_cache = [FMDatabase databaseWithPath:[Settings.cachesDirectory stringByAppendingPathComponent:@"caches.db"]];
+    [_db_cache open];
+    [_db_cache executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_friends (username varchar(255), user_id varchar(255))"];
+    [_db_cache executeUpdate:@"CREATE TABLE IF NOT EXISTS facebook_friends (name varchar(255), last_name varchar(255), uid varchar(255))"];
+    [_db_cache executeUpdate:@"CREATE TABLE IF NOT EXISTS twitter_img_urls (link_url varchar(255), img_url varchar(255))"];
+    [_db_cache close];
+    
+    /*
+     Initial Cache load
+     */
     
     self.timeline = [NSMutableArray array];
     
@@ -61,9 +75,60 @@
     for (NSDictionary *dict in nonTimelineTweetsTemp) {
         [_nonTimelineTweets addObject:[Tweet tweetWithDictionary:dict]];
     }
+}
+
+/*
+ User generated content
+ */
+
+- (void)saveDraft:(NSDictionary *)dict {
+    
+}
+
+- (void)createDraft:(NSDictionary *)dict {
+    [_db open];
+
+    if (dict.count > 0) {
+        [_db beginTransaction];
+        
+        for (NSString *key in dict) {
+            [_db executeUpdate:@"INSERT or REPLACE INTO twitter_img_urls (text, date, type, imagePath, guid) VALUES(?,?,?,?,?)",dict[@"text"],dict[@"date"],dict[@"type"],dict[@"imagePath"],[[NSUUID UUID]UUIDString]];
+        }
+        
+        [_db commit];
+    }
     
     [_db close];
 }
+
+- (NSMutableArray *)loadDrafts {
+    [_db open];
+    
+    FMResultSet *s = [_db executeQuery:@"SELECT * FROM drafts ORDER BY time ASC"];
+    
+    NSMutableArray *a = [NSMutableArray array];
+    
+    while ([s next]) {
+        [a addObject:@{@"text": [s stringForColumn:@"text"],
+                       @"date": [NSDate dateWithTimeIntervalSince1970:[s intForColumn:@"date"]],
+                       @"type": [s stringForColumn:@"type"],
+                       @"imagePath": [s stringForColumn:@"imagePath"]}];
+    }
+    
+    [s close];
+    [_db close];
+    return a;
+}
+
+- (void)deleteDraft:(NSDictionary *)draft {
+    [_db open];
+    [_db executeUpdate:@"DELETE FROM drafts where guid=?",draft[@"guid"]];
+    [_db close];
+}
+
+/*
+ CACHING
+ */
 
 - (void)cache {
     NSMutableArray *timelineTemp = [NSMutableArray array];
@@ -84,9 +149,9 @@
 }
 
 - (NSMutableDictionary *)twitterFriendsFromCache {
-    [_db open];
+    [_db_cache open];
     
-    FMResultSet *s = [_db executeQuery:@"SELECT * FROM twitter_friends ORDER BY username"];
+    FMResultSet *s = [_db_cache executeQuery:@"SELECT * FROM twitter_friends ORDER BY username"];
     
     NSMutableDictionary *d = [NSMutableDictionary dictionary];
     
@@ -96,31 +161,31 @@
     }
     
     [s close];
-    [_db close];
+    [_db_cache close];
     return d;
 }
 
 - (void)cacheTwitterFriendsDict:(NSMutableDictionary *)dict {
-    [_db open];
-    [_db executeUpdate:@"DELETE FROM twitter_friends"];
+    [_db_cache open];
+    [_db_cache executeUpdate:@"DELETE FROM twitter_friends"];
     
     if (dict.count > 0) {
-        [_db beginTransaction];
+        [_db_cache beginTransaction];
         
         for (NSString *key in dict) {
-            [_db executeUpdate:@"INSERT INTO twitter_friends (username, user_id) values(?,?)",dict[@"user_id"],key];
+            [_db_cache executeUpdate:@"INSERT INTO twitter_friends (username, user_id) values(?,?)",dict[@"user_id"],key];
         }
         
-        [_db commit];
+        [_db_cache commit];
     }
     
-    [_db close];
+    [_db_cache close];
 }
 
 - (NSMutableDictionary *)facebookFriendsFromCache:(NSMutableArray **)array {
-    [_db open];
+    [_db_cache open];
     
-    FMResultSet *s = [_db executeQuery:@"SELECT * FROM facebook_friends ORDER BY last_name"];
+    FMResultSet *s = [_db_cache executeQuery:@"SELECT * FROM facebook_friends ORDER BY last_name"];
     
     NSMutableDictionary *d = [NSMutableDictionary dictionary];
     
@@ -131,61 +196,61 @@
     }
     
     [s close];
-    [_db close];
+    [_db_cache close];
     return d;
 }
 
 - (void)cacheFacebookDicts:(NSArray *)array {
-    [_db open];
-    [_db executeUpdate:@"DELETE FROM facebook_friends"];
+    [_db_cache open];
+    [_db_cache executeUpdate:@"DELETE FROM facebook_friends"];
     
     if (array.count > 0) {
-        [_db beginTransaction];
+        [_db_cache beginTransaction];
         
         for (NSDictionary *dict in array) {
-            [_db executeUpdate:@"INSERT INTO facebook_friends (name, last_name, uid) values(?,?,?)",dict[@"name"],dict[@"last_name"],dict[@"uid"]];
+            [_db_cache executeUpdate:@"INSERT INTO facebook_friends (name, last_name, uid) values(?,?,?)",dict[@"name"],dict[@"last_name"],dict[@"uid"]];
         }
         
-        [_db commit];
+        [_db_cache commit];
     }
 
-    [_db close];
+    [_db_cache close];
 }
 
 - (NSString *)nameForFacebookID:(NSString *)uid {
-    [_db open];
+    [_db_cache open];
     NSString *name = nil;
     
-    FMResultSet *s = [_db executeQuery:@"SELECT name FROM facebook_Frieds WHERE uid=? LIMIT 1",uid];
+    FMResultSet *s = [_db_cache executeQuery:@"SELECT name FROM facebook_Frieds WHERE uid=? LIMIT 1",uid];
     if ([s next]) {
         name = [s stringForColumn:@"name"];
     }
     [s close];
-    [_db close];
+    [_db_cache close];
     return name;
 }
 
 - (void)clearImageURLCache {
-    [_db open];
-    [_db executeUpdate:@"DELETE FROM twitter_img_urls"];
-    [_db close];
+    [_db_cache open];
+    [_db_cache executeUpdate:@"DELETE FROM twitter_img_urls"];
+    [_db_cache close];
 }
 
 - (void)setImageURL:(NSString *)imageURL forLinkURL:(NSString *)linkURL {
-    [_db open];
-    [_db executeUpdate:@"INSERT or REPLACE INTO twitter_img_urls (img_url, link_url) VALUES(?,?)",imageURL,linkURL];
-    [_db close];
+    [_db_cache open];
+    [_db_cache executeUpdate:@"INSERT or REPLACE INTO twitter_img_urls (img_url, link_url) VALUES(?,?)",imageURL,linkURL];
+    [_db_cache close];
 }
 
 - (NSString *)getImageURLForLinkURL:(NSString *)linkURL {
     NSString *ret = nil;
-    [_db open];
-    FMResultSet *s = [_db executeQuery:@"SELECT img_url FROM twitter_img_urls WHERE link_url=?",linkURL];
+    [_db_cache open];
+    FMResultSet *s = [_db_cache executeQuery:@"SELECT img_url FROM twitter_img_urls WHERE link_url=?",linkURL];
     if ([s next]) {
         ret = [s stringForColumn:@"img_url"];
     }
     [s close];
-    [_db close];
+    [_db_cache close];
     return ret;
 }
 

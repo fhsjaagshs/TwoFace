@@ -10,10 +10,14 @@
 
 extern NSString * const kKeychainAccessTokenKey;
 
-@interface Keychain : NSObject
+@interface Keychain : NSMutableDictionary
 
+// Singleton API
 + (void)setObject:(id)object forKey:(NSString *)key;
 + (id)objectForKey:(NSString *)service;
 + (void)removeObjectForKey:(NSString *)key;
+
+// NSMutableDictionary API
++ (Keychain *)shared;
 
 @end
