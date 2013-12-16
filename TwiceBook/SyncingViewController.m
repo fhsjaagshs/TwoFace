@@ -24,7 +24,7 @@
     
     UINavigationBar *bar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Sync"];
-    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Back" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
+    topItem.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     [bar pushNavigationItem:topItem animated:NO];
     [self.view addSubview:bar];
     
@@ -136,8 +136,7 @@
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"lastSynced" object:nil];
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:@"dropboxLoggedInUser" object:nil];
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end

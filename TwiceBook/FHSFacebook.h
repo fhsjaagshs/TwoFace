@@ -22,7 +22,7 @@
 - (BOOL)handleOpenURL:(NSURL *)url;
 - (void)extendAccessTokenIfNeeded;
 
-- (NSMutableURLRequest *)generateRequestWithURL:(NSString *)baseURL params:(NSMutableDictionary *)params HTTPMethod:(NSString *)httpMethod;
+- (NSMutableURLRequest *)generateRequestWithURL:(NSString *)baseURL params:(NSDictionary *)params HTTPMethod:(NSString *)httpMethod;
 
 @property (nonatomic, strong) NSString *accessToken;
 @property (nonatomic, strong) NSDate *expirationDate;

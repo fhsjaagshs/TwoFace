@@ -68,16 +68,11 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
     }
 }
 
-- (NSMutableURLRequest *)generateRequestWithURL:(NSString *)baseURL params:(NSMutableDictionary *)params HTTPMethod:(NSString *)httpMethod {
-    NSString *url = [[self class]serializeURL:baseURL params:params httpMethod:@"GET"];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:30.0f];
-    [request setHTTPMethod:httpMethod];
+- (NSMutableURLRequest *)generateRequestWithURL:(NSString *)baseURL params:(NSDictionary *)paramsImmutable HTTPMethod:(NSString *)httpMethod {
     
-    if ([httpMethod isEqualToString: @"POST"]) {
-        NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",kStringBoundary];
-        [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
-        [request setHTTPBody:[self generatePostBody:params]];
-    }
+    [self extendAccessTokenIfNeeded];
+    
+    NSMutableDictionary *params = paramsImmutable.mutableCopy;
     
     params[@"format"] = @"json";
     params[@"sdk"] = @"ios";
@@ -88,9 +83,15 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
         params[@"access_token"] = _accessToken;
     }
     
-    NSLog(@"%@",params);
+    NSString *url = [[self class]serializeURL:baseURL params:params httpMethod:@"GET"];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:30.0f];
+    [request setHTTPMethod:httpMethod];
     
-    [self extendAccessTokenIfNeeded];
+    if ([httpMethod isEqualToString: @"POST"]) {
+        NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@",kStringBoundary];
+        [request setValue:contentType forHTTPHeaderField:@"Content-Type"];
+        [request setHTTPBody:[self generatePostBody:params]];
+    }
     
     return request;
 }

@@ -264,14 +264,14 @@
     UIViewAnimationCurve animationCurve;
 
     [notification.userInfo[UIKeyboardAnimationCurveUserInfoKey]getValue:&animationCurve];
-    NSTimeInterval animationDuration = [[notification userInfo][UIKeyboardAnimationDurationUserInfoKey] doubleValue];
-    CGRect keyboardRect = [self.view convertRect:[[notification userInfo][UIKeyboardFrameEndUserInfoKey]CGRectValue] fromView:nil];
+    NSTimeInterval animationDuration = [notification.userInfo[UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    CGRect keyboardRect = [self.view convertRect:[notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue] fromView:nil];
     
     [UIView beginAnimations:nil context:nil];
     [UIView setAnimationDuration:animationDuration];
     [UIView setAnimationCurve:animationCurve];
 
-    _replyZone.contentInset = UIEdgeInsetsMake(64, 0, up?keyboardRect.size.height:0, 0);
+    _replyZone.contentInset = UIEdgeInsetsMake(64, 0, up?keyboardRect.size.height+44:0, 0);
     _replyZone.scrollIndicatorInsets = _replyZone.contentInset;
     
     [UIView commitAnimations];
@@ -488,22 +488,21 @@
 }
 
 - (void)showDraftsBrowser {
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     
     void (^completionHandler)(NSUInteger, UIActionSheet *) = ^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
-        
         if (buttonIndex == 0) {
             DraftsViewController *vc = [[DraftsViewController alloc]init];
             [self presentViewController:vc animated:YES completion:nil];
         } else if (buttonIndex == 1) {
-            if (self.isFacebook) {
+            if (_isFacebook) {
                 UserSelectorViewController *vc = [[UserSelectorViewController alloc]initWithIsFacebook:YES isImmediateSelection:YES];
                 [self presentViewController:vc animated:YES completion:nil];
             } else {
-                [self.replyZone becomeFirstResponder];
+                [_replyZone becomeFirstResponder];
             }
         } else {
-            [self.replyZone becomeFirstResponder];
+            [_replyZone becomeFirstResponder];
         }
     };
     

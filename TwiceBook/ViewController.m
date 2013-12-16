@@ -268,7 +268,7 @@
 }
 
 - (void)showCompose {
-    UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:@"Compose" completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
+    UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if ([[actionSheet buttonTitleAtIndex:buttonIndex]isEqualToString:@"Tweet"]) {
             ReplyViewController *composer = [[ReplyViewController alloc]initWithTweet:nil];
             [self presentViewController:composer animated:YES completion:nil];
