@@ -29,6 +29,5 @@ BOOL any(BOOL one, BOOL two) {
 
 NSString * encodeForURL(NSString *urlString) {
     CFStringRef url = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, (CFStringRef)urlString, nil, CFSTR("!*'();:@&=+$,/?%#[]"), kCFStringEncodingUTF8);
-    NSString *result = (__bridge NSString *)url;
-	return result;
+	return (__bridge NSString *)url;
 }

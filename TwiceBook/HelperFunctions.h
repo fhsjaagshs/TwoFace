@@ -10,6 +10,6 @@
 
 void qAlert(NSString *title, NSString *message);
 CGRect resizeRectToWidth(CGRect rect, CGFloat newWidth);
-BOOL is5();
+//BOOL is5();
 BOOL any(BOOL one, BOOL two);
 NSString * encodeForURL(NSString *urlString);

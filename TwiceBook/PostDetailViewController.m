@@ -34,6 +34,7 @@
 
 - (void)loadView {
     [super loadView];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(openURL:) name:@"imageOpen" object:nil];
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(loadComments) name:@"commentsNotif" object:nil];
@@ -51,7 +52,7 @@
     BOOL hasLink = (linkURL.length > 0);
     BOOL isPhoto = [type isEqualToString:@"photo"];
     
-    self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
+   // self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     
     NSString *timestamp = [_post.createdAt timeElapsedSinceCurrentDate];
     NSString *title = [[type stringByCapitalizingFirstLetter]stringByAppendingFormat:@" - %@ ago",timestamp];

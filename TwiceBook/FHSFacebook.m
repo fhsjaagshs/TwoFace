@@ -41,9 +41,19 @@ static NSString *kUserKeychainKey = @"kUserKeychianKey";
         self.expirationDate = tokenDict[kExprDateKeychainKey];
         self.tokenDate = tokenDict[kTokenDateKeychainKey];
         self.user = [FacebookUser facebookUserWithDictionary:tokenDict[kUserKeychainKey]];
+        
+        if ([_expirationDate isKindOfClass:[NSDate class]]) {
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0e9 * _expirationDate.timeIntervalSinceNow)), dispatch_get_main_queue(), ^{
+                [self invalidateSession];
+            });
+        } else {
+            [self invalidateSession];
+        }
     }
     return self;
 }
+
+
 
 - (BOOL)isSessionValid {
     if (![_expirationDate isKindOfClass:[NSDate class]]) {

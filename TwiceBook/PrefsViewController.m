@@ -132,7 +132,6 @@
     } else if (section == 1) {
         IntermediateUserSelectorViewController *vc = [[IntermediateUserSelectorViewController alloc]init];
         [self.navigationController pushViewController:vc animated:YES];
-      //  [self presentViewController:vc animated:YES completion:nil];
     } else if (section == 2) {
         CachesViewController *vc = [[CachesViewController alloc]init];
         [self.navigationController pushViewController:vc animated:YES];

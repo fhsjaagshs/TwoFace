@@ -24,7 +24,7 @@
     #import "UserSelectorCell.h"
     
     #import "NSString+mods.h"
-    #import "NSDate+Helper.h"
+    #import "NSDate+twoface.h"
     #import "HelperFunctions.h"
     #import "UIActionSheet+BlockExtensions.h"
     #import "UIAlertView+BlockExtensions.h"

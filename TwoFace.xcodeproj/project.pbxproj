@@ -24,7 +24,6 @@
 		9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */; };
 		9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D860F15D74DC70085E640 /* UIImage+Scale.m */; };
 		9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7F43F1158E4D4300462D0D /* IntermediateUserSelectorViewController.m */; };
-		9BA753BB15BF1A2000717D94 /* NSDate+Helper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BA753BA15BF1A2000717D94 /* NSDate+Helper.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9BAFCD6B15971B200087EF45 /* NSString+mods.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BAFCD6A15971B200087EF45 /* NSString+mods.m */; };
 		9BB6B24815CDED5300FA2836 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BB6B24715CDED5300FA2836 /* SystemConfiguration.framework */; };
 		9BBC4CAE15DBED01006FA7DE /* Caution.png in Resources */ = {isa = PBXBuildFile; fileRef = 9BBC4CAD15DBED01006FA7DE /* Caution.png */; };
@@ -47,6 +46,7 @@
 		F14F91CA185B566B009D0EDE /* UserSelectorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F14F91C9185B566B009D0EDE /* UserSelectorCell.m */; };
 		F14F91CC185B9628009D0EDE /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = F14F91CB185B9628009D0EDE /* libsqlite3.0.dylib */; };
 		F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F158D72B15800C1D0061E5A6 /* ReplyViewController.m */; };
+		F15988F3185F4CC900FDDD8B /* NSDate+twoface.m in Sources */ = {isa = PBXBuildFile; fileRef = F15988F2185F4CC900FDDD8B /* NSDate+twoface.m */; };
 		F15A011F1763CAFE001C668C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F15A011E1763CAFE001C668C /* CoreText.framework */; };
 		F167CF44185BC09D006E1EB5 /* assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F167CF43185BC09D006E1EB5 /* assets.xcassets */; };
 		F18042C4175A8802008D191D /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = F18042C3175A8802008D191D /* Tweet.m */; };
@@ -99,8 +99,6 @@
 		9B7D860F15D74DC70085E640 /* UIImage+Scale.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Scale.m"; sourceTree = "<group>"; };
 		9B7F43F0158E4D4300462D0D /* IntermediateUserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntermediateUserSelectorViewController.h; sourceTree = "<group>"; };
 		9B7F43F1158E4D4300462D0D /* IntermediateUserSelectorViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IntermediateUserSelectorViewController.m; sourceTree = "<group>"; };
-		9BA753B915BF1A2000717D94 /* NSDate+Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+Helper.h"; sourceTree = "<group>"; };
-		9BA753BA15BF1A2000717D94 /* NSDate+Helper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+Helper.m"; sourceTree = "<group>"; };
 		9BAFCD6915971B200087EF45 /* NSString+mods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+mods.h"; sourceTree = "<group>"; };
 		9BAFCD6A15971B200087EF45 /* NSString+mods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+mods.m"; sourceTree = "<group>"; };
 		9BB6B24715CDED5300FA2836 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
@@ -139,6 +137,8 @@
 		F14F91CB185B9628009D0EDE /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
 		F158D72A15800C1D0061E5A6 /* ReplyViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplyViewController.h; sourceTree = "<group>"; };
 		F158D72B15800C1D0061E5A6 /* ReplyViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ReplyViewController.m; sourceTree = "<group>"; };
+		F15988F1185F4CC900FDDD8B /* NSDate+twoface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDate+twoface.h"; sourceTree = "<group>"; };
+		F15988F2185F4CC900FDDD8B /* NSDate+twoface.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDate+twoface.m"; sourceTree = "<group>"; };
 		F15A011E1763CAFE001C668C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		F167CF43185BC09D006E1EB5 /* assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = assets.xcassets; sourceTree = "<group>"; };
 		F18042C2175A8802008D191D /* Tweet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tweet.h; sourceTree = "<group>"; };
@@ -208,8 +208,8 @@
 		9B857FA415F5AAD500DE25E8 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				9BA753B915BF1A2000717D94 /* NSDate+Helper.h */,
-				9BA753BA15BF1A2000717D94 /* NSDate+Helper.m */,
+				F15988F1185F4CC900FDDD8B /* NSDate+twoface.h */,
+				F15988F2185F4CC900FDDD8B /* NSDate+twoface.m */,
 				9BAFCD6915971B200087EF45 /* NSString+mods.h */,
 				9BAFCD6A15971B200087EF45 /* NSString+mods.m */,
 				9B0B127915CF2DCF00217981 /* UIActionSheet+BlockExtensions.h */,
@@ -515,12 +515,12 @@
 				9B2A621E15AF8D5000C4A426 /* CommentViewController.m in Sources */,
 				9B2A622015AF8D5000C4A426 /* ImageDetailViewController.m in Sources */,
 				9B2A622215AF8D5000C4A426 /* PostDetailViewController.m in Sources */,
-				9BA753BB15BF1A2000717D94 /* NSDate+Helper.m in Sources */,
 				F14F91CA185B566B009D0EDE /* UserSelectorCell.m in Sources */,
 				9B0B127715CF2A0400217981 /* HelperFunctions.m in Sources */,
 				9B0B127D15CF2DCF00217981 /* UIActionSheet+BlockExtensions.m in Sources */,
 				F1E3DDBB185A036900DED240 /* FMDatabase.m in Sources */,
 				F1288F671852757000DECE1B /* DroppinBadassBlocks.m in Sources */,
+				F15988F3185F4CC900FDDD8B /* NSDate+twoface.m in Sources */,
 				9B0B127E15CF2DCF00217981 /* UIAlertView+BlockExtensions.m in Sources */,
 				9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */,
 				9B2378DE15FC18CC008A0D44 /* UIScrollView+UIScrollView_ZoomToPoint.m in Sources */,

@@ -67,14 +67,9 @@
         NSDate *date = [[NSUserDefaults standardUserDefaults]objectForKey:@"lastSyncedDateKey"];
 
         if (date) {
-            NSString *dateS = [date stringDaysAgo];
-            
-            if ([dateS isEqualToString:@"Today"]) {
-                dateS = [NSDate stringForDisplayFromDate:date prefixed:YES];
-            }
-            
-            return [NSString stringWithFormat:@"Last synced %@",dateS];
+            return [NSString stringWithFormat:@"Last synced %@",[date stringDaysAgo]];
         }
+        
         return @"Never Synced";
     }
     return nil;
