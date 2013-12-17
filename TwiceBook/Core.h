@@ -20,9 +20,9 @@
 + (Core *)shared;
 
 - (NSMutableArray *)loadDrafts;
-- (BOOL)draftExists:(NSDictionary *)draft;
-- (void)deleteDraft:(NSDictionary *)draft;
-- (void)saveDraft:(NSDictionary *)dict;
+- (BOOL)draftExists:(Draft *)draft;
+- (void)deleteDraft:(Draft *)draft;
+- (void)saveDraft:(Draft *)dict;
 
 + (void)clearImageCache;
 + (UIImage *)imageFromCache:(NSString *)imageName;

@@ -8,29 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface ReplyViewController : UIViewController <UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
-
-// Facebook
-@property (assign, nonatomic) BOOL isFacebook;
-@property (strong, nonatomic) NSString *toID;
-
-// Twitter
-@property (strong, nonatomic) UILabel *charactersLeft;
-@property (strong, nonatomic) Tweet *tweet;
-
-// UI
-@property (strong, nonatomic) UITextView *replyZone;
-@property (strong, nonatomic) UIToolbar *bar;
-@property (strong, nonatomic) UINavigationBar *navBar;
-
-// Content Handling
-@property (strong, nonatomic) UIImage *imageFromCameraRoll;
-@property (strong, nonatomic) NSMutableDictionary *loadedDraft;
-@property (assign, nonatomic) BOOL isLoadedDraft;
-@property (assign, nonatomic) CGRect originalTextViewFrame;
+@interface ReplyViewController : UIViewController 
 
 - (instancetype)initWithToID:(NSString *)toId;
-- (id)initWithTweet:(Tweet *)tweets;
-- (void)refreshCounter;
+- (instancetype)initWithTweet:(Tweet *)tweets;
 
 @end

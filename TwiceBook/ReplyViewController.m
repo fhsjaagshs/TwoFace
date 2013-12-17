@@ -9,6 +9,23 @@
 #import "ReplyViewController.h"
 #import "FHSTwitterEngine.h"
 
+@interface ReplyViewController () <UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
+
+@property (assign, nonatomic) BOOL isFacebook;
+@property (strong, nonatomic) NSString *toID;
+
+@property (strong, nonatomic) UIImage *imageFromCameraRoll;
+@property (strong, nonatomic) Draft *loadedDraft;
+
+@property (strong, nonatomic) UITextView *replyZone;
+@property (strong, nonatomic) UIToolbar *bar;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UILabel *charactersLeft;
+
+@property (strong, nonatomic) NSString *atUsername;
+
+@end
+
 @implementation ReplyViewController
 
 - (instancetype)initWithToID:(NSString *)toId {
@@ -20,11 +37,12 @@
     return self;
 }
 
-- (id)initWithTweet:(Tweet *)aTweet {
+- (instancetype)initWithTweet:(Tweet *)aTweet {
     self = [super init];
     if (self) {
         self.isFacebook = NO;
-        self.tweet = aTweet;
+        self.toID = aTweet.identifier;
+        self.atUsername = aTweet.user.screename;
     }
     return self;
 }
@@ -66,14 +84,12 @@
         [_bar addSubview:_charactersLeft];
         
         _navBar.topItem.title = @"Compose Status";
+    } else {
+        _replyZone.text = [NSString stringWithFormat:@"@%@ ",_atUsername];
+        _navBar.topItem.title = @"Reply";
     }
     
     _replyZone.inputAccessoryView = _bar;
-
-    if (_tweet) {
-        _replyZone.text = [NSString stringWithFormat:@"@%@ ",_tweet.user.screename];
-        _navBar.topItem.title = @"Reply";
-    }
     
     [_replyZone becomeFirstResponder];
     [self refreshCounter];
@@ -92,7 +108,7 @@
 - (void)scaleImageFromCameraRoll {
     if (_imageFromCameraRoll.size.width > 768 && _imageFromCameraRoll.size.height > 768) {
         float ratio = MIN(768/_imageFromCameraRoll.size.width, 768/_imageFromCameraRoll.size.height);
-        _imageFromCameraRoll = [_imageFromCameraRoll scaleToSize:CGSizeMake(ratio*_imageFromCameraRoll.size.width, ratio*_imageFromCameraRoll.size.height)];
+        self.imageFromCameraRoll = [_imageFromCameraRoll scaleToSize:CGSizeMake(ratio*_imageFromCameraRoll.size.width, ratio*_imageFromCameraRoll.size.height)];
     }
 }
 
@@ -100,13 +116,8 @@
     [Settings showHUDWithTitle:@"Tweeting..."];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
-            id ret = nil;
-            
-            if (_tweet) {
-                ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace inReplyTo:_tweet.identifier];
-            } else {
-                ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace];
-            }
+            // Is legit because FHSTwitterEngine does postTweet: if inReplyTo is nil
+            id ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace inReplyTo:_toID];
             
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -128,7 +139,6 @@
     
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
-            
             UIImagePickerController *imagePicker = [[UIImagePickerController alloc]init];
             imagePicker.delegate = self;
             
@@ -141,7 +151,6 @@
             } else {
                 [_replyZone becomeFirstResponder];
             }
-            
         } cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Take Photo", @"Choose from Library...", nil];
         as.actionSheetStyle = UIActionSheetStyleBlackTranslucent;
         [as showInView:self.view];
@@ -174,15 +183,15 @@
 }
 
 - (void)imageTouched {
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if (buttonIndex == 1) {
-            ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:self.imageFromCameraRoll];
+            ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:_imageFromCameraRoll];
             idvc.shouldShowSaveButton = NO;
             [self dismissViewControllerAnimated:YES completion:nil];
         } else {
-            [self.replyZone becomeFirstResponder];
+            [_replyZone becomeFirstResponder];
         }
 
         if (buttonIndex == 0) {
@@ -193,7 +202,7 @@
             [toolbarItems removeLastObject];
             self.bar.items = toolbarItems;
             
-            self.isLoadedDraft = NO;
+          //  self.isLoadedDraft = NO;
         }
         
         [self refreshCounter];
@@ -204,7 +213,7 @@
 }
 
 - (void)addImageToolbarItems {
-    self.isLoadedDraft = NO;
+   // self.isLoadedDraft = NO;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     UIImage *imageToBeSet = [self.imageFromCameraRoll scaleProportionallyToSize:CGSizeMake(36, 36)];
     [button setImage:imageToBeSet forState:UIControlStateNormal];
@@ -215,41 +224,40 @@
     button.layer.borderWidth = 1.0;
     [button addTarget:self action:@selector(imageTouched) forControlEvents:UIControlEventTouchUpInside];
 
-    NSMutableArray *newItems = [self.bar.items mutableCopy];
+    NSMutableArray *newItems = _bar.items.mutableCopy;
     
     UIBarButtonItem *bbiz = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
     bbiz.width = 5;
     
     [newItems addObject:bbiz];
     [newItems addObject:[[UIBarButtonItem alloc]initWithCustomView:button]];
-    self.bar.items = newItems;
+    _bar.items = newItems;
     [self refreshCounter];
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [picker dismissViewControllerAnimated:YES completion:nil];
-    [self.replyZone becomeFirstResponder];
+    [_replyZone becomeFirstResponder];
 }
 
 - (void)refreshCounter {
-    int charsLeft = 140-(self.imageFromCameraRoll?self.replyZone.text.length+20:self.replyZone.text.length);
+    int charsLeft = 140-(_imageFromCameraRoll?_replyZone.text.length+20:_replyZone.text.length);
     
-    self.charactersLeft.text = [NSString stringWithFormat:@"%d",charsLeft];
+    _charactersLeft.text = [NSString stringWithFormat:@"%d",charsLeft];
     
     if (charsLeft < 0) {
-        self.charactersLeft.textColor = [UIColor redColor];
-        self.navBar.topItem.rightBarButtonItem.enabled = NO;
+        _charactersLeft.textColor = [UIColor redColor];
+        _navBar.topItem.rightBarButtonItem.enabled = NO;
     } else if (charsLeft == 140) {
-        self.navBar.topItem.rightBarButtonItem.enabled = NO;
+        _navBar.topItem.rightBarButtonItem.enabled = NO;
     } else {
-        self.charactersLeft.textColor = [UIColor blackColor];
-        self.navBar.topItem.rightBarButtonItem.enabled = YES;
+        _charactersLeft.textColor = [UIColor blackColor];
+        _navBar.topItem.rightBarButtonItem.enabled = YES;
     }
 }
 
 - (void)textViewDidChange:(UITextView *)textView {
     [self refreshCounter];
-    self.isLoadedDraft = NO;
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
@@ -284,7 +292,7 @@
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
-    [self.replyZone resignFirstResponder];
+    [_replyZone resignFirstResponder];
     [super viewWillDisappear:animated];
 }
 
@@ -299,14 +307,13 @@
 
 - (void)purgeDraftImages {
     NSString *imageDir = [[Settings documentsDirectory]stringByAppendingPathComponent:@"draft_images"];
-    //NSMutableArray *drafts = [Settings drafts];
-    
+
     NSMutableArray *imagesToKeep = [NSMutableArray array];
     NSMutableArray *allFiles = [NSMutableArray arrayWithArray:[[NSFileManager defaultManager]contentsOfDirectoryAtPath:imageDir error:nil]];
     
     for (NSDictionary *dict in [Core.shared loadDrafts]) {
         
-        NSString *imageName = [dict[@"imagePath"]lastPathComponent];
+        NSString *imageName = [dict[@"image"]lastPathComponent];
 
         if (imageName.length > 0) {
             [imagesToKeep addObject:imageName];
@@ -322,85 +329,45 @@
 }
 
 - (void)saveDraft {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]init];
-    
-    NSString *thetoID = _isFacebook?_toID:_loadedDraft[@"toID"];
-    
-    if (thetoID.length > 0) {
-        dict[@"toID"] = thetoID;
-    }
-    
-    if (_replyZone.text.length > 0) {
-        dict[@"text"] = _replyZone.text;
-    }
-    
-    if (self.imageFromCameraRoll) {
-        NSString *filename = [NSString stringWithFormat:@"%lld.jpg",arc4random()%9999999999999999];
-        NSString *path = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
-
-        if (![[NSFileManager defaultManager]fileExistsAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"] isDirectory:nil]) {
-            [[NSFileManager defaultManager]createDirectoryAtPath:[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"] withIntermediateDirectories:NO attributes:nil error:nil];
-        }
-        
-        do {
-            filename = [NSString stringWithFormat:@"%lld.jpg",arc4random()%9999999999999999];
-            path = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draftImages"]stringByAppendingPathComponent:filename];
-        } while ([[NSFileManager defaultManager]fileExistsAtPath:path]);
-        
-        [UIImageJPEGRepresentation(self.imageFromCameraRoll, 1.0) writeToFile:path atomically:YES];
-        dict[@"imagePath"] = path;
-        
-        // Thumbnail
-        NSString *thumbnailFilename = [path stringByReplacingOccurrencesOfString:@".jpg" withString:@"-thumbnail.jpg"];
-        UIImage *thumbnail = [self.imageFromCameraRoll thumbnailImageWithSideOfLength:35];
-        
-        [UIImageJPEGRepresentation(thumbnail, 1.0) writeToFile:thumbnailFilename atomically:YES];
-        dict[@"thumbnailImagePath"] = thumbnailFilename;
-    }
-    
-    if (self.tweet) {
-        dict[@"tweet"] = self.tweet;
-    }
-    
-    dict[@"time"] = [NSDate date];
-    
-    [Core.shared saveDraft:dict];
+    Draft *d = [Draft draft];
+    d.text = _replyZone.text;
+    d.to_id = _toID;
+    d.image = _imageFromCameraRoll;
+    d.date = [NSDate date];
+    d.type = _isFacebook?@"fb":@"tw";
+    [Core.shared saveDraft:d];
 }
 
 - (void)loadDraft:(NSNotification *)notif {
-    
     self.imageFromCameraRoll = nil;
-    NSMutableArray *newItems = [self.bar.items mutableCopy];
+    NSMutableArray *newItems = _bar.items.mutableCopy;
     
-    if ([(UIBarButtonItem *)[newItems lastObject]customView]) {
+    if ([newItems.lastObject customView]) {
         [newItems removeLastObject];
     }
     
-    if ([(UIBarButtonItem *)[newItems lastObject]width] == 5) {
+    if ([newItems.lastObject width] == 5) {
         [newItems removeLastObject];
     }
     
-    self.bar.items = newItems;
+    _bar.items = newItems;
     
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc]initWithDictionary:(NSDictionary *)notif.object];
-    self.replyZone.text = dict[@"text"];
+    Draft *draft = notif.object;
+    _replyZone.text = draft.text;
+    self.imageFromCameraRoll = (draft.imagePath.length > 0)?[UIImage imageWithContentsOfFile:draft.imagePath]:draft.image;
+    self.toID = draft.to_id;
     
-    self.imageFromCameraRoll = [UIImage imageWithContentsOfFile:dict[@"imagePath"]];
-    self.tweet = dict[@"tweet"];
-    self.toID = self.isFacebook?dict[@"toID"]:nil;
-    
-    if (self.imageFromCameraRoll) {
+    if (_imageFromCameraRoll) {
         [self addImageToolbarItems];
     }
     
-    if (self.replyZone.text.length == 0 && !self.imageFromCameraRoll) {
-        self.navBar.topItem.rightBarButtonItem.enabled = NO;
+    if (_replyZone.text.length == 0 && !_imageFromCameraRoll) {
+        _navBar.topItem.rightBarButtonItem.enabled = NO;
     } else {
-        self.navBar.topItem.rightBarButtonItem.enabled = YES;
+        _navBar.topItem.rightBarButtonItem.enabled = YES;
     }
-    
-    self.isLoadedDraft = YES;
-    self.loadedDraft = dict;
+
+    self.loadedDraft = draft;
     [self refreshCounter];
 }
 
@@ -438,10 +405,10 @@
     } else {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
-        if (self.imageFromCameraRoll) {
+        if (_imageFromCameraRoll) {
             [self scaleImageFromCameraRoll];
             [Settings showHUDWithTitle:@"Uploading..."];
-            NSString *message = [self.replyZone.text stringByTrimmingWhitespace];
+            NSString *message = [_replyZone.text stringByTrimmingWhitespace];
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
@@ -451,7 +418,7 @@
                         @autoreleasepool {
                             if ([returnValue isKindOfClass:[NSError class]]) {
                                 [Settings hideHUD];
-                                [self.replyZone becomeFirstResponder];
+                                [_replyZone becomeFirstResponder];
                                 qAlert(@"Image Upload Failed", [NSString stringWithFormat:@"%@",[(NSError *)returnValue localizedDescription]]);
                             } else if ([returnValue isKindOfClass:[NSDictionary class]]) {
                                 NSString *link = ((NSDictionary *)returnValue)[@"url"];
@@ -502,7 +469,7 @@
 - (void)close {
     [_replyZone resignFirstResponder];
     
-    if (_isLoadedDraft && [Core.shared draftExists:_loadedDraft]) {
+    if ([Core.shared draftExists:_loadedDraft]) {
         [self dismissViewControllerAnimated:YES completion:nil];
         return;
     }

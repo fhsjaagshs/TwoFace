@@ -90,7 +90,7 @@
 }
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *draft = _drafts[indexPath.row];
+    Draft *draft = _drafts[indexPath.row];
     [Core.shared deleteDraft:draft];
     [_drafts removeObjectAtIndex:indexPath.row];
 

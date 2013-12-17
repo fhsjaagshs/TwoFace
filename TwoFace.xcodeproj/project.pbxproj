@@ -59,6 +59,7 @@
 		F19D0A45184919A700891122 /* FHSTwitterEngine.m in Sources */ = {isa = PBXBuildFile; fileRef = F19D0A44184919A700891122 /* FHSTwitterEngine.m */; };
 		F1C8CE61183BF54100DD2544 /* Keychain.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE60183BF54100DD2544 /* Keychain.m */; };
 		F1C8CE64183BFF7700DD2544 /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */; };
+		F1D6D867185FC61400800C48 /* Draft.m in Sources */ = {isa = PBXBuildFile; fileRef = F1D6D866185FC61400800C48 /* Draft.m */; };
 		F1DA26291850CDC500ED0A06 /* FHSFacebook.m in Sources */ = {isa = PBXBuildFile; fileRef = F1DA26281850CDC500ED0A06 /* FHSFacebook.m */; };
 		F1E0A8811699D8B8000054F3 /* UserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E0A8801699D8B8000054F3 /* UserSelectorViewController.m */; };
 		F1E182B9184FBC92002ABBD9 /* PostsClient.m in Sources */ = {isa = PBXBuildFile; fileRef = F1E182B8184FBC92002ABBD9 /* PostsClient.m */; };
@@ -158,6 +159,8 @@
 		F1C8CE60183BF54100DD2544 /* Keychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Keychain.m; sourceTree = "<group>"; };
 		F1C8CE62183BFF7700DD2544 /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
+		F1D6D865185FC61400800C48 /* Draft.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Draft.h; sourceTree = "<group>"; };
+		F1D6D866185FC61400800C48 /* Draft.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Draft.m; sourceTree = "<group>"; };
 		F1DA26271850CDC500ED0A06 /* FHSFacebook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FHSFacebook.h; sourceTree = "<group>"; };
 		F1DA26281850CDC500ED0A06 /* FHSFacebook.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FHSFacebook.m; sourceTree = "<group>"; };
 		F1E0A87F1699D8B8000054F3 /* UserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserSelectorViewController.h; sourceTree = "<group>"; };
@@ -363,6 +366,8 @@
 				F13964F4175EB9710073EE5E /* Settings.m */,
 				F1C8CE5F183BF54100DD2544 /* Keychain.h */,
 				F1C8CE60183BF54100DD2544 /* Keychain.m */,
+				F1D6D865185FC61400800C48 /* Draft.h */,
+				F1D6D866185FC61400800C48 /* Draft.m */,
 			);
 			name = General;
 			sourceTree = "<group>";
@@ -512,6 +517,7 @@
 				9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */,
 				9BAFCD6B15971B200087EF45 /* NSString+mods.m in Sources */,
 				9B2A621415AF8CEB00C4A426 /* ZoomingImageView.m in Sources */,
+				F1D6D867185FC61400800C48 /* Draft.m in Sources */,
 				9B2A621E15AF8D5000C4A426 /* CommentViewController.m in Sources */,
 				9B2A622015AF8D5000C4A426 /* ImageDetailViewController.m in Sources */,
 				9B2A622215AF8D5000C4A426 /* PostDetailViewController.m in Sources */,

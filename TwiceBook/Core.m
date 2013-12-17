@@ -89,11 +89,13 @@
     NSMutableArray *a = [NSMutableArray array];
     
     while ([s next]) {
-        [a addObject:@{@"text": [s stringForColumn:@"text"],
-                       @"date": [NSDate dateWithTimeIntervalSince1970:[s intForColumn:@"date"]],
-                       @"type": [s stringForColumn:@"type"],
-                       @"imagePath": [s stringForColumn:@"imagePath"],
-                       @"to_id": [s stringForColumn:@"to_id"]}];
+        Draft *d = [Draft draft];
+        d.text = [s stringForColumn:@"text"];
+        d.date = [NSDate dateWithTimeIntervalSince1970:[[s stringForColumn:@"date"]intValue]];
+        d.type = [s stringForColumn:@"type"];
+        d.imagePath = [s stringForColumn:@"imagePath"];
+        d.to_id = [s stringForColumn:@"to_id"];
+        [a addObject:d];
     }
     
     [s close];
@@ -101,32 +103,37 @@
     return a;
 }
 
-- (BOOL)draftExists:(NSDictionary *)draft {
+- (BOOL)draftExists:(Draft *)draft {
     [_db open];
-    BOOL exists = [_db executeQuery:@"SELECT guid FROM drafts WHERE guid=?",draft[@"guid"]].next;
+    BOOL exists = [_db executeQuery:@"SELECT guid FROM drafts WHERE guid=?",draft.guid].next;
     [_db close];
     return exists;
 }
 
-- (void)deleteDraft:(NSDictionary *)draft {
+- (void)deleteDraft:(Draft *)draft {
     [_db open];
-    [[NSFileManager defaultManager]removeItemAtPath:draft[@"imagePath"] error:nil];
-    [_db executeUpdate:@"DELETE FROM drafts where guid=?",draft[@"guid"]];
+    [[NSFileManager defaultManager]removeItemAtPath:draft.imagePath error:nil];
+    [_db executeUpdate:@"DELETE FROM drafts where guid=?",draft.guid];
     [_db close];
 }
 
-- (void)saveDraft:(NSDictionary *)dict {
+- (void)saveDraft:(Draft *)draft {
     [_db open];
     
-    if (dict.count > 0) {
-        NSString *guid = dict[@"guid"];
-        
-        if (guid.length > 0) {
-            [_db executeUpdate:@"DELETE FROM drafts WHERE guid=?",dict[@"guid"]];
+    if (draft) {
+        if (draft.guid.length == 0) {
+            draft.guid = [[NSUUID UUID]UUIDString];
         } else {
-            guid = [[NSUUID UUID]UUIDString];
+            [_db executeUpdate:@"DELETE FROM drafts WHERE guid=?",draft.guid];
         }
-        [_db executeUpdate:@"INSERT INTO drafts (text, date, type, imagePath, guid, to_id) VALUES(?,?,?,?,?)",dict[@"text"],dict[@"date"],dict[@"type"],dict[@"imagePath"],guid, dict[@"to_id"]];
+
+        if (draft.image) {
+            draft.imagePath = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draft_images"]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png",draft.guid]];
+            [UIImagePNGRepresentation(draft.image) writeToFile:draft.imagePath atomically:YES];
+            draft.image = nil;
+        }
+        
+        [_db executeUpdate:@"INSERT INTO drafts (text, date, type, image_path, guid, to_id) VALUES(?,?,?,?,?)",draft.text, [NSString stringWithFormat:@"%d",(int)draft.date.timeIntervalSince1970], draft.type, draft.imagePath, draft.guid, draft.to_id];
     }
     
     [_db close];

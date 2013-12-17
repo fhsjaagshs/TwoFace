@@ -33,16 +33,18 @@
     #import "NSArray+RemoveDuplicates.h"
     #import "UIImage+NSCoder.h"
 
-    #import "Settings.h"
-    #import "Core.h"
-    #import "Keychain.h"
-    #import "PostsClient.h"
+    #import "Draft.h"
 
     #import "TwitterUser.h"
     #import "Tweet.h"
 
     #import "FacebookUser.h"
     #import "Status.h"
+
+    #import "Settings.h"
+    #import "Core.h"
+    #import "Keychain.h"
+    #import "PostsClient.h"
 
     #import "AppDelegate.h"
     #import "ViewController.h"
