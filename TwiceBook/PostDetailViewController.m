@@ -52,8 +52,6 @@
     BOOL hasLink = (linkURL.length > 0);
     BOOL isPhoto = [type isEqualToString:@"photo"];
     
-   // self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
-    
     NSString *timestamp = [_post.createdAt timeElapsedSinceCurrentDate];
     NSString *title = [[type stringByCapitalizingFirstLetter]stringByAppendingFormat:@" - %@ ago",timestamp];
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 44)];

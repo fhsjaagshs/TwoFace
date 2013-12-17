@@ -69,8 +69,8 @@
         cell.accessoryView = imageView;
     }
 
-    NSDictionary *draft = _drafts[indexPath.row];
-    UIImage *image = [UIImage imageWithContentsOfFile:draft[@"imagePath"]];
+    Draft *draft = _drafts[indexPath.row];
+    UIImage *image = [UIImage imageWithContentsOfFile:draft.imagePath];
     
     if (image) {
         cell.accessoryView.hidden = NO;
@@ -79,8 +79,8 @@
         cell.accessoryView.hidden = YES;
     }
     
-    cell.textLabel.text = [[draft[@"time"]timeElapsedSinceCurrentDate]stringByAppendingString:@" ago"];
-    cell.detailTextLabel.text = draft[@"text"];
+    cell.textLabel.text = [draft.date.timeElapsedSinceCurrentDate stringByAppendingString:@" ago"];
+    cell.detailTextLabel.text = draft.text;
     
     return cell;
 }

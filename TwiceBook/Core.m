@@ -37,7 +37,7 @@
 - (void)setup {
     self.db = [FMDatabase databaseWithPath:[Settings.documentsDirectory stringByAppendingPathComponent:@"data.db"]];
     [_db open];
-    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS drafts (text varchar(1000), time varchar(100), image_path varchar(255), type varchar(2), guid varchar(64), to_id varchar(255))"];
+    [_db executeUpdate:@"CREATE TABLE IF NOT EXISTS drafts (text varchar(1000), date varchar(100), image_path varchar(255), type varchar(2), guid varchar(64), to_id varchar(255))"];
     [_db close];
     
     /*
@@ -84,7 +84,7 @@
 - (NSMutableArray *)loadDrafts {
     [_db open];
     
-    FMResultSet *s = [_db executeQuery:@"SELECT * FROM drafts ORDER BY time ASC"];
+    FMResultSet *s = [_db executeQuery:@"SELECT * FROM drafts ORDER BY date ASC"];
     
     NSMutableArray *a = [NSMutableArray array];
     
@@ -93,7 +93,7 @@
         d.text = [s stringForColumn:@"text"];
         d.date = [NSDate dateWithTimeIntervalSince1970:[[s stringForColumn:@"date"]intValue]];
         d.type = [s stringForColumn:@"type"];
-        d.imagePath = [s stringForColumn:@"imagePath"];
+        d.imagePath = [s stringForColumn:@"image_path"];
         d.to_id = [s stringForColumn:@"to_id"];
         [a addObject:d];
     }
@@ -118,25 +118,25 @@
 }
 
 - (void)saveDraft:(Draft *)draft {
-    [_db open];
-    
     if (draft) {
+        [_db open];
         if (draft.guid.length == 0) {
             draft.guid = [[NSUUID UUID]UUIDString];
         } else {
             [_db executeUpdate:@"DELETE FROM drafts WHERE guid=?",draft.guid];
         }
 
+        draft.date = [NSDate date];
+        
         if (draft.image) {
             draft.imagePath = [[[Settings documentsDirectory]stringByAppendingPathComponent:@"draft_images"]stringByAppendingPathComponent:[NSString stringWithFormat:@"%@.png",draft.guid]];
             [UIImagePNGRepresentation(draft.image) writeToFile:draft.imagePath atomically:YES];
             draft.image = nil;
         }
         
-        [_db executeUpdate:@"INSERT INTO drafts (text, date, type, image_path, guid, to_id) VALUES(?,?,?,?,?)",draft.text, [NSString stringWithFormat:@"%d",(int)draft.date.timeIntervalSince1970], draft.type, draft.imagePath, draft.guid, draft.to_id];
+        [_db executeUpdate:@"INSERT INTO drafts (text, date, type, image_path, guid, to_id) VALUES(?,?,?,?,?,?)",draft.text, [NSString stringWithFormat:@"%d",(int)draft.date.timeIntervalSince1970], draft.type, draft.imagePath, draft.guid, draft.to_id];
+        [_db close];
     }
-    
-    [_db close];
 }
 
 /*

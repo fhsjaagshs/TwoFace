@@ -27,10 +27,17 @@
 
 @implementation ReplyViewController
 
-- (instancetype)initWithToID:(NSString *)toId {
+- (instancetype)init {
     self = [super init];
     if (self) {
         self.draft = [Draft draft];
+    }
+    return self;
+}
+
+- (instancetype)initWithToID:(NSString *)toId {
+    self = [self init];
+    if (self) {
         _draft.to_id = toId;
         _draft.type = kFacebookType;
         self.isFacebook = YES;
@@ -39,9 +46,8 @@
 }
 
 - (instancetype)initWithTweet:(Tweet *)aTweet {
-    self = [super init];
+    self = [self init];
     if (self) {
-        self.draft = [Draft draft];
         _draft.to_id = aTweet.identifier;
         _draft.type = kTwitterType;
         self.isFacebook = NO;
@@ -86,10 +92,13 @@
         _charactersLeft.backgroundColor = [UIColor clearColor];
         [_bar addSubview:_charactersLeft];
         
-        _navBar.topItem.title = @"Compose Status";
-    } else {
-        _replyZone.text = [NSString stringWithFormat:@"@%@ ",_atUsername];
+        if (_atUsername.length > 0) {
+            _replyZone.text = [NSString stringWithFormat:@"@%@ ",_atUsername];
+        }
+        
         _navBar.topItem.title = @"Reply";
+    } else {
+        _navBar.topItem.title = @"Compose Status";
     }
     
     _replyZone.inputAccessoryView = _bar;
@@ -135,6 +144,7 @@
             
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                [Settings hideHUD];
                 [self dismissViewControllerAnimated:YES completion:nil];
                 
                 if ([ret isKindOfClass:[NSError class]]) {
