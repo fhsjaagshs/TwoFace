@@ -1,134 +1,163 @@
 //
-//  ZoomingImageView.m
-//  ZoomingImageView
+//  ZoomingImageViewTwo.m
+//  SwiftLoad
 //
-//  Created by Nathaniel Symer on 7/11/12.
-//  Copyright (c) 2012 Nathaniel Symer. All rights reserved.
+//  Created by Nathaniel Symer on 3/6/13.
+//  Copyright (c) 2013 Nathaniel Symer. All rights reserved.
 //
 
 #import "ZoomingImageView.h"
 
-@implementation ZoomingImageView
+@interface ZoomingImageView () <UIScrollViewDelegate>
 
-@synthesize theImageView;
+@property (nonatomic, strong) UIImageView *theImageView;
+
+@end
+
+@implementation ZoomingImageView
 
 - (void)setup {
     self.multipleTouchEnabled = YES;
-    self.maximumZoomScale = 5.0;
-    self.minimumZoomScale = 1.0;
     self.delegate = self;
-    self.showsVerticalScrollIndicator = NO;
-    self.showsHorizontalScrollIndicator = NO;
-    self.backgroundColor = [UIColor blackColor];
+    self.showsVerticalScrollIndicator = YES;
+    self.showsHorizontalScrollIndicator = YES;
+    self.backgroundColor = [UIColor clearColor];
     
-    self.theImageView = [[UIImageView alloc]initWithFrame:self.frame];
-    self.theImageView.backgroundColor = [UIColor blackColor];
-    self.theImageView.contentMode = UIViewContentModeCenter;
-    [self addSubview:self.theImageView];
+    self.theImageView = [[UIImageView alloc]initWithFrame:CGRectZero];
+    _theImageView.backgroundColor = [UIColor clearColor];
+    [self addSubview:_theImageView];
 }
 
-- (id)init {
-    if (self = [super init]) {
+- (instancetype)init {
+    self = [super init];
+    if (self) {
         [self setup];
     }
     return self;
 }
 
-- (id)initWithFrame:(CGRect)frame {
-    if (self = [super initWithFrame:frame]) {
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
+    if (self) {
         [self setup];
     }
     return self;
 }
 
-- (void)awakeFromNib {
-    [self setup];
+- (void)setImage:(UIImage *)image {
+    _image = image;
+    [self loadImage:_image];
 }
 
-- (void)adjustFrame {
-    CGRect photoImageViewFrame;
-    photoImageViewFrame.origin = CGPointZero;
-    photoImageViewFrame.size = self.theImageView.image.size;
-    self.theImageView.frame = photoImageViewFrame;
-    self.contentSize = photoImageViewFrame.size;
-    
-    [self setMaxMinZoomScalesForCurrentBounds];
+- (void)zoomOut {
+    [self setZoomScale:self.minimumZoomScale animated:YES];
+}
+
+- (CGRect)boundsWithContentInsets {
+    CGRect bounds = self.bounds;
+    bounds.origin.x += self.contentInset.left;
+    bounds.origin.y += self.contentInset.top;
+    bounds.size.width -= (self.contentInset.right+self.contentInset.left);
+    bounds.size.height -= (self.contentInset.top+self.contentInset.bottom);
+    return bounds;
 }
 
 - (void)loadImage:(UIImage *)image {
+    _theImageView.frame = [self boundsWithContentInsets];
+    self.contentSize = CGSizeZero;
     
-    [self.theImageView setImage:image];
-   
-    self.zoomScale = self.minimumZoomScale;
+    _theImageView.image = image;
     
     CGRect photoImageViewFrame;
     photoImageViewFrame.origin = CGPointZero;
     photoImageViewFrame.size = image.size;
-    self.theImageView.frame = photoImageViewFrame;
+    
+    _theImageView.frame = photoImageViewFrame;
     self.contentSize = photoImageViewFrame.size;
     
-    [self setMaxMinZoomScalesForCurrentBounds];
-}
-
-- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
-    return self.theImageView;
-}
-
-- (void)zoomOut {
-    [self zoomToPoint:CGPointMake(0, 0) withScale:self.minimumZoomScale animated:YES];
-    self.zoomScale = self.minimumZoomScale;
-}
-
-- (void)setMaxMinZoomScalesForCurrentBounds {
-
-	if (self.theImageView.image == nil) {
+    [self setNeedsLayout];
+    
+    // Reset - Absolutely crucial
+    self.maximumZoomScale = 1;
+	self.minimumZoomScale = 1;
+	self.zoomScale = 1;
+    
+    // Bail
+	if (!_theImageView.image) {
         return;
     }
-
-    self.zoomScale = self.minimumZoomScale;
-	self.maximumZoomScale = 1;
-	self.minimumZoomScale = 1;
-	
-    CGSize boundsSize = self.bounds.size;
-    CGSize imageSize = self.theImageView.frame.size;
-
+    
+	// Sizes
+    CGSize boundsSize = [self boundsWithContentInsets].size;
+    CGSize imageSize = _theImageView.frame.size;
+    
+    // Calculate Min
     CGFloat xScale = boundsSize.width/imageSize.width;
     CGFloat yScale = boundsSize.height/imageSize.height;
     CGFloat minScale = MIN(xScale, yScale);
-
-	if (xScale > 1 && yScale > 1) {
-		minScale = 1.0;
-	}
-	
-	self.maximumZoomScale = 5;
+    
+	self.maximumZoomScale = minScale*5;
 	self.minimumZoomScale = minScale;
-	self.zoomScale = minScale;
-	
-	self.theImageView.frame = CGRectMake(0, 0, self.theImageView.frame.size.width, self.theImageView.frame.size.height);
-	[self setNeedsLayout];
+	self.zoomScale = self.minimumZoomScale;
+    [self setNeedsLayout];
+}
+
+- (void)resetImage {
+    [self loadImage:_theImageView.image];
+}
+
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView {
+    return _theImageView;
 }
 
 - (void)layoutSubviews {
 	[super layoutSubviews];
-
-    CGSize boundsSize = self.bounds.size;
-    CGRect frameToCenter = self.theImageView.frame;
-
+	
+    // Center the image as it becomes smaller than the size of the screen
+    CGSize boundsSize = [self boundsWithContentInsets].size;
+    CGRect frameToCenter = _theImageView.frame;
+    
+    // Horizontally
     if (frameToCenter.size.width < boundsSize.width) {
-        frameToCenter.origin.x = floorf((boundsSize.width - frameToCenter.size.width) / 2.0);
+        frameToCenter.origin.x = floorf((boundsSize.width-frameToCenter.size.width) / 2.0);
 	} else {
         frameToCenter.origin.x = 0;
 	}
-
+    
+    // Vertically
     if (frameToCenter.size.height < boundsSize.height) {
-        frameToCenter.origin.y = floorf((boundsSize.height - frameToCenter.size.height) / 2.0);
+        frameToCenter.origin.y = floorf((boundsSize.height-frameToCenter.size.height) / 2.0);
 	} else {
         frameToCenter.origin.y = 0;
 	}
     
-	if (!CGRectEqualToRect(self.theImageView.frame, frameToCenter)) {
-		self.theImageView.frame = frameToCenter;
-    }
+    // Center
+    _theImageView.frame = frameToCenter;
+}
+
+- (void)zoomToPoint:(CGPoint)zoomPoint withScale:(CGFloat)scale animated:(BOOL)animated {
+    //Normalize current content size back to content scale of 1.0f
+    CGSize contentSize;
+    contentSize.width = (self.contentSize.width/self.zoomScale);
+    contentSize.height = (self.contentSize.height/self.zoomScale);
+    
+    //translate the zoom point to relative to the content rect
+    zoomPoint.x = (zoomPoint.x/self.bounds.size.width)*contentSize.width;
+    zoomPoint.y = (zoomPoint.y/self.bounds.size.height)*contentSize.height;
+    
+    //derive the size of the region to zoom to
+    CGSize zoomSize;
+    zoomSize.width = self.bounds.size.width/scale;
+    zoomSize.height = self.bounds.size.height/scale;
+    
+    //offset the zoom rect so the actual zoom point is in the middle of the rectangle
+    CGRect zoomRect;
+    zoomRect.origin.x = zoomPoint.x-zoomSize.width/2.0f;
+    zoomRect.origin.y = zoomPoint.y-zoomSize.height/2.0f;
+    zoomRect.size.width = zoomSize.width;
+    zoomRect.size.height = zoomSize.height;
+    //apply the resize
+    [self zoomToRect:zoomRect animated:animated];
 }
 
 @end

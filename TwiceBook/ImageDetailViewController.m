@@ -67,10 +67,11 @@
     self.view.backgroundColor = [UIColor blackColor];
     
     self.zoomingImageView = [[ZoomingImageView alloc]initWithFrame:UIScreen.mainScreen.bounds];
-    [_zoomingImageView setContentSize:_image.size];
-    [_zoomingImageView loadImage:_image];
+    _zoomingImageView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    _zoomingImageView.decelerationRate = UIScrollViewDecelerationRateFast;
     [self.view addSubview:_zoomingImageView];
-
+    _zoomingImageView.image = _image;
+    
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 20, 320, 44)];
     _navBar.barStyle = UIBarStyleBlackTranslucent;
     
@@ -93,7 +94,7 @@
     [tt setDelegate:self];
     [_zoomingImageView addGestureRecognizer:tt];
     
-    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imageViewWasTapped)];
+    UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imageViewWasSingleTapped:)];
     [t setNumberOfTapsRequired:1];
     [t setNumberOfTouchesRequired:1];
     [t setDelegate:self];
@@ -101,19 +102,23 @@
     [t requireGestureRecognizerToFail:tt];
 }
 
-- (void)imageViewWasTapped {
-    if (_navBar.alpha == 0) {
-        [self showControls];
-    } else {
-        [self hideControls];
-    }
+- (void)imageViewWasSingleTapped:(UIGestureRecognizer *)rec {
+    __weak ImageDetailViewController *weakself = self;
+    [UIView animateWithDuration:0.2f animations:^{
+        weakself.navBar.alpha = (weakself.navBar.alpha == 1.0f)?0.0f:1.0f;
+        
+        UIView *statusBar = [[UIApplication sharedApplication]valueForKey:@"statusBar"];
+        statusBar.alpha = (statusBar.alpha == 1.0f)?0.0f:1.0f;
+        
+        weakself.view.backgroundColor = (weakself.view.backgroundColor == [UIColor blackColor])?[UIColor whiteColor]:[UIColor blackColor];
+    }];
 }
 
 - (void)imageViewWasDoubleTapped:(UIGestureRecognizer *)rec {
     if (_zoomingImageView.zoomScale > _zoomingImageView.minimumZoomScale) {
         [_zoomingImageView zoomOut];
     } else {
-        [_zoomingImageView zoomToPoint:[rec locationInView:self.view] withScale:3 animated:YES];
+        [_zoomingImageView zoomToPoint:[rec locationInView:self.view] withScale:_zoomingImageView.maximumZoomScale animated:YES];
     }
 }
 
@@ -139,9 +144,9 @@
 }
 
 - (void)close {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
-    [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-    [[UIApplication sharedApplication]setStatusBarHidden:NO];
+ //   [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
+    //[[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
+  //  [[UIApplication sharedApplication]setStatusBarHidden:NO];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -149,29 +154,7 @@
     return NO;
 }
 
-- (void)showControls {
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.2];
-    [UIView setAnimationDelay:0.0];
-    [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    [_navBar setAlpha:1];
-    [[UIApplication sharedApplication]setStatusBarHidden:NO];
-    [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
-    [UIView commitAnimations];
-}
-
-- (void)hideControls {
-    [UIView beginAnimations:nil context:nil];
-    [UIView setAnimationDuration:0.2];
-    [UIView setAnimationDelay:0.0];
-    [UIView setAnimationCurve:UIViewAnimationCurveLinear];
-    [_navBar setAlpha:0];
-    [[UIApplication sharedApplication]setStatusBarHidden:YES];
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
-    [UIView commitAnimations];
-}
-
-- (void)viewWillAppear:(BOOL)animated {
+/*- (void)viewWillAppear:(BOOL)animated {
     if (_navBar.alpha == 0) {
         [_navBar setAlpha:1];
         [[UIApplication sharedApplication]setStatusBarHidden:NO];
@@ -187,7 +170,7 @@
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
     [_zoomingImageView setHidden:YES];
     [super viewWillDisappear:animated];
-}
+}*/
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter]removeObserver:self];

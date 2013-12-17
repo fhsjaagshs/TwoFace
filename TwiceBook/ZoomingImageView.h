@@ -1,18 +1,20 @@
 //
-//  ZoomingImageView.h
-//  ZommingImageView
+//  ZoomingImageViewTwo.h
+//  SwiftLoad
 //
-//  Created by Nathaniel Symer on 7/11/12.
-//  Copyright (c) 2012 Nathaniel Symer. All rights reserved.
+//  Created by Nathaniel Symer on 3/6/13.
+//  Copyright (c) 2013 Nathaniel Symer. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
 
-@interface ZoomingImageView : UIScrollView <UIScrollViewDelegate>
+@interface ZoomingImageView : UIScrollView
 
 - (void)zoomOut;
-- (void)loadImage:(UIImage *)image;
+- (void)resetImage;
 
-@property (strong, nonatomic) UIImageView *theImageView;
+- (void)zoomToPoint:(CGPoint)zoomPoint withScale:(CGFloat)scale animated:(BOOL)animated;
+
+@property (nonatomic, strong) UIImage *image;
 
 @end
