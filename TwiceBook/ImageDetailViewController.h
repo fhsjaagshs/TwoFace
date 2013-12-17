@@ -10,13 +10,10 @@
 
 @interface ImageDetailViewController : UIViewController <UIGestureRecognizerDelegate>
 
-- (id)initWithImagePath:(NSString *)path;
-- (id)initWithData:(NSData *)data;
-- (id)initWithImage:(UIImage *)imagey;
+- (instancetype)initWithImagePath:(NSString *)path;
+- (instancetype)initWithData:(NSData *)data;
+- (instancetype)initWithImage:(UIImage *)imagey;
 
-@property (strong, nonatomic) ZoomingImageView *zoomingImageView;
-@property (strong, nonatomic) UINavigationBar *navBar;
-@property (strong, nonatomic) UIImage *image;
 @property (assign, nonatomic) BOOL shouldShowSaveButton;
 
 @end

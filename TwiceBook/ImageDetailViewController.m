@@ -8,38 +8,83 @@
 
 #import "ImageDetailViewController.h"
 
+@interface ImageDetailViewController ()
+
+@property (strong, nonatomic) ZoomingImageView *zoomingImageView;
+@property (strong, nonatomic) UINavigationBar *navBar;
+@property (strong, nonatomic) UIImage *image;
+
+@end
+
 @implementation ImageDetailViewController
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.shouldShowSaveButton = YES;
+    }
+    return self;
+}
+
+- (instancetype)initWithImagePath:(NSString *)path {
+    if (self = [self init]) {
+        if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                @autoreleasepool {
+                    self.image = [UIImage imageWithContentsOfFile:path];
+                }
+            });
+        }
+    }
+    return self;
+}
+
+- (instancetype)initWithData:(NSData *)data {
+    if (self = [self init]) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            @autoreleasepool {
+                if (data.length > 0) {
+                    self.image = [UIImage imageWithData:data];
+                }
+            }
+        });
+    }
+    return self;
+}
+
+- (instancetype)initWithImage:(UIImage *)imagey {
+    self = [self init];
+    if (self) {
+        self.image = imagey;
+    }
+    return self;
+}
 
 - (void)loadView {
     [super loadView];
-    self.view = [[UIView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
     self.view.multipleTouchEnabled = YES;
     self.view.clipsToBounds = YES;
     self.view.backgroundColor = [UIColor blackColor];
     
-    self.zoomingImageView = [[ZoomingImageView alloc]initWithFrame:[[UIScreen mainScreen]bounds]];
+    self.zoomingImageView = [[ZoomingImageView alloc]initWithFrame:UIScreen.mainScreen.bounds];
+    [_zoomingImageView setContentSize:_image.size];
+    [_zoomingImageView loadImage:_image];
     [self.view addSubview:_zoomingImageView];
 
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 20, 320, 44)];
-    [_navBar setBarStyle:UIBarStyleBlackTranslucent];
+    _navBar.barStyle = UIBarStyleBlackTranslucent;
     
-    UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:@""];
+    UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:[NSString stringWithFormat:@"%.0f x %.0f", _image.size.width, _image.size.height]];
+    item.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
     
     if (_shouldShowSaveButton) {
         item.rightBarButtonItem = [[UIBarButtonItem alloc]initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(saveImage)];
     }
     
-    item.leftBarButtonItem = [[UIBarButtonItem alloc]initWithTitle:@"Close" style:UIBarButtonItemStyleBordered target:self action:@selector(close)];
-    
     [_navBar pushNavigationItem:item animated:YES];
     [self.view addSubview:_navBar];
     
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showControls) name:kEnteringForegroundNotif object:nil];
-    
-    self.navBar.topItem.title = [[NSString alloc]initWithFormat:@"%.0f x %.0f", self.image.size.width, self.image.size.height];
-    [_zoomingImageView setContentSize:_image.size];
-    [_zoomingImageView loadImage:_image];
-    
     [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     
     UITapGestureRecognizer *tt = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imageViewWasDoubleTapped:)];
@@ -54,47 +99,6 @@
     [t setDelegate:self];
     [_zoomingImageView addGestureRecognizer:t];
     [t requireGestureRecognizerToFail:tt];
-}
-
-- (instancetype)init {
-    self = [super init];
-    if (self) {
-        self.shouldShowSaveButton = YES;
-    }
-    return self;
-}
-
-- (id)initWithImagePath:(NSString *)path {
-    if (self = [self init]) {
-        if ([[NSFileManager defaultManager]fileExistsAtPath:path]) {
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                @autoreleasepool {
-                    self.image = [UIImage imageWithContentsOfFile:path];
-                }
-            });
-        }
-    }
-    return self;
-}
-
-- (id)initWithData:(NSData *)data {
-    if (self = [self init]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            @autoreleasepool {
-                if (data.length > 0) {
-                    self.image = [UIImage imageWithData:data];
-                }
-            }
-        });
-    }
-    return self;
-}
-
-- (id)initWithImage:(UIImage *)imagey {
-    if (self = [self init]) {
-        self.image = imagey;
-    }
-    return self;
 }
 
 - (void)imageViewWasTapped {
@@ -116,17 +120,14 @@
 - (void)saveImage {
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if (buttonIndex == 0) {
-            UIWindow *window = [[Settings appDelegate]window];
-            MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:window animated:YES];
-            hud.mode = MBProgressHUDModeIndeterminate;
-            hud.labelText = @"Saving...";
+            [Settings showHUDWithTitle:@"Saving..."];
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
-                    UIImageWriteToSavedPhotosAlbum(self.image, nil, nil, nil);
+                    UIImageWriteToSavedPhotosAlbum(_image, nil, nil, nil);
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
-                            [MBProgressHUD hideHUDForView:window animated:YES];
+                            [Settings hideHUD];
                         }
                     });
                 }
@@ -138,7 +139,6 @@
 }
 
 - (void)close {
-    [[NSNotificationCenter defaultCenter]removeObserver:self name:kEnteringForegroundNotif object:nil];
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
     [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
@@ -177,7 +177,6 @@
         [[UIApplication sharedApplication]setStatusBarHidden:NO];
         [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
     }
-    //[[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleBlackTranslucent animated:YES];
     [_zoomingImageView setHidden:NO];
     [super viewWillAppear:animated];
 }
@@ -188,6 +187,10 @@
     [[UIApplication sharedApplication]setStatusBarHidden:NO];
     [_zoomingImageView setHidden:YES];
     [super viewWillDisappear:animated];
+}
+
+- (void)dealloc {
+    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end
