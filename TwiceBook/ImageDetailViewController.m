@@ -18,6 +18,10 @@
 
 @implementation ImageDetailViewController
 
+- (UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 - (instancetype)init {
     self = [super init];
     if (self) {
@@ -72,7 +76,7 @@
     [self.view addSubview:_zoomingImageView];
     _zoomingImageView.image = _image;
     
-    self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 20, 320, 44)];
+    self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 64)];
     _navBar.barStyle = UIBarStyleBlackTranslucent;
     
     UINavigationItem *item = [[UINavigationItem alloc]initWithTitle:[NSString stringWithFormat:@"%.0f x %.0f", _image.size.width, _image.size.height]];
@@ -84,10 +88,7 @@
     
     [_navBar pushNavigationItem:item animated:YES];
     [self.view addSubview:_navBar];
-    
-    [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(showControls) name:kEnteringForegroundNotif object:nil];
-    [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
-    
+
     UITapGestureRecognizer *tt = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(imageViewWasDoubleTapped:)];
     [tt setNumberOfTapsRequired:2]; // 2
     [tt setNumberOfTouchesRequired:1]; // 1
@@ -109,8 +110,6 @@
         
         UIView *statusBar = [[UIApplication sharedApplication]valueForKey:@"statusBar"];
         statusBar.alpha = (statusBar.alpha == 1.0f)?0.0f:1.0f;
-        
-        weakself.view.backgroundColor = (weakself.view.backgroundColor == [UIColor blackColor])?[UIColor whiteColor]:[UIColor blackColor];
     }];
 }
 
@@ -144,36 +143,11 @@
 }
 
 - (void)close {
- //   [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
-    //[[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-  //  [[UIApplication sharedApplication]setStatusBarHidden:NO];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer {
     return NO;
-}
-
-/*- (void)viewWillAppear:(BOOL)animated {
-    if (_navBar.alpha == 0) {
-        [_navBar setAlpha:1];
-        [[UIApplication sharedApplication]setStatusBarHidden:NO];
-        [self performSelector:@selector(hideControls) withObject:nil afterDelay:5.0f];
-    }
-    [_zoomingImageView setHidden:NO];
-    [super viewWillAppear:animated];
-}
-
-- (void)viewWillDisappear:(BOOL)animated {
-    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls) object:nil];
-    [[UIApplication sharedApplication]setStatusBarStyle:UIStatusBarStyleDefault animated:YES];
-    [[UIApplication sharedApplication]setStatusBarHidden:NO];
-    [_zoomingImageView setHidden:YES];
-    [super viewWillDisappear:animated];
-}*/
-
-- (void)dealloc {
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 @end

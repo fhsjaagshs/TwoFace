@@ -213,7 +213,7 @@
         if (buttonIndex == 1) {
             ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:_draft.image];
             idvc.shouldShowSaveButton = NO;
-            [self dismissViewControllerAnimated:YES completion:nil];
+            [self presentViewController:idvc animated:YES completion:nil];
         } else {
             [_replyZone becomeFirstResponder];
         }
