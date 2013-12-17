@@ -8,6 +8,9 @@
 
 #import "Draft.h"
 
+NSString * const kTwitterType = @"tw";
+NSString * const kFacebookType = @"fb";
+
 @implementation Draft
 
 + (Draft *)draft {

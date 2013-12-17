@@ -12,10 +12,9 @@
 @interface ReplyViewController () <UITextViewDelegate, UINavigationControllerDelegate, UIImagePickerControllerDelegate>
 
 @property (assign, nonatomic) BOOL isFacebook;
-@property (strong, nonatomic) NSString *toID;
 
-@property (strong, nonatomic) UIImage *imageFromCameraRoll;
-@property (strong, nonatomic) Draft *loadedDraft;
+@property (strong, nonatomic) Draft *draft;
+@property (assign, nonatomic) BOOL isLoadedDraft;
 
 @property (strong, nonatomic) UITextView *replyZone;
 @property (strong, nonatomic) UIToolbar *bar;
@@ -31,7 +30,9 @@
 - (instancetype)initWithToID:(NSString *)toId {
     self = [super init];
     if (self) {
-        self.toID = toId;
+        self.draft = [Draft draft];
+        _draft.to_id = toId;
+        _draft.type = kFacebookType;
         self.isFacebook = YES;
     }
     return self;
@@ -40,8 +41,10 @@
 - (instancetype)initWithTweet:(Tweet *)aTweet {
     self = [super init];
     if (self) {
+        self.draft = [Draft draft];
+        _draft.to_id = aTweet.identifier;
+        _draft.type = kTwitterType;
         self.isFacebook = NO;
-        self.toID = aTweet.identifier;
         self.atUsername = aTweet.user.screename;
     }
     return self;
@@ -52,14 +55,14 @@
     CGRect screenBounds = [[UIScreen mainScreen]bounds];
 
     self.replyZone = [[UITextView alloc]initWithFrame:screenBounds];
+    _replyZone.font = [UIFont systemFontOfSize:14];
     _replyZone.backgroundColor = [UIColor whiteColor];
     _replyZone.editable = YES;
-    _replyZone.clipsToBounds = NO;
-    _replyZone.font = [UIFont systemFontOfSize:14];
     _replyZone.delegate = self;
     _replyZone.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
     _replyZone.scrollIndicatorInsets = _replyZone.contentInset;
     [self.view addSubview:_replyZone];
+    [_replyZone addObserver:self forKeyPath:@"text" options:NSKeyValueObservingOptionNew context:nil];
     
     self.navBar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, screenBounds.size.width, 64)];
     UINavigationItem *topItem = [[UINavigationItem alloc]initWithTitle:@"Compose Tweet"];
@@ -100,15 +103,26 @@
     [[NSNotificationCenter defaultCenter]addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
+    if ([object isEqual:_replyZone] && [keyPath isEqualToString:@"text"]) {
+        _draft.text = _replyZone.text;
+    }
+}
+
+- (void)textViewDidChange:(UITextView *)textView {
+    [self refreshCounter];
+    _draft.text = _replyZone.text;
+}
+
 - (void)saveToID:(NSNotification *)notif {
-    self.toID = notif.object;
-    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[[Core.shared nameForFacebookID:_toID]componentsSeparatedByString:@" "]firstObject]];
+    _draft.to_id = notif.object;
+    _navBar.topItem.title = [NSString stringWithFormat:@"To %@",[[[Core.shared nameForFacebookID:_draft.to_id]componentsSeparatedByString:@" "]firstObject]];
 }
 
 - (void)scaleImageFromCameraRoll {
-    if (_imageFromCameraRoll.size.width > 768 && _imageFromCameraRoll.size.height > 768) {
-        float ratio = MIN(768/_imageFromCameraRoll.size.width, 768/_imageFromCameraRoll.size.height);
-        self.imageFromCameraRoll = [_imageFromCameraRoll scaleToSize:CGSizeMake(ratio*_imageFromCameraRoll.size.width, ratio*_imageFromCameraRoll.size.height)];
+    if (_draft.image.size.width > 768 && _draft.image.size.height > 768) {
+        float ratio = MIN(768/_draft.image.size.width, 768/_draft.image.size.height);
+        _draft.image = [_draft.image scaleToSize:CGSizeMake(ratio*_draft.image.size.width, ratio*_draft.image.size.height)];
     }
 }
 
@@ -117,7 +131,7 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @autoreleasepool {
             // Is legit because FHSTwitterEngine does postTweet: if inReplyTo is nil
-            id ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace inReplyTo:_toID];
+            id ret = [[FHSTwitterEngine sharedEngine]postTweet:_replyZone.text.stringByTrimmingWhitespace inReplyTo:_draft.to_id];
             
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -158,7 +172,7 @@
         UIImagePickerController *imagePicker = [[UIImagePickerController alloc]init];
         [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
         imagePicker.delegate = self;
-        [self.replyZone resignFirstResponder];
+        [_replyZone resignFirstResponder];
         [self presentViewController:imagePicker animated:YES completion:nil];
     }
 }
@@ -166,7 +180,7 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [picker dismissViewControllerAnimated:YES completion:nil];
 
-    self.imageFromCameraRoll = info[UIImagePickerControllerOriginalImage];
+    _draft.image = info[UIImagePickerControllerOriginalImage];
     [self scaleImageFromCameraRoll];
     
     NSMutableArray *toolbarItems = _bar.items.mutableCopy;
@@ -187,22 +201,22 @@
     
     UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
         if (buttonIndex == 1) {
-            ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:_imageFromCameraRoll];
+            ImageDetailViewController *idvc = [[ImageDetailViewController alloc]initWithImage:_draft.image];
             idvc.shouldShowSaveButton = NO;
             [self dismissViewControllerAnimated:YES completion:nil];
         } else {
             [_replyZone becomeFirstResponder];
         }
 
-        if (buttonIndex == 0) {
-            self.imageFromCameraRoll = nil;
+        if (buttonIndex == actionSheet.destructiveButtonIndex) {
+            _draft.image = nil;
 
             NSMutableArray *toolbarItems = _bar.items.mutableCopy;
             [toolbarItems removeLastObject];
             [toolbarItems removeLastObject];
-            self.bar.items = toolbarItems;
+            _bar.items = toolbarItems;
             
-          //  self.isLoadedDraft = NO;
+            self.isLoadedDraft = NO;
         }
         
         [self refreshCounter];
@@ -213,9 +227,8 @@
 }
 
 - (void)addImageToolbarItems {
-   // self.isLoadedDraft = NO;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    UIImage *imageToBeSet = [self.imageFromCameraRoll scaleProportionallyToSize:CGSizeMake(36, 36)];
+    UIImage *imageToBeSet = [_draft.image scaleProportionallyToSize:CGSizeMake(36, 36)];
     [button setImage:imageToBeSet forState:UIControlStateNormal];
     button.frame = CGRectMake(274, 4, imageToBeSet.size.width, imageToBeSet.size.height);
     button.layer.cornerRadius = 5.0;
@@ -241,7 +254,7 @@
 }
 
 - (void)refreshCounter {
-    int charsLeft = 140-(_imageFromCameraRoll?_replyZone.text.length+20:_replyZone.text.length);
+    int charsLeft = 140-(_draft.image?_replyZone.text.length+20:_replyZone.text.length);
     
     _charactersLeft.text = [NSString stringWithFormat:@"%d",charsLeft];
     
@@ -254,10 +267,6 @@
         _charactersLeft.textColor = [UIColor blackColor];
         _navBar.topItem.rightBarButtonItem.enabled = YES;
     }
-}
-
-- (void)textViewDidChange:(UITextView *)textView {
-    [self refreshCounter];
 }
 
 - (void)keyboardWillShow:(NSNotification *)notification {
@@ -297,23 +306,23 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
-    [self.replyZone becomeFirstResponder];
+    [_replyZone becomeFirstResponder];
     [super viewWillAppear:animated];
 }
 
 - (void)deletePostedDraft {
-    [Core.shared deleteDraft:_loadedDraft];
+    [Core.shared deleteDraft:_draft];
 }
 
 - (void)purgeDraftImages {
     NSString *imageDir = [[Settings documentsDirectory]stringByAppendingPathComponent:@"draft_images"];
 
     NSMutableArray *imagesToKeep = [NSMutableArray array];
-    NSMutableArray *allFiles = [NSMutableArray arrayWithArray:[[NSFileManager defaultManager]contentsOfDirectoryAtPath:imageDir error:nil]];
+    NSMutableArray *allFiles = [[NSFileManager defaultManager]contentsOfDirectoryAtPath:imageDir error:nil].mutableCopy;
     
-    for (NSDictionary *dict in [Core.shared loadDrafts]) {
+    for (Draft *draft in [Core.shared loadDrafts]) {
         
-        NSString *imageName = [dict[@"image"]lastPathComponent];
+        NSString *imageName = draft.imagePath.lastPathComponent;
 
         if (imageName.length > 0) {
             [imagesToKeep addObject:imageName];
@@ -329,17 +338,11 @@
 }
 
 - (void)saveDraft {
-    Draft *d = [Draft draft];
-    d.text = _replyZone.text;
-    d.to_id = _toID;
-    d.image = _imageFromCameraRoll;
-    d.date = [NSDate date];
-    d.type = _isFacebook?@"fb":@"tw";
-    [Core.shared saveDraft:d];
+    [Core.shared saveDraft:_draft];
+    self.isLoadedDraft = YES;
 }
 
 - (void)loadDraft:(NSNotification *)notif {
-    self.imageFromCameraRoll = nil;
     NSMutableArray *newItems = _bar.items.mutableCopy;
     
     if ([newItems.lastObject customView]) {
@@ -352,22 +355,21 @@
     
     _bar.items = newItems;
     
-    Draft *draft = notif.object;
-    _replyZone.text = draft.text;
-    self.imageFromCameraRoll = (draft.imagePath.length > 0)?[UIImage imageWithContentsOfFile:draft.imagePath]:draft.image;
-    self.toID = draft.to_id;
+    self.isLoadedDraft = YES;
     
-    if (_imageFromCameraRoll) {
+    self.draft = notif.object;
+    _replyZone.text = _draft.text;
+    
+    if (_draft.image) {
         [self addImageToolbarItems];
     }
     
-    if (_replyZone.text.length == 0 && !_imageFromCameraRoll) {
+    if (_replyZone.text.length == 0 && !_draft.image) {
         _navBar.topItem.rightBarButtonItem.enabled = NO;
     } else {
         _navBar.topItem.rightBarButtonItem.enabled = YES;
     }
 
-    self.loadedDraft = draft;
     [self refreshCounter];
 }
 
@@ -381,12 +383,12 @@
     if (_isFacebook) {
         [Settings showHUDWithTitle:@"Posting..."];
         
-        NSMutableDictionary *params = @{ @"message":_replyZone.text }.mutableCopy;
+        NSMutableDictionary *params = @{ @"message": _replyZone.text }.mutableCopy;
         
-        NSString *graphURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/%@",(_toID.length == 0)?@"me":_toID, (_imageFromCameraRoll != nil)?@"photos":@"feed"];
+        NSString *graphURL = [NSString stringWithFormat:@"https://graph.facebook.com/%@/%@",(_draft.to_id.length == 0)?@"me":_draft.to_id, (_draft.image != nil)?@"photos":@"feed"];
         
-        if (_imageFromCameraRoll) {
-            params[@"source"] = UIImagePNGRepresentation(_imageFromCameraRoll);
+        if (_draft.image) {
+            params[@"source"] = UIImagePNGRepresentation(_draft.image);
         }
         
         NSMutableURLRequest *request = [FHSFacebook.shared generateRequestWithURL:graphURL params:params HTTPMethod:@"POST"];
@@ -405,14 +407,14 @@
     } else {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         
-        if (_imageFromCameraRoll) {
+        if (_draft.image) {
             [self scaleImageFromCameraRoll];
             [Settings showHUDWithTitle:@"Uploading..."];
             NSString *message = [_replyZone.text stringByTrimmingWhitespace];
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 @autoreleasepool {
-                    id returnValue = [[FHSTwitterEngine sharedEngine]uploadImageToTwitPic:UIImageJPEGRepresentation(self.imageFromCameraRoll, 0.8) withMessage:message twitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
+                    id returnValue = [[FHSTwitterEngine sharedEngine]uploadImageToTwitPic:UIImageJPEGRepresentation(_draft.image, 0.8) withMessage:message twitPicAPIKey:@"264b928f14482c7ad2ec20f35f3ead22"];
                     
                     dispatch_sync(dispatch_get_main_queue(), ^{
                         @autoreleasepool {
@@ -422,7 +424,8 @@
                                 qAlert(@"Image Upload Failed", [NSString stringWithFormat:@"%@",[(NSError *)returnValue localizedDescription]]);
                             } else if ([returnValue isKindOfClass:[NSDictionary class]]) {
                                 NSString *link = ((NSDictionary *)returnValue)[@"url"];
-                                self.replyZone.text = [[self.replyZone.text stringByTrimmingWhitespace]stringByAppendingFormat:@" %@",link];
+                                _replyZone.text = [[_replyZone.text stringByTrimmingWhitespace]stringByAppendingFormat:@" %@",link];
+                                self.isLoadedDraft = NO;
                                 [self kickoffTweetPost];
                             }
                         }
@@ -469,14 +472,14 @@
 - (void)close {
     [_replyZone resignFirstResponder];
     
-    if ([Core.shared draftExists:_loadedDraft]) {
+    if (_isLoadedDraft && [Core.shared draftExists:_draft]) {
         [self dismissViewControllerAnimated:YES completion:nil];
         return;
     }
 
     BOOL isJustMention = ([_replyZone.text componentsSeparatedByString:@" "].count == 1) && (_replyZone.text.length > 0)?[[_replyZone.text substringToIndex:1]isEqualToString:@"@"]:NO;
     
-    if (any(_imageFromCameraRoll != nil, (_replyZone.text.length > 0 && !isJustMention))) {
+    if (any(_draft.image != nil, (_replyZone.text.length > 0 && !isJustMention))) {
         UIActionSheet *as = [[UIActionSheet alloc]initWithTitle:nil completionBlock:^(NSUInteger buttonIndex, UIActionSheet *actionSheet) {
             if (buttonIndex == 1) {
                 [self saveDraft];
@@ -495,6 +498,7 @@
 }
 
 - (void)dealloc {
+    [_replyZone removeObserver:self forKeyPath:@"text"];
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 

@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString * const kTwitterType;
+extern NSString * const kFacebookType;
+
 @interface Draft : NSObject
 
 + (Draft *)draft;
