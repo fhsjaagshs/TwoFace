@@ -61,6 +61,6 @@
     #import "DraftsViewController.h"
     #import "UserSelectorViewController.h"
 
-    #import "InterceptTwitPicLink.h"
+    #import "InterceptImageLink.h"
 
 #endif

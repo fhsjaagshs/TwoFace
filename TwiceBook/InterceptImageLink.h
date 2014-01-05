@@ -8,8 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface InterceptTwitPicLink : UIApplication
-
-//@property (nonatomic, strong) NSMutableDictionary *picTwitterLinks;
+@interface InterceptImageLink : UIApplication
 
 @end

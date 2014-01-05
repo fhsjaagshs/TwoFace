@@ -11,6 +11,6 @@
 int main(int argc, char *argv[])
 {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, @"InterceptTwitPicLink", @"AppDelegate");
+        return UIApplicationMain(argc, argv, @"InterceptImageLink", @"AppDelegate");
     }
 }

@@ -10,6 +10,12 @@
 
 @implementation NSString (mods)
 
+- (BOOL)testRegex:(NSString *)expression {
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:expression options:NSRegularExpressionCaseInsensitive error:nil];
+    NSTextCheckingResult *match = [regex firstMatchInString:self options:0 range:NSMakeRange(0, self.length)];
+    return match != nil;
+}
+
 - (CGSize)sizeWithMaxSize:(CGSize)size font:(UIFont *)font {
     NSAttributedString *attributedText = [[NSAttributedString alloc]initWithString:self attributes:@{ NSFontAttributeName: font }];
     return [attributedText boundingRectWithSize:size options:NSStringDrawingUsesLineFragmentOrigin context:nil].size;

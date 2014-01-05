@@ -13,14 +13,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 
 @interface UserSelectorViewController () <UITableViewDataSource, UITableViewDelegate, UIAlertViewDelegate>
 
-
-
-//
-//
 // TODO: Follow users directly in app
-//
-//
-
 
 @property (nonatomic, strong) UIRefreshControl *refreshControl;
 @property (nonatomic, strong) UITableView *theTableView;

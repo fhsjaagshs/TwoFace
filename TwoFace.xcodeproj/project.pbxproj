@@ -21,7 +21,7 @@
 		9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B4FF41D160FF1FF00563A31 /* PrefsViewController.m */; };
 		9B5DA1C9162CF6410034ABDC /* Checkmark@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */; };
 		9B5EE1F81624EA9000BFC265 /* DraftsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */; };
-		9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */; };
+		9B6DC065161D1073006C2B2F /* InterceptImageLink.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B6DC064161D1073006C2B2F /* InterceptImageLink.m */; };
 		9B7D861015D74DC70085E640 /* UIImage+Scale.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D860F15D74DC70085E640 /* UIImage+Scale.m */; };
 		9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9B7F43F1158E4D4300462D0D /* IntermediateUserSelectorViewController.m */; };
 		9BAFCD6B15971B200087EF45 /* NSString+mods.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BAFCD6A15971B200087EF45 /* NSString+mods.m */; };
@@ -41,6 +41,7 @@
 		F129B66B157B8237005353EB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B66A157B8237005353EB /* main.m */; };
 		F129B66F157B8237005353EB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B66E157B8237005353EB /* AppDelegate.m */; };
 		F129B672157B8237005353EB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F129B671157B8237005353EB /* ViewController.m */; };
+		F135E2551878EF2B00A0C6A9 /* InterceptImageLinkViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F135E2541878EF2B00A0C6A9 /* InterceptImageLinkViewController.m */; };
 		F13964F5175EB9710073EE5E /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = F13964F4175EB9710073EE5E /* Settings.m */; };
 		F1397B27175FDC3E00CC9EDA /* Core.m in Sources */ = {isa = PBXBuildFile; fileRef = F1397B26175FDC3E00CC9EDA /* Core.m */; };
 		F14F91CA185B566B009D0EDE /* UserSelectorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = F14F91C9185B566B009D0EDE /* UserSelectorCell.m */; };
@@ -94,8 +95,8 @@
 		9B5DA1C8162CF6410034ABDC /* Checkmark@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Checkmark@2x.png"; sourceTree = "<group>"; };
 		9B5EE1F51624EA9000BFC265 /* DraftsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DraftsViewController.h; sourceTree = "<group>"; };
 		9B5EE1F61624EA9000BFC265 /* DraftsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DraftsViewController.m; sourceTree = "<group>"; };
-		9B6DC063161D1073006C2B2F /* InterceptTwitPicLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterceptTwitPicLink.h; sourceTree = "<group>"; };
-		9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterceptTwitPicLink.m; sourceTree = "<group>"; };
+		9B6DC063161D1073006C2B2F /* InterceptImageLink.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterceptImageLink.h; sourceTree = "<group>"; };
+		9B6DC064161D1073006C2B2F /* InterceptImageLink.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterceptImageLink.m; sourceTree = "<group>"; };
 		9B7D860E15D74DC70085E640 /* UIImage+Scale.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Scale.h"; sourceTree = "<group>"; };
 		9B7D860F15D74DC70085E640 /* UIImage+Scale.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+Scale.m"; sourceTree = "<group>"; };
 		9B7F43F0158E4D4300462D0D /* IntermediateUserSelectorViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IntermediateUserSelectorViewController.h; sourceTree = "<group>"; };
@@ -129,6 +130,8 @@
 		F129B66E157B8237005353EB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		F129B670157B8237005353EB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		F129B671157B8237005353EB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		F135E2531878EF2B00A0C6A9 /* InterceptImageLinkViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InterceptImageLinkViewController.h; sourceTree = "<group>"; };
+		F135E2541878EF2B00A0C6A9 /* InterceptImageLinkViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InterceptImageLinkViewController.m; sourceTree = "<group>"; };
 		F13964F3175EB9710073EE5E /* Settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		F13964F4175EB9710073EE5E /* Settings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		F1397B25175FDC3E00CC9EDA /* Core.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Core.h; sourceTree = "<group>"; };
@@ -242,8 +245,10 @@
 				F1C8CE63183BFF7700DD2544 /* MBProgressHUD.m */,
 				9B2A621215AF8CEB00C4A426 /* ZoomingImageView.h */,
 				9B2A621315AF8CEB00C4A426 /* ZoomingImageView.m */,
-				9B6DC063161D1073006C2B2F /* InterceptTwitPicLink.h */,
-				9B6DC064161D1073006C2B2F /* InterceptTwitPicLink.m */,
+				9B6DC063161D1073006C2B2F /* InterceptImageLink.h */,
+				9B6DC064161D1073006C2B2F /* InterceptImageLink.m */,
+				F135E2531878EF2B00A0C6A9 /* InterceptImageLinkViewController.h */,
+				F135E2541878EF2B00A0C6A9 /* InterceptImageLinkViewController.m */,
 				F14F91C8185B566B009D0EDE /* UserSelectorCell.h */,
 				F14F91C9185B566B009D0EDE /* UserSelectorCell.m */,
 			);
@@ -513,6 +518,7 @@
 				F129B66F157B8237005353EB /* AppDelegate.m in Sources */,
 				F129B672157B8237005353EB /* ViewController.m in Sources */,
 				F128A1EC157FE5C4001BC156 /* TweetDetailViewController.m in Sources */,
+				F135E2551878EF2B00A0C6A9 /* InterceptImageLinkViewController.m in Sources */,
 				F158D72D15800C1D0061E5A6 /* ReplyViewController.m in Sources */,
 				9B7F43F3158E4D4300462D0D /* IntermediateUserSelectorViewController.m in Sources */,
 				9BAFCD6B15971B200087EF45 /* NSString+mods.m in Sources */,
@@ -533,7 +539,7 @@
 				9B400FE31603EA430050774F /* SyncingViewController.m in Sources */,
 				9B4FF41F160FF1FF00563A31 /* PrefsViewController.m in Sources */,
 				F19D0A45184919A700891122 /* FHSTwitterEngine.m in Sources */,
-				9B6DC065161D1073006C2B2F /* InterceptTwitPicLink.m in Sources */,
+				9B6DC065161D1073006C2B2F /* InterceptImageLink.m in Sources */,
 				9BCEB749162220550048CC43 /* NSArray+RemoveDuplicates.m in Sources */,
 				F1DA26291850CDC500ED0A06 /* FHSFacebook.m in Sources */,
 				9BCEB74D16222AF90048CC43 /* CachesViewController.m in Sources */,

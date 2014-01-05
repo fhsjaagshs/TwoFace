@@ -10,6 +10,7 @@
 
 @interface NSString (mods)
 
+- (BOOL)testRegex:(NSString *)expression;
 - (CGSize)sizeWithMaxSize:(CGSize)size font:(UIFont *)font;
 - (NSString *)stringByRemovingHTMLEntities;
 - (NSString *)stringByCapitalizingFirstLetter;

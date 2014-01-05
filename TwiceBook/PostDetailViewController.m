@@ -7,7 +7,7 @@
 //
 
 #import "PostDetailViewController.h"
-#import "InterceptTwitPicLink.h"
+#import "InterceptImageLink.h"
 #import "FHSTwitterEngine.h"
 
 #define bgViewPadding 33
@@ -62,11 +62,11 @@
     [self.view addSubview:_navBar];
     
     self.displayNameLabel = [[UILabel alloc]initWithFrame:CGRectMake(14, 53, 292, 21)];
-    self.displayNameLabel.textAlignment = NSTextAlignmentCenter;
-    self.displayNameLabel.font = [UIFont boldSystemFontOfSize:17];
-    self.displayNameLabel.backgroundColor = [UIColor clearColor];
-    self.displayNameLabel.text = (toName.length > 0)?[posterName stringByAppendingFormat:@" to %@",toName]:posterName;
-    [self.view addSubview:self.displayNameLabel];
+    _displayNameLabel.textAlignment = NSTextAlignmentCenter;
+    _displayNameLabel.font = [UIFont boldSystemFontOfSize:17];
+    _displayNameLabel.backgroundColor = [UIColor clearColor];
+    _displayNameLabel.text = (toName.length > 0)?[posterName stringByAppendingFormat:@" to %@",toName]:posterName;
+    [self.view addSubview:_displayNameLabel];
     
     self.theImageView = [[UIImageView alloc]initWithFrame:CGRectMake(218, 82, 92, 92)];
     self.theImageView.contentMode = UIViewContentModeScaleAspectFit;
