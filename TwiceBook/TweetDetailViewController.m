@@ -149,7 +149,7 @@
                             @autoreleasepool {
                                 [Settings hideHUD];
                                 if ([returnValue isKindOfClass:[NSError class]]) {
-                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",[returnValue code]]];
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %ld",(long)[returnValue code]]];
                                 }
                             }
                         });
@@ -167,9 +167,9 @@
                                 [Settings hideHUD];
                                 
                                 if ([returnValue isKindOfClass:[NSError class]]) {
-                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %d",[returnValue code]]];
+                                    [Settings showSelfHidingHudWithTitle:[NSString stringWithFormat:@"Error %ld",(long)[returnValue code]]];
                                 } else {
-                                    int index = [Core.shared.timeline indexOfObject:_tweet];
+                                    NSUInteger index = [Core.shared.timeline indexOfObject:_tweet];
                                     if (index != INT_MAX) {
                                         [_tweet setValue:isFavorite?@"false":@"true" forKey:@"favorited"];
                                         Core.shared.timeline[index] = _tweet;

@@ -258,7 +258,7 @@
 		F129B64F157B8237005353EB = {
 			isa = PBXGroup;
 			children = (
-				F129B664157B8237005353EB /* PrimaFacie */,
+				F129B664157B8237005353EB /* TwoFace */,
 				F129B65D157B8237005353EB /* Frameworks */,
 				F129B65B157B8237005353EB /* Products */,
 			);
@@ -291,7 +291,7 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		F129B664157B8237005353EB /* PrimaFacie */ = {
+		F129B664157B8237005353EB /* TwoFace */ = {
 			isa = PBXGroup;
 			children = (
 				F129B66D157B8237005353EB /* AppDelegate.h */,
@@ -325,7 +325,7 @@
 				9B298C6615B62EBE00A7C594 /* Custom Classes */,
 				F129B665157B8237005353EB /* Supporting Files */,
 			);
-			name = PrimaFacie;
+			name = TwoFace;
 			path = TwiceBook;
 			sourceTree = "<group>";
 		};
@@ -467,7 +467,7 @@
 		F129B651157B8237005353EB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0500;
+				LastUpgradeCheck = 0710;
 				ORGANIZATIONNAME = "Nathaniel Symer";
 				TargetAttributes = {
 					F129B659157B8237005353EB = {
@@ -572,12 +572,16 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Corinna Wiedmer-Symer (RT2G2Q9WRP)";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -609,11 +613,14 @@
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_ENTITLEMENTS = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Corinna Wiedmer-Symer";
 				COPY_PHASE_STRIP = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
@@ -651,6 +658,7 @@
 				INFOPLIST_FILE = "TwiceBook/TwoFace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.fhsjaagshs.TwoFace;
 				PRODUCT_NAME = TwoFace;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "89C6FCC5-1F46-4855-9F68-611BBA263564";
@@ -681,6 +689,7 @@
 				INFOPLIST_FILE = "TwiceBook/TwoFace-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.fhsjaagshs.TwoFace;
 				PRODUCT_NAME = TwoFace;
 				PROVISIONING_PROFILE = "";
 				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "03C8377E-FD2B-4172-997E-CD9EB0BF3908";

@@ -332,7 +332,7 @@ id removeNull(id rootObject) {
 }
 
 - (NSString *)base64Encode {
-    int outLength = ((((self.length*4)/3)/4)*4)+(((self.length*4)/3)%4?4:0);
+    int outLength = (int)((((self.length*4)/3)/4)*4)+(((self.length*4)/3)%4?4:0);
     const char *inputBuffer = self.bytes;
     char *outputBuffer = malloc(outLength+1);
     outputBuffer[outLength] = 0;
@@ -1357,7 +1357,7 @@ id removeNull(id rootObject) {
     
     [req setHTTPBody:body];
     
-    [req setValue:[NSString stringWithFormat:@"%d",body.length] forHTTPHeaderField:@"Content-Length"];
+    [req setValue:[NSString stringWithFormat:@"%lu",(unsigned long)body.length] forHTTPHeaderField:@"Content-Length"];
     
     NSError *error = nil;
     NSHTTPURLResponse *response = nil;

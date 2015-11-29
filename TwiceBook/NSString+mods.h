@@ -14,7 +14,7 @@
 - (CGSize)sizeWithMaxSize:(CGSize)size font:(UIFont *)font;
 - (NSString *)stringByRemovingHTMLEntities;
 - (NSString *)stringByCapitalizingFirstLetter;
-- (int)occurencesOfString:(NSString *)string;
+- (NSUInteger)occurencesOfString:(NSString *)string;
 - (BOOL)containsString:(NSString *)otherString;
 - (NSString *)stringByTrimmingExtraInternalSpacing;
 - (NSString *)stringBySanitizingForFilename;

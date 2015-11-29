@@ -83,8 +83,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
-    int section = indexPath.section;
-    int row = indexPath.row;
+    NSUInteger section = indexPath.section;
+    NSUInteger row = indexPath.row;
     
     AppDelegate *ad = [Settings appDelegate];
     

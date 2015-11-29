@@ -76,7 +76,7 @@
     _window.rootViewController = _viewController;
     [_window makeKeyAndVisible];
     
-    [FHSFacebook.shared setAppID:@"314352998657355"];
+    [FHSFacebook.shared setAppID:kFacebookAppID];
     [FHSFacebook.shared setDelegate:self];
     
     [[FHSTwitterEngine sharedEngine]permanentlySetConsumerKey:kOAuthConsumerKey andSecret:kOAuthConsumerSecret];
@@ -98,7 +98,7 @@
     
     [FHSFacebook.shared extendAccessTokenIfNeeded];
     
-    DBSession *session = [[DBSession alloc]initWithAppKey:@"9fxkta36zv81dc6" appSecret:@"6xbgfmggidmb66a" root:kDBRootAppFolder];
+    DBSession *session = [[DBSession alloc]initWithAppKey:kDropboxKey appSecret:kDropboxSecret root:kDBRootAppFolder];
 	session.delegate = self;
 	[DBSession setSharedSession:session];
     return YES;

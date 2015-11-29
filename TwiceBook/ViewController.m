@@ -148,8 +148,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = Core.shared.timeline.count;
-    return (count == 0)?_refreshControl.isRefreshing?0:1:count;
+    return (Core.shared.timeline.count == 0)?_refreshControl.isRefreshing?0:1:Core.shared.timeline.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

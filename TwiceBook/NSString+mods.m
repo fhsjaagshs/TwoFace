@@ -42,8 +42,17 @@
     return [self stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:[[self substringToIndex:1] uppercaseString]];
 }
 
-- (int)occurencesOfString:(NSString *)string {
-    return ([[self stringByReplacingOccurrencesOfString:string withString:@"``"]componentsSeparatedByString:@"``"].count-1);
+- (NSUInteger)occurencesOfString:(NSString *)string {
+    NSUInteger count = 0;
+    NSRange range = NSMakeRange(0, self.length);
+    while(range.location != NSNotFound) {
+        range = [self rangeOfString:string options:0 range:range];
+        if (range.location != NSNotFound) {
+            range = NSMakeRange(range.location+range.length, self.length-(range.location+range.length));
+            count++; 
+        }
+    }
+    return count;
 }
 
 - (BOOL)containsString:(NSString *)otherString {

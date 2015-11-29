@@ -44,8 +44,8 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    int count = _drafts.count;
-    return (count == 0)?@"There are no saved drafts.":[NSString stringWithFormat:@"There %@ %d draft%@.",(count == 1)?@"is":@"are",count,(count == 1)?@"":@"s"];
+    if (_drafts.count == 0) return @"There are no saved drafts.";
+    else return [NSString stringWithFormat:@"There %@ %lu draft%@.",(_drafts.count == 1)?@"is":@"are",(unsigned long)_drafts.count,(_drafts.count == 1)?@"":@"s"];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {

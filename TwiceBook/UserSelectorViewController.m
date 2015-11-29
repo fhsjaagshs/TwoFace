@@ -172,7 +172,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
                 NSError *theError = (NSError *)retIDs;
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     @autoreleasepool {
-                        qAlert([NSString stringWithFormat:@"Error %d",theError.code], theError.localizedDescription);
+                        qAlert([NSString stringWithFormat:@"Error %ld",(long)theError.code], theError.localizedDescription);
                     }
                 });
             } else if ([retIDs isKindOfClass:[NSDictionary class]]) {
@@ -246,7 +246,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (void)updateCounter {
-    _counter.text = [NSString stringWithFormat:@"%d/5",_isFacebook?Settings.selectedFacebookFriends.count:Settings.selectedTwitterUsernames.count];
+    _counter.text = [NSString stringWithFormat:@"%lu/5",(unsigned long)(_isFacebook?Settings.selectedFacebookFriends.count:Settings.selectedTwitterUsernames.count)];
 }
 
 - (void)resetSelectedUsers {
@@ -298,7 +298,7 @@ static NSString * const fqlFriendsOrdered = @"SELECT name,uid,last_name FROM use
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    int count = _isFacebook?_facebookFriends.count:_twitterFriends.count;
+    NSUInteger count = _isFacebook?_facebookFriends.count:_twitterFriends.count;
     return (count > 0)?count:(_refreshControl.isRefreshing?0:1);
 }
 

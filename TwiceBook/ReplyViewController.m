@@ -148,7 +148,7 @@
                 [self dismissViewControllerAnimated:YES completion:nil];
                 
                 if ([ret isKindOfClass:[NSError class]]) {
-                    qAlert([NSString stringWithFormat:@"Error %d",[ret code]], [ret localizedDescription]);
+                    qAlert([NSString stringWithFormat:@"Error %ld",(long)[ret code]], [ret localizedDescription]);
                     [self saveDraft];
                 } else {
                     [self deletePostedDraft];
@@ -264,14 +264,14 @@
 }
 
 - (void)refreshCounter {
-    int charsLeft = 140-(_draft.image?_replyZone.text.length+20:_replyZone.text.length);
+    NSUInteger chars = (_draft.image?_replyZone.text.length+20:_replyZone.text.length);
+
+    _charactersLeft.text = [NSString stringWithFormat:@"%d",140-(int)chars];
     
-    _charactersLeft.text = [NSString stringWithFormat:@"%d",charsLeft];
-    
-    if (charsLeft < 0) {
+    if (chars > 140) {
         _charactersLeft.textColor = [UIColor redColor];
         _navBar.topItem.rightBarButtonItem.enabled = NO;
-    } else if (charsLeft == 140) {
+    } else if (chars == 0) {
         _navBar.topItem.rightBarButtonItem.enabled = NO;
     } else {
         _charactersLeft.textColor = [UIColor blackColor];

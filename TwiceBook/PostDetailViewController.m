@@ -328,7 +328,7 @@
             }
             
             if ([timeline containsObject:_post]) {
-                int index = [timeline indexOfObject:_post];
+                NSUInteger index = [timeline indexOfObject:_post];
                 
                 if (index < INT_MAX) {
                     _post.comments = parsedComments;

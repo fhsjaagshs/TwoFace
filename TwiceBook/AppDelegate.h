@@ -10,6 +10,10 @@
 
 #import <UIKit/UIKit.h>
 
+static NSString *kDropboxSecret = @"";
+static NSString *kDropboxKey = @"";
+static NSString *kFacebookAppID = @"";
+
 @class ViewController;
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>

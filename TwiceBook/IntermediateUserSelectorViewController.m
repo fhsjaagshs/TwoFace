@@ -48,15 +48,15 @@
     if (indexPath.row == 0) {
         cell.textLabel.text = @"Twitter";
         BOOL authorized = [[FHSTwitterEngine sharedEngine]isAuthorized];
-        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[Settings selectedTwitterUsernames]count]]:@"Login Required";
         
         if (!authorized) {
+            cell.detailTextLabel.text = @"Login Required";
             cell.detailTextLabel.textColor = [UIColor redColor];
-        } 
+        } else cell.detailTextLabel.text = [NSString stringWithFormat:@"%lu/5",(unsigned long)[[Settings selectedTwitterUsernames]count]];
     } else if (indexPath.row == 1) {
         cell.textLabel.text = @"Facebook";
         BOOL authorized = FHSFacebook.shared.isSessionValid;
-        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%d/5",[[Settings selectedFacebookFriends]count]]:@"Login Required";
+        cell.detailTextLabel.text = authorized?[NSString stringWithFormat:@"%lu/5",(unsigned long)[[Settings selectedFacebookFriends]count]]:@"Login Required";
         
         if (!authorized) {
             cell.detailTextLabel.textColor = [UIColor redColor];
